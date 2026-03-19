@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MITEC Sign In</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#f4f6f8;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.card{
+  background:#fff;
+  padding:24px;
+  border-radius:16px;
+  width:340px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+
+h3{
+  margin-bottom:16px;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  background:#0b3f6f;
+  color:#fff;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+.status{
+  margin-top:10px;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h3>Sign In</h3>
+
+  <input id="voucher" placeholder="Voucher No">
+
+  <select id="shift">
+    <option value="">Select Shift</option>
+    <option value="0600">06:00</option>
+    <option value="0700">07:00</option>
+    <option value="0800">08:00</option>
+    <option value="1100">11:00</option>
+  </select>
+
+  <select id="dept">
+    <option value="">Select Department</option>
+    <option value="SETUP">SETUP</option>
+    <option value="OPERATION">OPERATION</option>
+    <option value="KIT">KIT</option>
+    <option value="STWD">STWD</option>
+  </select>
+
+  <button onclick="submitSignIn()">Submit</button>
+
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+// get from login
+const docNo = localStorage.getItem("mcl_doc_no");
+
+// block access if not login
+if(!docNo){
+  alert("Please login first");
+  window.location.href = "index.html";
+}
+
+async function submitSignIn(){
+
+  const voucher = document.getElementById("voucher").value;
+  const shift = document.getElementById("shift").value;
+  const dept = document.getElementById("dept").value;
+  const status = document.getElementById("status");
+
+  if(!voucher || !shift || !dept){
+    status.innerText = "Complete all fields";
+    return;
+  }
+
+  status.innerText = "Submitting...";
+
+  try{
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=signIn&doc_no=${docNo}&voucher=${voucher}&shift=${shift}&dept=${dept}`);
+    const data = await res.json();
+
+    if(data.ok){
+      status.innerText = "Sign In recorded";
+
+      // optional: clear form
+      document.getElementById("voucher").value = "";
+      document.getElementById("shift").value = "";
+      document.getElementById("dept").value = "";
+    }else{
+      status.innerText = data.message || "Error";
+    }
+
+  }catch(err){
+    status.innerText = "Connection error";
+  }
+}
+</script>
+
+</body>
+</html>
