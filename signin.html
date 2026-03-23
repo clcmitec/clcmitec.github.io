@@ -146,8 +146,23 @@ async function submitSignIn(){
   status.innerText = "";
 
   try{
-    const res = await fetch(`${APPS_SCRIPT_URL}?action=signIn&doc_no=${docNo}&voucher=${voucher}&shift=${shift}&dept=${dept}`);
-    const data = await res.json();
+
+    const url = `${APPS_SCRIPT_URL}?action=signIn&doc_no=${encodeURIComponent(docNo)}&voucher=${encodeURIComponent(voucher)}&shift=${encodeURIComponent(shift)}&dept=${encodeURIComponent(dept)}`;
+
+    console.log("Request URL:", url);
+
+    const res = await fetch(url);
+
+    const text = await res.text();
+    console.log("Raw response:", text);
+
+    let data;
+
+    try{
+      data = JSON.parse(text);
+    }catch(e){
+      throw new Error("Invalid JSON from server");
+    }
 
     if(data.ok){
       status.innerText = "✅ Sign In recorded";
@@ -162,7 +177,8 @@ async function submitSignIn(){
     }
 
   }catch(err){
-    status.innerText = "❌ Connection error";
+    console.error(err);
+    status.innerText = "❌ Failed: " + err.message;
     status.style.color = "red";
   }
 
