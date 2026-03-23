@@ -12,6 +12,7 @@ body{
   justify-content:center;
   align-items:center;
   height:100vh;
+  margin:0;
 }
 
 .card{
@@ -42,6 +43,11 @@ button{
   color:#fff;
   border-radius:10px;
   font-weight:bold;
+  cursor:pointer;
+}
+
+button:disabled{
+  background:#999;
 }
 
 .status{
@@ -59,54 +65,54 @@ button{
   <input id="voucher" placeholder="Voucher No">
 
   <select id="shift">
-    "<option value="""">Select Shift</option>"
-    "<option value=""0600"">06:00</option>"
-    "<option value=""0700"">07:00</option>"
-    "<option value=""0800"">08:00</option>"
-    "<option value=""0900"">09:00</option>"
-    "<option value=""1000"">10:00</option>"
-    "<option value=""1100"">11:00</option>"
-    "<option value=""1200"">12:00</option>"
-    "<option value=""1300"">13:00</option>"
-    "<option value=""1400"">14:00</option>"
-    "<option value=""1500"">15:00</option>"
-    "<option value=""1600"">16:00</option>"
-    "<option value=""1700"">17:00</option>"
-    "<option value=""1800"">18:00</option>"
-    "<option value=""1900"">19:00</option>"
-    "<option value=""2000"">20:00</option>"
-    "<option value=""2100"">21:00</option>"
-    "<option value=""2200"">22:00</option>"
-    "<option value=""2300"">23:00</option>"
-    "<option value=""2400"">00:00</option>"
-    "<option value=""0100"">01:00</option>"
-    "<option value=""0200"">02:00</option>"
-    "<option value=""0300"">03:00</option>"
-    "<option value=""0400"">04:00</option>"
-    "<option value=""0500"">05:00</option>"
+    <option value="">Select Shift</option>
+    <option value="0600">06:00</option>
+    <option value="0700">07:00</option>
+    <option value="0800">08:00</option>
+    <option value="0900">09:00</option>
+    <option value="1000">10:00</option>
+    <option value="1100">11:00</option>
+    <option value="1200">12:00</option>
+    <option value="1300">13:00</option>
+    <option value="1400">14:00</option>
+    <option value="1500">15:00</option>
+    <option value="1600">16:00</option>
+    <option value="1700">17:00</option>
+    <option value="1800">18:00</option>
+    <option value="1900">19:00</option>
+    <option value="2000">20:00</option>
+    <option value="2100">21:00</option>
+    <option value="2200">22:00</option>
+    <option value="2300">23:00</option>
+    <option value="0000">00:00</option>
+    <option value="0100">01:00</option>
+    <option value="0200">02:00</option>
+    <option value="0300">03:00</option>
+    <option value="0400">04:00</option>
+    <option value="0500">05:00</option>
   </select>
 
   <select id="dept">
     <option value="">Select Department</option>
-    "<option value=""AV"">AV</option>"
-    "<option value=""CAT"">CAT</option>"
-    "<option value=""EXH"">EXH</option>"
-    "<option value=""FIN"">FIN</option>"
-    "<option value=""GCC"">GCC</option>"
-    "<option value=""GS"">GS</option>"
-    "<option value=""HK"">HK</option>"
-    "<option value=""HR"">HR</option>"
-    "<option value=""KIT"">KIT</option>"
-    "<option value=""LINEN"">LINEN</option>"
-    "<option value=""OPERATION"">OPERATION</option>"
-    "<option value=""PUR"">PUR</option>"
-    "<option value=""QA"">QA</option>"
-    "<option value=""SC"">SC</option>"
-    "<option value=""SETUP"">SETUP</option>"
-    "<option value=""STWD"">STWD</option>"
+    <option value="AV">AV</option>
+    <option value="CAT">CAT</option>
+    <option value="EXH">EXH</option>
+    <option value="FIN">FIN</option>
+    <option value="GCC">GCC</option>
+    <option value="GS">GS</option>
+    <option value="HK">HK</option>
+    <option value="HR">HR</option>
+    <option value="KIT">KIT</option>
+    <option value="LINEN">LINEN</option>
+    <option value="OPERATION">OPERATION</option>
+    <option value="PUR">PUR</option>
+    <option value="QA">QA</option>
+    <option value="SC">SC</option>
+    <option value="SETUP">SETUP</option>
+    <option value="STWD">STWD</option>
   </select>
 
-  <button onclick="submitSignIn()">Submit</button>
+  <button id="submitBtn" onclick="submitSignIn()">Submit</button>
 
   <div class="status" id="status"></div>
 </div>
@@ -114,10 +120,8 @@ button{
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
 
-// get from login
 const docNo = localStorage.getItem("mcl_doc_no");
 
-// block access if not login
 if(!docNo){
   alert("Please login first");
   window.location.href = "index.html";
@@ -125,36 +129,45 @@ if(!docNo){
 
 async function submitSignIn(){
 
-  const voucher = document.getElementById("voucher").value;
+  const voucher = document.getElementById("voucher").value.trim();
   const shift = document.getElementById("shift").value;
   const dept = document.getElementById("dept").value;
   const status = document.getElementById("status");
+  const btn = document.getElementById("submitBtn");
 
   if(!voucher || !shift || !dept){
-    status.innerText = "Complete all fields";
+    status.innerText = "⚠️ Complete all fields";
+    status.style.color = "red";
     return;
   }
 
-  status.innerText = "Submitting...";
+  btn.disabled = true;
+  btn.innerText = "Submitting...";
+  status.innerText = "";
 
   try{
     const res = await fetch(`${APPS_SCRIPT_URL}?action=signIn&doc_no=${docNo}&voucher=${voucher}&shift=${shift}&dept=${dept}`);
     const data = await res.json();
 
     if(data.ok){
-      status.innerText = "Sign In recorded";
+      status.innerText = "✅ Sign In recorded";
+      status.style.color = "green";
 
-      // optional: clear form
       document.getElementById("voucher").value = "";
       document.getElementById("shift").value = "";
       document.getElementById("dept").value = "";
     }else{
-      status.innerText = data.message || "Error";
+      status.innerText = "❌ " + (data.message || "Error");
+      status.style.color = "red";
     }
 
   }catch(err){
-    status.innerText = "Connection error";
+    status.innerText = "❌ Connection error";
+    status.style.color = "red";
   }
+
+  btn.disabled = false;
+  btn.innerText = "Submit";
 }
 </script>
 
