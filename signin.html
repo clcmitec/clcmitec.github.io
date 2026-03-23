@@ -151,7 +151,7 @@ async function submitSignIn(){
     const data = await res.json();
 
     if(data.ok){
-      status.innerText = "Sign in recorded";
+      status.innerText = "✅ Sign in recorded";
       status.style.color = "green";
 
       // OPTIONAL: disable button after success
