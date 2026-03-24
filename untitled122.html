@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC Worker Portal</title>
+  <style>
+    body{
+      margin:0;
+      font-family:system-ui, Arial, sans-serif;
+      background:#eef3f8;
+    }
+
+    .hero{
+      margin:20px;
+      padding:60px 20px 600px;
+      border-radius:30px;
+      background:linear-gradient(145deg,#001c45,#002d6e 55%,#0b4ea2);
+      text-align:center;
+    }
+
+    .hero img{
+      width:160px;
+      filter:brightness(0) invert(1);
+    }
+
+    .cardWrap{
+      max-width:357px ;
+            text-align:inline;
+      margin:-580px auto 0;
+    }
+
+    .card{
+      background:#fff;
+      border-radius:26px;
+      padding:24px 20px;
+      box-shadow:
+        0 20px 45px rgba(0,0,0,0.12),
+        0 6px 14px rgba(0,0,0,0.08);
+    }
+
+    h1{
+      font-size:20px;
+      margin:0 0 6px;
+    }
+
+    .sub{
+      font-size:14px;
+      color:#666;
+      margin-bottom:18px;
+      line-height:1.4;
+    }
+
+    label{
+      display:block;
+      font-size:13px;
+      font-weight:600;
+      margin:0 0 6px;
+    }
+
+    input{
+      width:100%;
+      height:48px;
+      border:2px solid #d5dde8;
+      border-radius:14px;
+      padding:0 12px;
+      margin-bottom:14px;
+      font-size:15px;
+      box-sizing:border-box;
+    }
+
+    input:focus{
+      outline:none;
+      border-color:#0b4ea2;
+    }
+
+    button{
+      width:100%;
+      height:50px;
+      border:none;
+      border-radius:999px;
+      font-weight:700;
+      font-size:15px;
+      cursor:pointer;
+    }
+
+    .btnMain{
+      background:linear-gradient(135deg,#0b4ea2,#002d6e);
+      color:#fff;
+    }
+
+    .btnAlt{
+      margin-top:10px;
+      background:#fff;
+      border:1px solid #d5dde8;
+      color:#002d6e;
+    }
+
+    .msg{
+      margin-top:10px;
+      font-size:13px;
+      color:#b42318;
+      text-align:center;
+      min-height:18px;
+    }
+
+    .footer{
+      text-align:center;
+      font-size:12px;
+      color:#888;
+      margin-top:20px;
+      padding-bottom:20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <img src="https://hercules-cdn.com/file_G1cF6VttU3RSj2DksyB2vBX6" alt="MITEC Logo">
+  </div>
+
+  <div class="cardWrap">
+    <div class="card">
+      <h1>Sign in to your worker account</h1>
+      <div class="sub">Use your registered phone number and IC or passport number.</div>
+
+      <label for="phoneInput">Phone number</label>
+      <input id="phoneInput" type="text" inputmode="numeric" placeholder="Example: 60123456789">
+
+      <label for="docInput">IC / Passport number</label>
+      <input id="docInput" type="text" placeholder="Example: 010203145678">
+
+      <button class="btnMain" onclick="handleLogin()">Login</button>
+      <button class="btnAlt" onclick="handleUpdateProfile()">Register/First Time User</button>
+
+      <div id="loginMessage" class="msg"></div>
+    </div>
+
+    <div class="footer">Malaysia International Trade & Exhibition Centre</div>
+  </div>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+    function normalizePhone(value) {
+      let phone = String(value || "").replace(/[^\d]/g, "").trim();
+      if (phone.startsWith("+")) phone = phone.substring(1);
+      return phone;
+    }
+
+    async function handleLogin() {
+      const phone = normalizePhone(document.getElementById("phoneInput").value);
+      const docNo = document.getElementById("docInput").value.trim();
+      const msg = document.getElementById("loginMessage");
+
+      msg.style.color = "#b42318";
+      msg.textContent = "";
+
+      if (!phone || !docNo) {
+        msg.textContent = "Please enter phone and document number.";
+        return;
+      }
+
+      try {
+        const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}&phone=${encodeURIComponent(phone)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data && data.ok && data.exists) {
+          msg.style.color = "#027a48";
+          msg.textContent = "Login successful";
+
+          localStorage.setItem("mitecWorkerRecord", JSON.stringify(data.record || {}));
+
+          setTimeout(() => {
+            window.location.href = "https://clcmitec.github.io/casualmitec/dashboard.html";
+          }, 600);
+        } else {
+          msg.textContent = "No worker record found.";
+        }
+      } catch (err) {
+        msg.textContent = "Server connection failed.";
+      }
+    }
+
+    function handleUpdateProfile() {
+      window.location.href = "129.html";
+    }
+  </script>
+
+</body>
+</html>
