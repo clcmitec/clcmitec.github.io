@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC Casual Labour Dashboard</title>
+  <style>
+    :root{
+      --brand:#0b3f6f;
+      --brand-dark:#072c4d;
+      --gold:#d2a93d;
+      --bg:#f4f6f8;
+      --card:#ffffff;
+      --text:#17212b;
+      --muted:#667085;
+      --line:#e5e7eb;
+      --shadow:0 10px 30px rgba(2,18,34,.10);
+      --shadow-strong:0 16px 40px rgba(2,18,34,.18);
+      --success:#027a48;
+      --danger:#b42318;
+      --max:1180px;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:"Segoe UI",Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.55;
+    }
+    a{text-decoration:none;color:inherit}
+    .container{width:min(var(--max), calc(100% - 32px));margin:auto}
+
+    .topbar{
+      background:linear-gradient(90deg,var(--brand-dark),var(--brand));
+      color:#fff;
+      position:sticky;
+      top:0;
+      z-index:50;
+      box-shadow:var(--shadow);
+    }
+    .topbar-inner{
+      min-height:78px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:14px 0;
+    }
+    .brand-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+    .brand-logo{
+      width:52px;
+      background:#fff;
+      border-radius:12px;
+      padding:4px;
+      flex-shrink:0;
+    }
+    .brand-title{
+      font-size:20px;
+      font-weight:800;
+      line-height:1.1;
+    }
+    .brand-sub{
+      font-size:12px;
+      opacity:.9;
+      margin-top:3px;
+    }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .chip{
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.15);
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:13px;
+      max-width:320px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      border-radius:12px;
+      padding:11px 16px;
+      font-weight:700;
+      transition:.2s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .btn-light{
+      background:#fff;
+      color:var(--brand);
+    }
+    .btn-dark{
+      background:#081521;
+      color:#fff;
+    }
+
+    .hero{padding:24px 0 10px}
+    .hero-box{
+      background:
+        linear-gradient(120deg, rgba(5,31,55,.86), rgba(11,63,111,.62)),
+        url("https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+      border-radius:28px;
+      min-height:280px;
+      box-shadow:var(--shadow-strong);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      overflow:hidden;
+    }
+    .hero-content{
+      padding:30px 26px;
+      max-width:760px;
+    }
+    .hero-kicker{
+      display:inline-block;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:13px;
+      margin-bottom:14px;
+    }
+    .hero h1{
+      font-size:clamp(28px,5vw,44px);
+      line-height:1.08;
+      margin-bottom:10px;
+    }
+    .hero p{
+      font-size:15px;
+      color:rgba(255,255,255,.92);
+      max-width:620px;
+    }
+    .hero-buttons{
+      margin-top:20px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .main{padding:24px 0 42px}
+    .grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:18px;
+    }
+    .stack{
+      display:grid;
+      gap:18px;
+    }
+    .panel{
+      background:var(--card);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+    .panel-title{
+      font-size:22px;
+      color:var(--brand);
+      font-weight:900;
+      margin-bottom:8px;
+    }
+    .panel-copy{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:16px;
+    }
+
+    .status-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+    .status-card{
+      background:#f8fafc;
+      border:1px solid #eef2f6;
+      border-radius:18px;
+      padding:16px;
+    }
+    .status-card strong{
+      display:block;
+      font-size:16px;
+      color:var(--brand-dark);
+      margin-bottom:4px;
+    }
+    .status-card span{
+      display:block;
+      color:#475467;
+      font-size:14px;
+    }
+
+    .action-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+    .action-card{
+      background:#fff;
+      border:1px solid #edf1f5;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      transition:.2s ease;
+      display:block;
+    }
+    .action-card:hover{transform:translateY(-3px)}
+    .icon{
+      width:48px;
+      height:48px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#eef4f9;
+      color:var(--brand);
+      font-size:22px;
+      margin-bottom:12px;
+    }
+    .action-card h3{
+      font-size:18px;
+      color:var(--brand-dark);
+      margin-bottom:6px;
+    }
+    .action-card p{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+    .action-link{
+      color:var(--brand);
+      font-weight:800;
+      font-size:14px;
+    }
+
+    .notice-list{
+      display:grid;
+      gap:10px;
+    }
+    .notice{
+      background:#f8fafc;
+      border:1px solid #eef2f6;
+      border-radius:14px;
+      padding:13px;
+      font-size:14px;
+      color:#475467;
+    }
+
+    .profile-list{
+      display:grid;
+      gap:12px;
+    }
+    .profile-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 0;
+      border-bottom:1px solid var(--line);
+    }
+    .profile-row:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
+    .profile-label{
+      color:var(--muted);
+      font-size:14px;
+    }
+    .profile-value{
+      color:var(--text);
+      font-weight:700;
+      text-align:right;
+      word-break:break-word;
+    }
+
+    .status-msg{
+      margin-top:10px;
+      font-size:14px;
+      min-height:20px;
+    }
+    .status-msg.success{color:var(--success)}
+    .status-msg.error{color:var(--danger)}
+
+    .loading-screen{
+      position:fixed;
+      inset:0;
+      background:rgba(244,246,248,.96);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      flex-direction:column;
+      gap:12px;
+    }
+    .spinner{
+      width:42px;
+      height:42px;
+      border:4px solid #dbe5ef;
+      border-top-color:var(--brand);
+      border-radius:999px;
+      animation:spin .9s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr}
+    }
+    @media (max-width:760px){
+      .topbar-inner{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+      .top-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .status-grid,.action-grid{
+        grid-template-columns:1fr;
+      }
+      .hero-box{min-height:240px}
+      .hero-content{padding:24px 18px}
+      .hero-buttons{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="spinner"></div>
+    <div id="loadingText">Loading profile...</div>
+  </div>
+
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand-wrap">
+        <img src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC Logo" class="brand-logo">
+        <div>
+          <div class="brand-title">MITEC Casual Labour Dashboard</div>
+          <div class="brand-sub">Personal access for bookings, attendance, and forms</div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <div class="chip" id="userChip">Loading account...</div>
+        <a href="index.html" class="btn btn-light">Back to Portal</a>
+        <button class="btn btn-dark" id="logoutBtn" type="button">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-box">
+        <div class="hero-content">
+          <div class="hero-kicker">● Logged-in workspace</div>
+          <h1 id="heroTitle">Welcome to your dashboard.</h1>
+          <p>You may sign in your attendance after getting your voucher from the security.</p>
+          <div class="hero-buttons">
+            <a href="signin.html" class="btn btn-light">⏱ Sign In</a>
+            <a href="signout.html" class="btn btn-light">⏹ Sign Out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="main">
+    <div class="container grid">
+
+      <div class="stack">
+        <section class="panel">
+          <h2 class="panel-title">Profile Picture</h2>
+          <p class="panel-copy">Photo submitted in your application record.</p>
+
+          <div style="display:flex;justify-content:center;">
+            <img
+              id="profilePhotoPreview"
+              src=""
+              alt="Profile Picture"
+              style="
+                width:160px;
+                height:160px;
+                object-fit:cover;
+                border-radius:24px;
+                border:1px solid #e5e7eb;
+                box-shadow:0 10px 24px rgba(2,18,34,.12);
+                background:#f8fafc;
+                display:none;
+              "
+            />
+          </div>
+
+          <div id="profilePhotoEmpty" style="text-align:center;color:#667085;font-size:14px;margin-top:12px;">
+            No profile picture available.
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">My Account</h2>
+          <p class="panel-copy">Basic profile info from your submitted application record.</p>
+
+          <div class="profile-list">
+            <div class="profile-row"><div class="profile-label">Name</div><div class="profile-value" id="profileName">-</div></div>
+            <div class="profile-row"><div class="profile-label">Email</div><div class="profile-value" id="profileEmail">-</div></div>
+            <div class="profile-row"><div class="profile-label">Document No.</div><div class="profile-value" id="profileDocNo">-</div></div>
+            <div class="profile-row"><div class="profile-label">Phone</div><div class="profile-value" id="profilePhone">-</div></div>
+            <div class="profile-row"><div class="profile-label">Document Type</div><div class="profile-value" id="profileDocType">-</div></div>
+            <div class="profile-row"><div class="profile-label">Gender</div><div class="profile-value" id="profileGender">-</div></div>
+            <div class="profile-row"><div class="profile-label">Address</div><div class="profile-value" id="profileAlamat">-</div></div>
+            <div class="profile-row"><div class="profile-label">Marital Status</div><div class="profile-value" id="profileStatusKahwin">-</div></div>
+            <div class="profile-row"><div class="profile-label">Bank</div><div class="profile-value" id="profileBank">-</div></div>
+            <div class="profile-row"><div class="profile-label">Bank Account</div><div class="profile-value" id="profileAccountNo">-</div></div>
+            <div class="profile-row"><div class="profile-label">Account Name</div><div class="profile-value" id="profileAccountName">-</div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Additional Details</h2>
+          <p class="panel-copy">Important submitted details for quick checking.</p>
+
+          <div class="profile-list">
+            <div class="profile-row"><div class="profile-label">Emergency Contact</div><div class="profile-value" id="profileWaris">-</div></div>
+            <div class="profile-row"><div class="profile-label">Relationship</div><div class="profile-value" id="profileHubungan">-</div></div>
+            <div class="profile-row"><div class="profile-label">Emergency No.</div><div class="profile-value" id="profileEmergencyNo">-</div></div>
+            <div class="profile-row"><div class="profile-label">Skills</div><div class="profile-value" id="profileKebolehan">-</div></div>
+            <div class="profile-row"><div class="profile-label">Typhoid</div><div class="profile-value" id="profileTyphoid">-</div></div>
+            <div class="profile-row"><div class="profile-label">Transportation</div><div class="profile-value" id="profileTransport">-</div></div>
+            <div class="profile-row"><div class="profile-label">Medical History</div><div class="profile-value" id="profileSejarah">-</div></div>
+            <div class="profile-row"><div class="profile-label">Medical Details</div><div class="profile-value" id="profileSejarahOther">-</div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Uploaded Records</h2>
+          <p class="panel-copy">Quick access to what was submitted in the application.</p>
+
+          <div class="profile-list">
+            <div class="profile-row"><div class="profile-label">IC Copy</div><div class="profile-value" id="profileIcLink">-</div></div>
+            <div class="profile-row"><div class="profile-label">Photo File</div><div class="profile-value" id="profilePhotoLink">-</div></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="panel">
+          <h2 class="panel-title">Today’s Status</h2>
+          <p class="panel-copy">A quick glance so users stop asking obvious things in five different places.</p>
+
+          <div class="status-grid">
+            <div class="status-card">
+              <strong>Account</strong>
+              <span id="accountStatus">Loading...</span>
+            </div>
+            <div class="status-card">
+              <strong>Attendance</strong>
+              <span id="attendanceStatus">Attendance module linked separately</span>
+            </div>
+            <div class="status-card">
+              <strong>Next Booking</strong>
+              <span id="bookingStatus">Booking module linked separately</span>
+            </div>
+          </div>
+
+          <div class="status-msg" id="statusMsg"></div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Quick Actions</h2>
+          <p class="panel-copy">The main tools people actually came for.</p>
+
+          <div class="action-grid">
+            <a class="action-card" href="https://docs.google.com/forms/d/e/1FAIpQLSdlghgMsBRWFQf8QzOCkJXHhqfDf_KVoM2uZ5EagOe6rSyp9A/viewform" target="_blank" rel="noopener noreferrer">
+              <div class="icon">⏱</div>
+              <h3>Sign In</h3>
+              <p>Record clock-in without wandering around the site like a lost tourist.</p>
+              <span class="action-link">Open →</span>
+            </a>
+
+            <a class="action-card" href="https://docs.google.com/forms/d/e/1FAIpQLSe-Fxc20YfHs13IRq-G2yrLFaNA3BDdTCAnEDEORLcXBGzv3A/viewform" target="_blank" rel="noopener noreferrer">
+              <div class="icon">⏹</div>
+              <h3>Sign Out</h3>
+              <p>Record your clock-out properly so later nobody acts surprised.</p>
+              <span class="action-link">Open →</span>
+            </a>
+
+            <a class="action-card" href="https://lookerstudio.google.com/u/0/reporting/9b8a64f0-2e03-430d-aa29-bdb31989a35e/page/p_azx0l4vt7c" target="_blank" rel="noopener noreferrer">
+              <div class="icon">📊</div>
+              <h3>Attendance Record</h3>
+              <p>View your attendance record and stop relying on memory alone.</p>
+              <span class="action-link">Open →</span>
+            </a>
+
+            <a class="action-card" href="https://clcmitec.github.io/casualmitec-home/" target="_blank" rel="noopener noreferrer">
+              <div class="icon">🗓</div>
+              <h3>My Booking</h3>
+              <p>Check assigned work details and current booking information.</p>
+              <span class="action-link">Open →</span>
+            </a>
+
+            <a class="action-card" href="https://clcmitec.github.io/bank-details/" target="_blank" rel="noopener noreferrer">
+              <div class="icon">✎</div>
+              <h3>Edit My Application</h3>
+              <p>Review or update your submitted registration details if anything changes.</p>
+              <span class="action-link">Open →</span>
+            </a>
+
+            <a class="action-card" href="#" id="formsCard">
+              <div class="icon">🧾</div>
+              <h3>Forms</h3>
+              <p>Replacement voucher and third-party account forms can be plugged here later.</p>
+              <span class="action-link">Pending →</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Important Reminders</h2>
+          <p class="panel-copy">A few things worth not getting wrong.</p>
+
+          <div class="notice-list">
+            <div class="notice">Always check your booking details before reporting for duty.</div>
+            <div class="notice">Incomplete attendance records may affect verification and payment processing.</div>
+            <div class="notice">Ensure submitted forms contain accurate account and personal details.</div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+    const loadingScreen = document.getElementById("loadingScreen");
+    const loadingText = document.getElementById("loadingText");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userChip = document.getElementById("userChip");
+    const heroTitle = document.getElementById("heroTitle");
+    const statusMsg = document.getElementById("statusMsg");
+
+    const accountStatus = document.getElementById("accountStatus");
+    const attendanceStatus = document.getElementById("attendanceStatus");
+    const bookingStatus = document.getElementById("bookingStatus");
+
+    const profilePhotoPreview = document.getElementById("profilePhotoPreview");
+    const profilePhotoEmpty = document.getElementById("profilePhotoEmpty");
+
+    const ids = {
+      profileName: "name_mykad",
+      profileEmail: "email",
+      profileDocNo: "mykad_passport_no",
+      profilePhone: "phone",
+      profileDocType: "doc_type",
+      profileGender: "gender",
+      profileAlamat: "alamat",
+      profileStatusKahwin: "status_perkahwinan",
+      profileBank: "bank",
+      profileAccountNo: "account_no",
+      profileAccountName: "account_name",
+      profileWaris: "nama_waris",
+      profileHubungan: "hubungan",
+      profileEmergencyNo: "emergency_no",
+      profileKebolehan: "kebolehan",
+      profileTyphoid: "typhoid",
+      profileTransport: "transportation",
+      profileSejarah: "sejarah",
+      profileSejarahOther: "sejarah_other"
+    };
+
+    profilePhotoPreview.addEventListener("error", () => {
+      profilePhotoPreview.style.display = "none";
+      profilePhotoEmpty.style.display = "block";
+    });
+
+    function setStatus(message = "", type = "") {
+      statusMsg.textContent = message;
+      statusMsg.className = "status-msg";
+      if (type) statusMsg.classList.add(type);
+    }
+
+    function showLoader(message = "Loading...") {
+      loadingText.textContent = message;
+      loadingScreen.style.display = "flex";
+    }
+
+    function hideLoader() {
+      loadingScreen.style.display = "none";
+    }
+
+    function redirectToLogin() {
+      window.location.href = "index.html";
+    }
+
+    function logoutDashboard() {
+      localStorage.removeItem("mcl_doc_no");
+      redirectToLogin();
+    }
+
+    function getSavedDocNo() {
+      return (localStorage.getItem("mcl_doc_no") || "").trim();
+    }
+
+    function safeValue(value) {
+      if (value === null || value === undefined || value === "") return "-";
+      return String(value);
+    }
+
+    function createFileLink(url, label) {
+      if (!url) return "-";
+      const escapedUrl = String(url).replace(/"/g, "&quot;");
+      return `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" style="color:#0b3f6f;font-weight:700;">${label}</a>`;
+    }
+
+    function fillDashboard(record) {
+      Object.keys(ids).forEach((elementId) => {
+        const el = document.getElementById(elementId);
+        if (el) el.textContent = safeValue(record[ids[elementId]]);
+      });
+
+      const icLinkEl = document.getElementById("profileIcLink");
+      if (icLinkEl) {
+        icLinkEl.innerHTML = record.ic_link
+          ? createFileLink(record.ic_link, "Open IC Copy")
+          : "-";
+      }
+
+      const photoLinkEl = document.getElementById("profilePhotoLink");
+      if (photoLinkEl) {
+        photoLinkEl.innerHTML = record.photo_link
+          ? createFileLink(record.photo_link, "Open Photo")
+          : "-";
+      }
+
+      if (record.photo_link) {
+        profilePhotoPreview.src = record.photo_link;
+        profilePhotoPreview.style.display = "block";
+        profilePhotoEmpty.style.display = "none";
+      } else {
+        profilePhotoPreview.src = "";
+        profilePhotoPreview.style.display = "none";
+        profilePhotoEmpty.style.display = "block";
+      }
+
+      const fullName = safeValue(record.name_mykad);
+      const docNo = safeValue(record.mykad_passport_no);
+
+      userChip.textContent = `${fullName} • ${docNo}`;
+      heroTitle.textContent = `Welcome, ${record.name_mykad || "user"}.`;
+
+      accountStatus.textContent = "Application Found";
+      attendanceStatus.textContent = "Attendance module linked separately";
+      bookingStatus.textContent = "Booking module linked separately";
+
+      setStatus("Profile loaded from Google Sheet.", "success");
+    }
+
+    async function loadDashboardData() {
+      const docNo = getSavedDocNo();
+
+      if (!docNo) {
+        redirectToLogin();
+        return;
+      }
+
+      try {
+        showLoader("Loading profile...");
+        const response = await fetch(`${APPS_SCRIPT_URL}?doc_no=${encodeURIComponent(docNo)}`);
+        const data = await response.json();
+
+        if (!data.ok || !data.record) {
+          hideLoader();
+          setStatus(data.message || "Record not found.", "error");
+          localStorage.removeItem("mcl_doc_no");
+          setTimeout(() => redirectToLogin(), 1500);
+          return;
+        }
+
+        fillDashboard(data.record);
+        hideLoader();
+      } catch (error) {
+        console.error(error);
+        hideLoader();
+        setStatus("Failed to load dashboard data.", "error");
+      }
+    }
+
+    logoutBtn.addEventListener("click", logoutDashboard);
+
+    const formsCard = document.getElementById("formsCard");
+    if (formsCard) {
+      formsCard.addEventListener("click", function(e) {
+        e.preventDefault();
+        setStatus("Forms section is not connected yet.", "error");
+      });
+    }
+
+    loadDashboardData();
+  </script>
+</body>
+</html>
