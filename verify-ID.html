@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC Casual Labour - Verify ID</title>
+  <style>
+    :root{
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --brand:#002d6e;
+      --brand-2:#0b4ea2;
+      --gold:#d4af37;
+      --text:#101828;
+      --muted:#667085;
+      --line:#d0d5dd;
+      --danger:#b42318;
+      --ok:#027a48;
+      --shadow:0 18px 40px rgba(2,45,110,.12);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:420px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .top{
+      background:linear-gradient(180deg,var(--brand),var(--brand-2));
+      color:#fff;
+      padding:28px 24px 22px;
+      text-align:center;
+    }
+
+    .top h1{
+      margin:0;
+      font-size:28px;
+      line-height:1.15;
+    }
+
+    .top p{
+      margin:10px 0 0;
+      font-size:14px;
+      opacity:.95;
+    }
+
+    .body{
+      padding:24px;
+    }
+
+    label{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+      margin:0 0 10px;
+    }
+
+    input{
+      width:100%;
+      height:54px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:0 16px;
+      font-size:16px;
+      outline:none;
+    }
+
+    input:focus{
+      border-color:var(--brand-2);
+      box-shadow:0 0 0 4px rgba(11,78,162,.10);
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .btn{
+      width:100%;
+      height:54px;
+      border:none;
+      border-radius:999px;
+      background:var(--brand);
+      color:#fff;
+      font-size:17px;
+      font-weight:700;
+      cursor:pointer;
+      margin-top:20px;
+    }
+
+    .btn:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+    }
+
+    .ghost{
+      display:block;
+      width:100%;
+      text-align:center;
+      text-decoration:none;
+      margin-top:14px;
+      padding:14px 18px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      color:var(--brand);
+      font-weight:700;
+      background:#fff;
+    }
+
+    .msg{
+      margin-top:16px;
+      font-size:14px;
+      line-height:1.5;
+      text-align:center;
+      min-height:22px;
+    }
+
+    .msg.error{ color:var(--danger); }
+    .msg.ok{ color:var(--ok); }
+
+    .footer{
+      text-align:center;
+      margin-top:16px;
+      font-size:13px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <h1>Verify Your ID</h1>
+        <p>First-time registration check for MITEC Casual Labour</p>
+      </div>
+
+      <div class="body">
+        <label for="docNo">IC / Passport Number</label>
+        <input id="docNo" type="text" placeholder="Example: 010203145678" />
+
+        <div class="hint">
+          Enter your registered identification number to continue. Existing users will be redirected to login.
+        </div>
+
+        <button id="continueBtn" class="btn" type="button">Continue</button>
+        <a class="ghost" href="https://clcmitec.github.io/casualmitec">Back to Login</a>
+
+        <div id="msg" class="msg"></div>
+      </div>
+    </div>
+
+    <div class="footer">MITEC Casual Labour System</div>
+  </div>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+    const LOGIN_URL = "https://clcmitec.github.io/casualmitec";
+    const REGISTER_URL = "https://clcmitec.github.io/casualmitec/129";
+
+    const docNoInput = document.getElementById("docNo");
+    const continueBtn = document.getElementById("continueBtn");
+    const msg = document.getElementById("msg");
+
+    function normalizeDocNo(value){
+      return String(value || "").replace(/[^0-9A-Za-z]/g, "").trim().toUpperCase();
+    }
+
+    function setMessage(text, type){
+      msg.textContent = text || "";
+      msg.className = "msg" + (type ? " " + type : "");
+    }
+
+    async function checkDocOnly(){
+      const docNo = normalizeDocNo(docNoInput.value);
+
+      if(!docNo){
+        setMessage("Please enter your IC or passport number.", "error");
+        docNoInput.focus();
+        return;
+      }
+
+      continueBtn.disabled = true;
+      setMessage("Checking your record...", "");
+
+      try{
+        const url = WEB_APP_URL + "?action=check_doc_only&doc_no=" + encodeURIComponent(docNo);
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if(!data.ok){
+          setMessage(data.message || "Unable to verify your ID at the moment.", "error");
+          continueBtn.disabled = false;
+          return;
+        }
+
+        if(data.exists){
+          setMessage("This ID is already registered. Redirecting to login...", "ok");
+          setTimeout(() => {
+            window.location.href = LOGIN_URL;
+          }, 1200);
+          return;
+        }
+
+        setMessage("ID not found in the system. Redirecting to first-time registration...", "ok");
+        setTimeout(() => {
+          window.location.href = REGISTER_URL + "?doc_no=" + encodeURIComponent(docNo);
+        }, 1200);
+
+      }catch(err){
+        setMessage("Connection error. Please try again.", "error");
+        continueBtn.disabled = false;
+      }
+    }
+
+    continueBtn.addEventListener("click", checkDocOnly);
+
+    docNoInput.addEventListener("keydown", function(e){
+      if(e.key === "Enter"){
+        checkDocOnly();
+      }
+    });
+  </script>
+</body>
+</html>

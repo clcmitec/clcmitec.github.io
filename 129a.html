@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MITEC — Application Form</title>
+
+  <style>
+    :root{
+      --bg:#f4f6f9;
+      --card:#ffffff;
+      --text:#101828;
+      --muted:#55606a;
+      --line:#d9e1ea;
+      --brand:#224289;
+      --brand2:#D4AF37;
+      --danger:#b42318;
+      --ok:#027a48;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:860px;
+      margin:24px auto;
+      padding:0 14px 34px;
+    }
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom:16px;
+    }
+    .logo{
+      width:54px;
+      height:54px;
+      border-radius:14px;
+      background:#fff;
+      display:grid;
+      place-items:center;
+      box-shadow:0 6px 20px rgba(0,0,0,.06);
+      overflow:hidden;
+      flex:0 0 54px;
+    }
+    .logo img{
+      width:44px;
+      height:44px;
+      object-fit:contain;
+    }
+    .toptext h1{
+      margin:0;
+      font-size:20px;
+      line-height:1.2;
+      color:var(--brand);
+    }
+    .toptext p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg,var(--brand),#163366 70%);
+      color:#fff;
+      border-radius:24px;
+      padding:22px 18px;
+      box-shadow:0 12px 28px rgba(34,66,137,.18);
+      margin-bottom:16px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.14);
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      margin-bottom:12px;
+    }
+    .hero h2{
+      margin:0 0 8px;
+      font-size:24px;
+      line-height:1.2;
+    }
+    .hero p{
+      margin:0;
+      color:#e8edf9;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .progressWrap{
+      background:#fff;
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 10px 22px rgba(0,0,0,.06);
+      margin-bottom:16px;
+    }
+    .progressHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:600;
+    }
+    .bar{
+      height:10px;
+      background:#e9eef5;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .bar > span{
+      display:block;
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--brand2),#f0cf69);
+      border-radius:999px;
+      transition:width .28s ease;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:24px;
+      box-shadow:0 12px 28px rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding:20px 18px 0;
+    }
+    .cardHead h3{
+      margin:0;
+      font-size:22px;
+      color:#12223f;
+      line-height:1.2;
+    }
+    .cardHead p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+    .cardBody{
+      padding:18px;
+    }
+
+    .step{display:none}
+    .step.active{display:block}
+
+    .sectionTitle{
+      margin:0 0 8px;
+      font-size:16px;
+      color:#12223f;
+      font-weight:800;
+    }
+    .sectionDesc{
+      margin:0 0 16px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+    @media (min-width:720px){
+      .grid.two{grid-template-columns:1fr 1fr}
+      .grid.three{grid-template-columns:1fr 1fr 1fr}
+    }
+
+    label.req{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      margin:0 0 7px;
+      color:#23324d;
+    }
+    label.req::after{
+      content:" *";
+      color:var(--danger);
+    }
+
+    .field input,
+    .field select,
+    .field textarea{
+      width:100%;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:14px;
+      padding:14px 14px;
+      font-size:15px;
+      color:var(--text);
+      outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    .field textarea{min-height:120px; resize:vertical}
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus{
+      border-color:#93a7d9;
+      box-shadow:0 0 0 4px rgba(34,66,137,.08);
+    }
+    .field input[readonly]{
+      background:#f8fafc;
+      color:#475467;
+      cursor:not-allowed;
+    }
+
+    .hint{
+      display:none;
+      margin-top:7px;
+      color:var(--danger);
+      font-size:12px;
+      line-height:1.45;
+      font-weight:600;
+    }
+    .hint.show{display:block}
+
+    .radioRow{
+      display:grid;
+      gap:10px;
+    }
+    @media (min-width:560px){
+      .radioRow.two{grid-template-columns:1fr 1fr}
+      .radioRow.three{grid-template-columns:1fr 1fr 1fr}
+    }
+    .radioCard{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 14px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      cursor:pointer;
+      background:#fff;
+    }
+    .radioCard input{margin-top:3px}
+    .radioCard b{
+      display:block;
+      font-size:14px;
+      color:#1d2c47;
+      margin-bottom:2px;
+    }
+    .radioCard span{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .fileBox{
+      border:1.5px dashed #cbd7ea;
+      background:#fbfcfe;
+      border-radius:18px;
+      padding:14px;
+    }
+    .fileBox p{
+      margin:0 0 12px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+    .fileList{
+      margin:10px 0 0;
+      padding-left:18px;
+      color:#344054;
+      font-size:13px;
+    }
+
+    .checkRow{
+      display:grid;
+      gap:10px;
+    }
+    .checkItem{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color:#344054;
+      font-size:14px;
+      line-height:1.6;
+    }
+    .checkItem input{
+      margin-top:4px;
+      flex:0 0 auto;
+    }
+
+    .summary{
+      display:grid;
+      gap:10px;
+      background:#fafbff;
+      border:1px solid #e1e8f5;
+      border-radius:18px;
+      padding:14px;
+      font-size:14px;
+      line-height:1.6;
+      color:#22314f;
+    }
+    .summary b{color:#12223f}
+
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:22px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:13px 18px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .btnGhost{
+      background:#eef2f8;
+      color:#23324d;
+    }
+    .btnPrimary{
+      background:var(--brand);
+      color:#fff;
+    }
+    .btnPrimary[disabled]{
+      opacity:.65;
+      cursor:not-allowed;
+    }
+
+    .alert{
+      margin-top:16px;
+      border-radius:16px;
+      padding:12px 14px;
+      font-size:13px;
+      line-height:1.5;
+      display:none;
+      background:#fff4f2;
+      color:#912018;
+      border:1px solid #f3c3bc;
+    }
+    .alert.ok{
+      background:#ecfdf3;
+      color:#05603a;
+      border-color:#abe6c4;
+    }
+
+    .miniNote{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    .footerNote{
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+      margin-top:14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="logo">
+        <img src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC logo">
+      </div>
+      <div class="toptext">
+        <h1>MITEC Casual Labour</h1>
+        <p>First-Time Registration Form</p>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="chip" id="chipStep">Section 1 of 6</div>
+      <h2 id="stepHeading">Application Form</h2>
+      <p id="stepSub">By proceeding, you acknowledge and agree with the statements below.</p>
+    </section>
+
+    <section class="progressWrap">
+      <div class="progressHead">
+        <span>Completion Progress</span>
+        <span id="metaRight">0%</span>
+      </div>
+      <div class="bar"><span id="bar"></span></div>
+    </section>
+
+    <section class="card">
+      <div class="cardHead">
+        <h3>Worker Information Submission</h3>
+        <p>Please complete all required sections carefully. This page is intended for first-time registration only.</p>
+      </div>
+
+      <div class="cardBody">
+        <form id="appForm" novalidate>
+          <input type="hidden" name="form_mode" id="formMode" value="create">
+          <input type="hidden" name="existing_row" id="existingRow" value="">
+
+          <!-- STEP 0 -->
+          <section class="step active" data-title="Application Form" data-sub="By proceeding, you acknowledge and agree with the statements below.">
+            <div class="sectionTitle">Privacy & Confidentiality</div>
+            <p class="sectionDesc">By proceeding with this form, you acknowledge and agree that:</p>
+
+            <div class="fileBox" style="border-style:solid">
+              <p class="sectionDesc" style="margin:0">
+                <b>All submitted information is Private &amp; Confidential (P&amp;C)</b>, accessible only to authorized personnel for attendance, coordination, and administrative purposes under MITEC.
+                <br><br>
+                Your data may be stored and processed using Google Workspace services (e.g., Google Sheets/Drive) in line with Google’s security and privacy standards.
+                <br><br>
+                You confirm that all information provided is accurate and you consent to its use for legitimate purposes related to casual employment at MITEC.
+                <br><br>
+                Any misuse, unauthorized access, or data tampering may result in access restriction, disciplinary action, or legal consequences.
+              </p>
+            </div>
+
+            <label class="req">Proceed</label>
+            <div class="checkRow">
+              <label class="checkItem">
+                <input type="checkbox" id="agreeProceed" required>
+                I understand and agree to proceed with this first-time registration form.
+              </label>
+            </div>
+
+            <div class="nav">
+              <span></span>
+              <button type="button" class="btn btnPrimary nextBtn">Next</button>
+            </div>
+          </section>
+
+          <!-- STEP 1 -->
+          <section class="step" data-title="Personal Information" data-sub="Enter your identity and contact details exactly as required.">
+            <div class="sectionTitle">Personal Details</div>
+            <p class="sectionDesc">Please ensure your identity information matches your official document.</p>
+
+            <div class="grid two">
+              <div class="field">
+                <label class="req">Full Name (as per document)</label>
+                <input type="text" name="name_mykad" id="nameMykad" required autocomplete="name" placeholder="Enter your full name">
+                <div class="hint">Please enter your full name.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Phone Number</label>
+                <input type="tel" name="phone" id="phoneNumber" required inputmode="numeric" placeholder="60123456789">
+                <div class="hint">Enter a valid mobile number starting with 601.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Email Address</label>
+                <input type="email" name="email" id="email" required autocomplete="email" placeholder="Enter your email address">
+                <div class="hint">Please enter a valid email address.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Document Type</label>
+                <div class="radioRow two">
+                  <label class="radioCard">
+                    <input type="radio" name="doc_type" value="MYKAD" required checked>
+                    <span><b>MyKAD</b>Malaysian identification card</span>
+                  </label>
+                  <label class="radioCard">
+                    <input type="radio" name="doc_type" value="PASSPORT" required>
+                    <span><b>Passport</b>International passport number</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="req">Document Number</label>
+                <input type="text" name="mykad_passport_no" id="docNumber" required autocomplete="off" inputmode="text" placeholder="MyKAD: 12 digits (e.g., 010203145678)" readonly>
+                <div class="hint" id="docHint">MyKAD number must be exactly 12 digits, no dash.</div>
+              </div>
+
+              <div class="field" style="grid-column:1/-1;">
+                <label class="req">Home Address</label>
+                <textarea name="alamat" id="alamat" required placeholder="Enter your full address"></textarea>
+                <div class="hint">Please enter your address.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <button type="button" class="btn btnGhost prevBtn">Back</button>
+              <button type="button" class="btn btnPrimary nextBtn">Next</button>
+            </div>
+          </section>
+
+          <!-- STEP 2 -->
+          <section class="step" data-title="Personal Status & Emergency Contact" data-sub="Provide your personal profile and emergency contact information.">
+            <div class="sectionTitle">Personal Profile</div>
+
+            <div class="grid two">
+              <div class="field">
+                <label class="req">Gender</label>
+                <div class="radioRow two">
+                  <label class="radioCard">
+                    <input type="radio" name="gender" value="MALE" required>
+                    <span><b>Male</b></span>
+                  </label>
+                  <label class="radioCard">
+                    <input type="radio" name="gender" value="FEMALE" required>
+                    <span><b>Female</b></span>
+                  </label>
+                </div>
+                <div class="hint">Please select your gender.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Marital Status</label>
+                <div class="radioRow two">
+                  <label class="radioCard">
+                    <input type="radio" name="status_perkahwinan" value="SINGLE" required>
+                    <span><b>Single</b></span>
+                  </label>
+                  <label class="radioCard">
+                    <input type="radio" name="status_perkahwinan" value="MARRIED" required>
+                    <span><b>Married</b></span>
+                  </label>
+                </div>
+                <div class="hint">Please select your marital status.</div>
+              </div>
+            </div>
+
+            <div class="sectionTitle" style="margin-top:18px;">Emergency Contact</div>
+
+            <div class="grid two">
+              <div class="field">
+                <label class="req">Emergency Contact Name</label>
+                <input type="text" name="nama_waris" id="namaWaris" required placeholder="Enter emergency contact name">
+                <div class="hint">Please enter the emergency contact name.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Relationship</label>
+                <input type="text" name="hubungan" id="hubungan" required placeholder="Example: Mother, Brother">
+                <div class="hint">Please enter the relationship.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Emergency Contact Number</label>
+                <input type="tel" name="emergency_no" id="emergencyNumber" required inputmode="numeric" placeholder="60123456789">
+                <div class="hint">Enter a valid emergency contact number starting with 601.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <button type="button" class="btn btnGhost prevBtn">Back</button>
+              <button type="button" class="btn btnPrimary nextBtn">Next</button>
+            </div>
+          </section>
+
+          <!-- STEP 3 -->
+          <section class="step" data-title="Work Profile" data-sub="Provide the information required for work suitability and health-related declaration.">
+            <div class="sectionTitle">Work Profile</div>
+
+            <div class="grid two">
+              <div class="field">
+                <label class="req">Ability / Skill</label>
+                <input type="text" name="kebolehan" id="kebolehan" required placeholder="Example: Banquet service, ushering">
+                <div class="hint">Please state your relevant ability or skill.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Typhoid Injection</label>
+                <div class="radioRow two">
+                  <label class="radioCard">
+                    <input type="radio" name="typhoid" value="YES" required>
+                    <span><b>Yes</b></span>
+                  </label>
+                  <label class="radioCard">
+                    <input type="radio" name="typhoid" value="NO" required>
+                    <span><b>No</b></span>
+                  </label>
+                </div>
+                <div class="hint">Please select your typhoid status.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Transportation</label>
+                <div class="radioRow two">
+                  <label class="radioCard">
+                    <input type="radio" name="transportation" value="OWN" required>
+                    <span><b>Own Transport</b></span>
+                  </label>
+                  <label class="radioCard">
+                    <input type="radio" name="transportation" value="PUBLIC" required>
+                    <span><b>Public Transport</b></span>
+                  </label>
+                </div>
+                <div class="hint">Please select your transportation type.</div>
+              </div>
+
+              <div class="field" style="grid-column:1/-1;">
+                <label class="req">Medical / History Declaration</label>
+                <div class="radioRow three">
+                  <label class="radioCard">
+                    <input type="radio" name="sejarah" value="NONE" required>
+                    <span><b>None</b>No known condition</span>
+                  </label>
+                  <label class="radioCard">
+                    <input type="radio" name="sejarah" value="YES" required>
+                    <span><b>Yes</b>Relevant history declared</span>
+                  </label>
+                  <label class="radioCard">
+                    <input type="radio" name="sejarah" value="OTHER" required>
+                    <span><b>Other</b>Specify details below</span>
+                  </label>
+                </div>
+                <div class="hint">Please select one option.</div>
+              </div>
+
+              <div class="field" id="sejarahOtherWrap" style="display:none; grid-column:1/-1;">
+                <label class="req">If Other, Please Specify</label>
+                <textarea name="sejarah_other" id="sejarahOther" placeholder="State your details here"></textarea>
+                <div class="hint">Please specify your declaration.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <button type="button" class="btn btnGhost prevBtn">Back</button>
+              <button type="button" class="btn btnPrimary nextBtn">Next</button>
+            </div>
+          </section>
+
+          
+          <!-- STEP 4 -->
+          <section class="step" data-title="Banking Information" data-sub="Provide your bank details accurately for payment purposes.">
+            <div class="sectionTitle">Banking Information</div>
+
+            <div class="grid two">
+              <div class="field">
+                <label class="req">Bank Name</label>
+                <input type="text" name="bank" id="bank" required placeholder="Enter bank name">
+                <div class="hint">Please enter your bank name.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Account Number</label>
+                <input type="text" name="account_no" id="accountNo" required inputmode="numeric" placeholder="Enter account number">
+                <div class="hint">Account number must contain digits only.</div>
+              </div>
+
+              <div class="field" style="grid-column:1/-1;">
+                <label class="req">Account Holder Name</label>
+                <input type="text" name="account_name" id="accountName" required placeholder="Enter account holder name">
+                <div class="hint">Please enter the account holder name.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <button type="button" class="btn btnGhost prevBtn">Back</button>
+              <button type="button" class="btn btnPrimary nextBtn">Next</button>
+            </div>
+          </section>
+
+          <!-- STEP 5 -->
+          <section class="step" data-title="Document Upload" data-sub="Upload the required supporting files clearly and accurately.">
+            <div class="sectionTitle">Supporting Documents</div>
+
+            <div class="grid two">
+              <div class="field">
+                <label class="req">IC / Passport Copy</label>
+                <div class="fileBox">
+                  <p>Upload a clear copy of your MyKAD or passport. Make sure the information is readable.</p>
+                  <input type="file" id="icCopy" accept="image/*,.pdf" required>
+                  <ul id="icList" class="fileList"></ul>
+                </div>
+                <div class="hint">Please upload your IC / passport copy.</div>
+              </div>
+
+              <div class="field">
+                <label class="req">Photo</label>
+                <div class="fileBox">
+                  <p>Upload a clear recent photo of yourself.</p>
+                  <input type="file" id="gambar" accept="image/*" required>
+                  <ul id="gambarList" class="fileList"></ul>
+                </div>
+                <div class="hint">Please upload your photo.</div>
+              </div>
+            </div>
+
+            <div class="sectionTitle" style="margin-top:18px;">Declaration</div>
+
+            <div class="checkRow">
+              <label class="checkItem">
+                <input type="checkbox" id="declareTrue" required>
+                I confirm that all information provided in this form is true, accurate, and complete.
+              </label>
+              <label class="checkItem">
+                <input type="checkbox" id="declareConsent" required>
+                I consent to MITEC processing my submitted information for legitimate administrative and operational purposes.
+              </label>
+              <label class="checkItem">
+                <input type="checkbox" id="declareMode" required>
+                I understand that this page is intended for first-time registration only, and existing users should use the login page.
+              </label>
+            </div>
+
+            <div class="nav">
+              <button type="button" class="btn btnGhost prevBtn">Back</button>
+              <button type="button" class="btn btnPrimary nextBtn">Review Submission</button>
+            </div>
+          </section>
+
+          <!-- STEP 6 -->
+          <section class="step" data-title="Review & Submit" data-sub="Please review your information carefully before submitting.">
+            <div class="sectionTitle">Submission Summary</div>
+            <div id="summaryBox" class="summary"></div>
+
+            <div id="submitStatusBox" class="alert"></div>
+
+            <div class="nav">
+              <button type="button" class="btn btnGhost prevBtn">Back</button>
+              <button type="submit" id="submitBtn" class="btn btnPrimary">Submit Form</button>
+            </div>
+          </section>
+        </form>
+      </div>
+    </section>
+
+    <div class="footerNote">
+      MITEC Casual Labour Attendance System, Human Resources Department.
+    </div>
+  </div>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+    const form = document.getElementById("appForm");
+    const steps = Array.from(document.querySelectorAll(".step"));
+    const stepHeading = document.getElementById("stepHeading");
+    const stepSub = document.getElementById("stepSub");
+    const chipStep = document.getElementById("chipStep");
+    const bar = document.getElementById("bar");
+    const metaRight = document.getElementById("metaRight");
+    const submitBtn = document.getElementById("submitBtn");
+    const submitStatusBox = document.getElementById("submitStatusBox");
+    const formMode = document.getElementById("formMode");
+    const existingRow = document.getElementById("existingRow");
+
+    let current = 0;
+
+    function updateHeader() {
+      const step = steps[current];
+      stepHeading.textContent = step.dataset.title || "Application Form";
+      stepSub.textContent = step.dataset.sub || "Please complete all required fields.";
+
+      const sectionNo = current + 1;
+      chipStep.textContent = `Section ${sectionNo} of ${steps.length}`;
+      const pct = Math.round((sectionNo / steps.length) * 100);
+      bar.style.width = pct + "%";
+      metaRight.textContent = pct + "%";
+    }
+
+    function showStep(index) {
+      steps.forEach((step, i) => {
+        step.classList.toggle("active", i === index);
+      });
+      current = index;
+      updateHeader();
+      if (current === steps.length - 1) buildSummary();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showHint(el, show = true) {
+      if (!el) return;
+      el.classList.toggle("show", show);
+    }
+
+    function clearHints(step) {
+      step.querySelectorAll(".hint").forEach(h => h.classList.remove("show"));
+    }
+
+    function normalizeDigitsOnly(value) {
+      return String(value || "").replace(/[^\d]/g, "");
+    }
+
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name) || "";
+    }
+
+    function preloadDocNoFromUrl() {
+      const docNo = getQueryParam("doc_no").trim();
+      if (!docNo) return;
+
+      const cleanDoc = docNo.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
+      const docField = document.getElementById("docNumber");
+
+      if (docField) {
+        docField.value = cleanDoc;
+        docField.readOnly = true;
+      }
+    }
+
+    function updateDocTypeUI(value) {
+      const docHint = document.getElementById("docHint");
+      const docNumber = document.getElementById("docNumber");
+
+      if (value === "PASSPORT") {
+        docHint.textContent = "Please enter your passport number.";
+        docNumber.placeholder = "Passport number";
+      } else {
+        docHint.textContent = "MyKAD number must be exactly 12 digits, no dash.";
+        docNumber.placeholder = "MyKAD: 12 digits (e.g., 010203145678)";
+      }
+    }
+
+    function validateStep(index) {
+      const step = steps[index];
+      let ok = true;
+      clearHints(step);
+
+      if (index === 0) {
+        return document.getElementById("agreeProceed").checked;
+      }
+
+      const requiredFields = step.querySelectorAll("[required]");
+      requiredFields.forEach(field => {
+        if (field.type === "radio" || field.type === "checkbox") return;
+
+        const hint = field.parentElement?.querySelector(".hint") || field.nextElementSibling;
+
+        if (field.type === "file") {
+          if (!field.files || !field.files.length) {
+            ok = false;
+            showHint(hint, true);
+          }
+          return;
+        }
+
+        if (!String(field.value || "").trim()) {
+          ok = false;
+          showHint(hint, true);
+        }
+      });
+
+      const radioGroups = new Set();
+      step.querySelectorAll('input[type="radio"][required]').forEach(r => radioGroups.add(r.name));
+      radioGroups.forEach(name => {
+        const selected = step.querySelector(`input[name="${name}"]:checked`);
+        const group = step.querySelector(`input[name="${name}"]`);
+        const hint = group?.closest(".radioRow")?.nextElementSibling;
+        if (!selected) {
+          ok = false;
+          if (hint && hint.classList.contains("hint")) hint.classList.add("show");
+        }
+      });
+
+      if (index === 1) {
+        const email = document.getElementById("email");
+        const phone = document.getElementById("phoneNumber");
+        const docType = document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD";
+        const docNo = document.getElementById("docNumber");
+
+        if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+          ok = false;
+          showHint(email.nextElementSibling, true);
+        }
+
+        if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(phone.value))) {
+          ok = false;
+          showHint(phone.nextElementSibling, true);
+        }
+
+        if (docType === "MYKAD" && !/^\d{12}$/.test((docNo.value || "").trim())) {
+          ok = false;
+          showHint(document.getElementById("docHint"), true);
+        }
+
+        if (docType === "PASSPORT" && !String(docNo.value || "").trim()) {
+          ok = false;
+          showHint(document.getElementById("docHint"), true);
+        }
+      }
+
+      if (index === 2) {
+        const emergencyNo = document.getElementById("emergencyNumber");
+        if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(emergencyNo.value))) {
+          ok = false;
+          showHint(emergencyNo.nextElementSibling, true);
+        }
+      }
+
+      if (index === 3) {
+        const sejarahValue = document.querySelector('input[name="sejarah"]:checked')?.value || "";
+        const sejarahOther = document.getElementById("sejarahOther");
+        if (sejarahValue === "OTHER" && !String(sejarahOther.value || "").trim()) {
+          ok = false;
+          showHint(sejarahOther.nextElementSibling, true);
+        }
+      }
+
+      if (index === 4) {
+        const accountNo = document.getElementById("accountNo");
+        if (!/^\d+$/.test((accountNo.value || "").trim())) {
+          ok = false;
+          showHint(accountNo.nextElementSibling, true);
+        }
+      }
+
+      if (index === 5) {
+        ["declareTrue", "declareConsent", "declareMode"].forEach(id => {
+          if (!document.getElementById(id).checked) ok = false;
+        });
+      }
+
+      return ok;
+    }
+
+    document.querySelectorAll(".nextBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (current === 0) {
+          if (!validateStep(0)) return;
+          showStep(current + 1);
+          return;
+        }
+
+        if (!validateStep(current)) return;
+        if (current < steps.length - 1) showStep(current + 1);
+      });
+    });
+
+    document.querySelectorAll(".prevBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (current > 0) showStep(current - 1);
+      });
+    });
+
+    document.querySelectorAll('input[name="doc_type"]').forEach(radio => {
+      radio.addEventListener("change", () => updateDocTypeUI(radio.value));
+    });
+
+    document.querySelectorAll('input[name="sejarah"]').forEach(radio => {
+      radio.addEventListener("change", () => {
+        const wrap = document.getElementById("sejarahOtherWrap");
+        const otherInput = document.getElementById("sejarahOther");
+
+        if (radio.value === "OTHER" && radio.checked) {
+          wrap.style.display = "block";
+          otherInput.setAttribute("required", "required");
+        } else if (radio.checked) {
+          wrap.style.display = "none";
+          otherInput.removeAttribute("required");
+          otherInput.value = "";
+        }
+      });
+    });
+
+    ["phoneNumber", "emergencyNumber", "accountNo"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("input", () => {
+        el.value = el.value.replace(/[^\d]/g, "");
+      });
+    });
+
+    ["nameMykad", "namaWaris", "hubungan", "accountName"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("input", () => {
+        el.value = el.value.toUpperCase();
+      });
+    });
+
+    function updateFileList(inputId, listId) {
+      const input = document.getElementById(inputId);
+      const list = document.getElementById(listId);
+      if (!input || !list) return;
+
+      input.addEventListener("change", () => {
+        list.innerHTML = "";
+        Array.from(input.files || []).forEach(file => {
+          const li = document.createElement("li");
+          li.textContent = file.name;
+          list.appendChild(li);
+        });
+      });
+    }
+
+    updateFileList("icCopy", "icList");
+    updateFileList("gambar", "gambarList");
+
+    function safeVal(id) {
+      return (document.getElementById(id)?.value || "").trim();
+    }
+
+    function checkedText(name) {
+      return document.querySelector(`input[name="${name}"]:checked`)?.value || "-";
+    }
+
+    function buildSummary() {
+      const summaryBox = document.getElementById("summaryBox");
+      summaryBox.innerHTML = `
+        <div><b>Application Type:</b> First-Time Registration</div>
+        <div><b>Full Name:</b> ${safeVal("nameMykad") || "-"}</div>
+        <div><b>Phone Number:</b> ${safeVal("phoneNumber") || "-"}</div>
+        <div><b>Email:</b> ${safeVal("email") || "-"}</div>
+        <div><b>Document Type:</b> ${checkedText("doc_type")}</div>
+        <div><b>Document Number:</b> ${safeVal("docNumber") || "-"}</div>
+        <div><b>Address:</b> ${safeVal("alamat") || "-"}</div>
+        <div><b>Gender:</b> ${checkedText("gender")}</div>
+        <div><b>Marital Status:</b> ${checkedText("status_perkahwinan")}</div>
+        <div><b>Emergency Contact:</b> ${safeVal("namaWaris") || "-"} (${safeVal("hubungan") || "-"}) - ${safeVal("emergencyNumber") || "-"}</div>
+        <div><b>Ability / Skill:</b> ${safeVal("kebolehan") || "-"}</div>
+        <div><b>Typhoid:</b> ${checkedText("typhoid")}</div>
+        <div><b>Transportation:</b> ${checkedText("transportation")}</div>
+        <div><b>Medical / History:</b> ${checkedText("sejarah")} ${safeVal("sejarahOther") ? " - " + safeVal("sejarahOther") : ""}</div>
+        <div><b>Bank:</b> ${safeVal("bank") || "-"}</div>
+        <div><b>Account Number:</b> ${safeVal("accountNo") || "-"}</div>
+        <div><b>Account Holder:</b> ${safeVal("accountName") || "-"}</div>
+      `;
+    }
+
+    function showSubmitMessage(message, ok = false) {
+      submitStatusBox.style.display = "block";
+      submitStatusBox.textContent = message;
+      submitStatusBox.className = ok ? "alert ok" : "alert";
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      if (!validateStep(5)) {
+        showSubmitMessage("Please complete all required declarations before submitting.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      try {
+        const icFile = document.getElementById("icCopy").files[0];
+        const photoFile = document.getElementById("gambar").files[0];
+
+        const payload = {
+          form_mode: "create",
+          existing_row: "",
+          name_mykad: safeVal("nameMykad"),
+          phone: safeVal("phoneNumber"),
+          email: safeVal("email"),
+          doc_type: checkedText("doc_type"),
+          mykad_passport_no: safeVal("docNumber"),
+          alamat: safeVal("alamat"),
+          gender: checkedText("gender"),
+          status_perkahwinan: checkedText("status_perkahwinan"),
+          nama_waris: safeVal("namaWaris"),
+          hubungan: safeVal("hubungan"),
+          emergency_no: safeVal("emergencyNumber"),
+          kebolehan: safeVal("kebolehan"),
+          typhoid: checkedText("typhoid"),
+          transportation: checkedText("transportation"),
+          sejarah: checkedText("sejarah"),
+          sejarah_other: safeVal("sejarahOther"),
+          bank: safeVal("bank"),
+          account_no: safeVal("accountNo"),
+          account_name: safeVal("accountName")
+        };
+
+        if (icFile) {
+          payload.ic_copy_base64 = await fileToBase64(icFile);
+          payload.ic_copy_filename = icFile.name;
+        }
+
+        if (photoFile) {
+          payload.gambar_base64 = await fileToBase64(photoFile);
+          payload.gambar_filename = photoFile.name;
+        }
+
+        const response = await fetch(WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.ok) {
+          showSubmitMessage(result.message || "Record submitted successfully.", true);
+          form.reset();
+          document.getElementById("icList").innerHTML = "";
+          document.getElementById("gambarList").innerHTML = "";
+          document.getElementById("sejarahOtherWrap").style.display = "none";
+          updateDocTypeUI("MYKAD");
+          preloadDocNoFromUrl();
+          formMode.value = "create";
+          existingRow.value = "";
+          submitBtn.textContent = "Submit Form";
+          showStep(0);
+          return;
+        }
+
+        showSubmitMessage(result.message || "Submission failed.");
+      } catch (error) {
+        console.error(error);
+        showSubmitMessage("Unable to submit the form. Please try again.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Form";
+      }
+    });
+
+    updateHeader();
+    updateDocTypeUI("MYKAD");
+    preloadDocNoFromUrl();
+    formMode.value = "create";
+    existingRow.value = "";
+    submitBtn.textContent = "Submit Form";
+  </script>
+</body>
+</html>
+       
