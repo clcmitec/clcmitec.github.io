@@ -574,12 +574,25 @@
   </nav>
 
   <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
     function getStoredWorker() {
       try {
         return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       } catch (e) {
         return {};
       }
+    }
+
+    function normalizePhone(value) {
+      return String(value || "").replace(/[^\d]/g, "").trim();
+    }
+
+    function normalizeDocNo(value) {
+      return String(value || "")
+        .replace(/[^0-9A-Za-z]/g, "")
+        .trim()
+        .toUpperCase();
     }
 
     function formatHeroName(name) {
@@ -606,13 +619,13 @@
 
     function getImageFromWorker(worker) {
       const possibleFields = [
+        "photo_link",
         "photo",
         "photo_url",
         "image",
         "image_url",
         "profile_photo",
         "photoLink",
-        "photo_link",
         "picture",
         "img",
         "worker_photo",
@@ -631,10 +644,11 @@
       return "";
     }
 
-    function fillWorkerData() {
-      const worker = getStoredWorker();
+    function fillWorkerData(workerParam) {
+      const worker = workerParam || getStoredWorker();
 
       const name =
+        worker.name_mykad ||
         worker.name ||
         worker.full_name ||
         worker.worker_name ||
@@ -649,19 +663,20 @@
         "Department not available";
 
       const phone =
-        localStorage.getItem("mcl_phone") ||
         worker.phone ||
         worker.phone_no ||
         worker.Phone ||
+        localStorage.getItem("mcl_phone") ||
         "-";
 
       const doc =
-        localStorage.getItem("mcl_doc_no") ||
+        worker.mykad_passport_no ||
         worker.doc_no ||
         worker.ic ||
         worker.passport ||
         worker["IC / Passport"] ||
         worker["IC"] ||
+        localStorage.getItem("mcl_doc_no") ||
         "-";
 
       const email =
@@ -680,11 +695,14 @@
       document.getElementById("workerEmail").textContent = email;
 
       if (headerImg) {
+        headerImg.classList.remove("loaded");
+
         headerImg.onload = function() {
           headerImg.classList.add("loaded");
         };
 
         headerImg.onerror = function() {
+          headerImg.onerror = null;
           headerImg.src =
             "https://ui-avatars.com/api/?name=" +
             encodeURIComponent(name) +
@@ -715,13 +733,39 @@
       window.location.href = "index.html";
     }
 
-    function checkLogin() {
+    async function checkLogin() {
       const workerData = localStorage.getItem("mitecWorkerRecord");
-      if (!workerData) {
+
+      if (workerData) {
+        fillWorkerData();
+        return;
+      }
+
+      const docNo = normalizeDocNo(localStorage.getItem("mcl_doc_no"));
+      const phone = normalizePhone(localStorage.getItem("mcl_phone"));
+
+      if (!docNo || !phone) {
         window.location.href = "index.html";
         return;
       }
-      fillWorkerData();
+
+      try {
+        const url =
+          `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}&phone=${encodeURIComponent(phone)}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data && data.ok && data.exists && data.record) {
+          localStorage.setItem("mitecWorkerRecord", JSON.stringify(data.record));
+          fillWorkerData(data.record);
+        } else {
+          window.location.href = "index.html";
+        }
+      } catch (err) {
+        console.error(err);
+        window.location.href = "index.html";
+      }
     }
 
     window.addEventListener("load", checkLogin);
