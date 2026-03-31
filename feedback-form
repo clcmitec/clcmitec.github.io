@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Feedback Form</title>
+<style>
+/* BODY & CONTAINER */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #f0f2f5, #d9e2ec);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+}
+.container {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 480px;
+  transform: translateY(-50px);
+  opacity: 0;
+  animation: slideFadeIn 0.8s forwards;
+}
+@keyframes slideFadeIn {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* HEADINGS */
+h2 {
+  margin-top: 0;
+  font-size: 26px;
+  text-align: center;
+  color: #203a43;
+}
+p {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #555;
+}
+
+/* FORM GROUPS */
+.form-group {
+  margin-bottom: 18px;
+}
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #2c5364;
+}
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+input[type=text]:focus, select:focus, textarea:focus {
+  border-color: #2c5364;
+  box-shadow: 0 0 10px rgba(44,83,100,0.3);
+}
+textarea { resize: none; }
+
+/* RATING */
+.rating {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  gap: 4px;
+}
+.rating input { display: none; }
+.rating label {
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  background: #f7f9fa;
+}
+.rating label:hover {
+  background: #2c5364;
+  color: white;
+  transform: scale(1.05);
+}
+.rating input:checked + label {
+  background: #2c5364;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(44,83,100,0.4);
+}
+
+/* SUBMIT BUTTON */
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg,#2c5364,#203a43);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+button:hover {
+  background: linear-gradient(90deg,#203a43,#2c5364);
+  transform: scale(1.03);
+}
+
+/* POPUP */
+.popup-overlay {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+.popup-overlay.active {
+  visibility: visible;
+  opacity: 1;
+}
+.popup {
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  text-align: center;
+  width: 90%;
+  max-width: 360px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  transform: scale(0.8);
+  transition: all 0.4s ease;
+}
+.popup-overlay.active .popup {
+  transform: scale(1);
+}
+.popup h3 { margin-top:0; color:#2c5364; }
+.popup button {
+  margin-top:16px;
+  padding: 12px 20px;
+  background: linear-gradient(90deg,#2c5364,#203a43);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.popup button:hover { 
+  transform: scale(1.05);
+  background: linear-gradient(90deg,#203a43,#2c5364);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Website Feedback Form</h2>
+  <p>We value your feedback about the website. Please help us improve by sharing your experience.</p>
+  <form id="feedbackForm">
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="name" placeholder="Enter your name" required>
+    </div>
+    <div class="form-group">
+      <label>Category (Website Aspect)</label>
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <option>Design / Layout</option>
+        <option>Navigation / Usability</option>
+        <option>Content / Information</option>
+        <option>Performance / Speed</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Rating</label>
+      <div class="rating">
+        <input type="radio" id="verybad" name="rating" value="Very Bad" required>
+        <label for="verybad">Very Bad</label>
+        <input type="radio" id="bad" name="rating" value="Bad">
+        <label for="bad">Bad</label>
+        <input type="radio" id="average" name="rating" value="Average">
+        <label for="average">Average</label>
+        <input type="radio" id="good" name="rating" value="Good">
+        <label for="good">Good</label>
+        <input type="radio" id="excellent" name="rating" value="Excellent">
+        <label for="excellent">Excellent</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Comments / Suggestions</label>
+      <textarea id="message" rows="4" placeholder="Your feedback..." required></textarea>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+</div>
+
+<div class="popup-overlay" id="successPopup">
+  <div class="popup">
+    <h3>Feedback Submitted!</h3>
+    <p>Thank you for sharing your thoughts about the website.</p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<script>
+const form = document.getElementById("feedbackForm");
+const popup = document.getElementById("successPopup");
+
+// Your Apps Script URL
+const scriptURL = "https://script.google.com/macros/s/AKfycbz9GZMn1ycankqfiOGzW8_v4-61mFKsHpLnfNNKi8-YvByrpNA3AiiSXyCC4SLJfrlsNw/exec";
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  const name = document.getElementById("name").value.trim();
+  const category = document.getElementById("category").value;
+  const ratingEl = document.querySelector('input[name="rating"]:checked');
+  const message = document.getElementById("message").value.trim();
+
+  if (!name || !category || !ratingEl || !message) {
+    alert("Please answer all questions before submitting.");
+    return;
+  }
+
+  const payload = {
+    name: name,
+    category: category,
+    rating: ratingEl.value,
+    message: message
+  };
+  
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    popup.classList.add("active");
+    form.reset();
+  })
+  .catch(err => alert("Submission failed. Try again."));
+});
+
+function closePopup() {
+  popup.classList.remove("active");
+}
+</script>
+
+</body>
+</html>
