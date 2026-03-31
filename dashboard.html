@@ -618,32 +618,35 @@
     }
 
     function getImageFromWorker(worker) {
-      const possibleFields = [
-        "photo_link",
-        "photo",
-        "photo_url",
-        "image",
-        "image_url",
-        "profile_photo",
-        "photoLink",
-        "picture",
-        "img",
-        "worker_photo",
-        "PHOTO",
-        "Photo",
-        "Image",
-        "Profile Photo"
-      ];
 
-      for (let key of possibleFields) {
-        if (worker[key] && String(worker[key]).trim() !== "") {
-          return convertDriveViewToDirect(worker[key]);
-        }
-      }
+  const possibleFields = [
+    "photo",
+    "photo_url",
+    "gambar",
+    "gambar_url",
+    "gambar_link",
+    "image",
+    "image_url",
+    "profile_photo",
+    "photoLink",
+    "photo_link",
+    "picture",
+    "img",
+    "worker_photo",
+    "PHOTO",
+    "Photo",
+    "Image",
+    "Profile Photo"
+  ];
 
-      return "";
+  for (let key of possibleFields) {
+    if (worker[key] && String(worker[key]).trim() !== "") {
+      return convertDriveViewToDirect(worker[key]);
     }
+  }
 
+  return "";
+    }
     function fillWorkerData(workerParam) {
       const worker = workerParam || getStoredWorker();
 
