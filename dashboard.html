@@ -602,54 +602,121 @@
       </div>
     </div>
 
+<div class="card">
+  <h3 class="sectionTitle">Records & Services</h3>
+
+  <div class="rowList">
+
+    <button class="rowLink" onclick="goToPage('signin.html')">
+      <span>
+        <span class="rowTitle">Sign In</span>
+        <span class="rowSub">Record your attendance and voucher number</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="rowLink" onclick="goToPage('129.html')">
+      <span>
+        <span class="rowTitle">Attendance</span>
+        <span class="rowSub">Submit clock in / clock out information</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="rowLink" onclick="goToPage('profile.html')">
+      <span>
+        <span class="rowTitle">My Profile</span>
+        <span class="rowSub">View your worker registration information</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="rowLink" onclick="goToPage('faq.html')">
+      <span>
+        <span class="rowTitle">FAQ - CasualMITEC</span>
+        <span class="rowSub">Important information and guidance</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="rowLink" onclick="goToPage('feedback-form.html')">
+      <span>
+        <span class="rowTitle">Feedback</span>
+        <span class="rowSub">Submit feedback or report issues</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+  </div>
+</div>
+
+
+
     <div class="card">
       <h3 class="sectionTitle">Records & Services</h3>
-
       <div class="rowList">
-
-        <button class="rowLink" onclick="goToPage('signin.html')">
+        <button class="rowLink" onclick="goToPage('my-record.html')">
           <span>
-            <span class="rowTitle">Sign In</span>
-            <span class="rowSub">Record your attendance and voucher number</span>
+            <span class="rowTitle">My Record</span>
+            <span class="rowSub">Review your submitted information</span>
           </span>
           <span class="arrow">›</span>
         </button>
 
-        <button class="rowLink" onclick="goToPage('129.html')">
+        <button class="rowLink" onclick="goToPage('documents.html')">
           <span>
-            <span class="rowTitle">Attendance</span>
-            <span class="rowSub">Submit clock in / clock out information</span>
+            <span class="rowTitle">My Documents</span>
+            <span class="rowSub">Access supporting documents and files</span>
           </span>
           <span class="arrow">›</span>
         </button>
 
         <button class="rowLink" onclick="goToPage('profile.html')">
           <span>
-            <span class="rowTitle">My Profile</span>
-            <span class="rowSub">View your worker registration information</span>
+            <span class="rowTitle">Profile Settings</span>
+            <span class="rowSub">View or update account details</span>
           </span>
           <span class="arrow">›</span>
         </button>
 
-        <button class="rowLink" onclick="goToPage('faq.html')">
+        <button class="rowLink" onclick="goToPage('help.html')">
           <span>
-            <span class="rowTitle">FAQ - CasualMITEC</span>
-            <span class="rowSub">Important information and guidance</span>
+            <span class="rowTitle">Help & Guidance</span>
+            <span class="rowSub">Important notices and usage guidance</span>
           </span>
           <span class="arrow">›</span>
         </button>
-
-        <button class="rowLink" onclick="goToPage('feedback-form.html')">
-          <span>
-            <span class="rowTitle">Feedback</span>
-            <span class="rowSub">Submit feedback or report issues</span>
-          </span>
-          <span class="arrow">›</span>
-        </button>
-
       </div>
     </div>
 
+    
+
+  <nav class="bottomNav">
+    <button class="bottomNavItem active" onclick="goToPage('dashboard.html')">
+      <span class="navIcon">⌂</span>
+      <span class="navText">Home</span>
+    </button>
+
+    <button class="bottomNavItem" onclick="goToPage('attendance.html')">
+      <span class="navIcon">◷</span>
+      <span class="navText">Attendance</span>
+    </button>
+
+    <button class="bottomNavItem" onclick="goToPage('my-record.html')">
+      <span class="navIcon">☰</span>
+      <span class="navText">Record</span>
+    </button>
+
+    <button class="bottomNavItem" onclick="goToPage('documents.html')">
+      <span class="navIcon">▣</span>
+      <span class="navText">Docs</span>
+    </button>
+
+    <button class="bottomNavItem" onclick="goToPage('profile.html')">
+      <span class="navIcon">◉</span>
+      <span class="navText">Profile</span>
+    </button>
+  </nav>
     <div class="card">
       <button class="logoutBtn" onclick="logout()">Logout</button>
     </div>
