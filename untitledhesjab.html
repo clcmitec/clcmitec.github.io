@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MITEC Sign In | Material Design</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+:root {
+  --md-bg: #F8F9FA;
+  --md-surface: #FFFFFF;
+  --md-primary: #0B57D0; /* Classic Google Blue */
+  --md-on-primary: #FFFFFF;
+  --md-primary-container: #D3E3FD;
+  --md-on-primary-container: #041E49;
+  --md-outline: #747775;
+  --md-outline-variant: #C4C7C5;
+  --md-text: #1F1F1F;
+  --md-text-variant: #444746;
+  --md-error: #B3261E;
+  --md-error-bg: #F9DEDC;
+  --md-success: #146C2E;
+  --md-success-bg: #C4EED0;
+  
+  --radius-card: 24px;
+  --radius-input: 8px; /* Material standard for outlined text fields */
+  --radius-btn: 100px; /* Material Pill Button */
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: var(--md-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 24px;
+  color: var(--md-text);
+}
+
+.shell {
+  width: 100%;
+  max-width: 380px;
+}
+
+/* Optional Top Nav to go back */
+.topNav {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.backBtn {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--md-text-variant);
+  cursor: pointer;
+  padding: 8px 12px 8px 0;
+  font-family: inherit;
+}
+
+.backBtn:hover {
+  color: var(--md-primary);
+}
+
+.card {
+  background: var(--md-surface);
+  padding: 32px 24px;
+  border-radius: var(--radius-card);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--md-outline-variant);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.headerIcon {
+  width: 48px;
+  height: 48px;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 16px auto;
+}
+
+h3 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--md-text-variant);
+}
+
+.field {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 14px;
+  font-size: 20px;
+  color: var(--md-outline);
+  pointer-events: none;
+}
+
+/* Material Outlined Text Field Style */
+input, select {
+  width: 100%;
+  height: 56px;
+  padding: 0 16px 0 44px; /* Space for icon */
+  border-radius: var(--radius-input);
+  border: 1px solid var(--md-outline);
+  background: var(--md-surface);
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--md-text);
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+select {
+  cursor: pointer;
+  /* Custom select arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23747775' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border: 2px solid var(--md-primary);
+  padding-left: 43px; /* Adjust for 2px border so text doesn't jump */
+}
+
+input::placeholder, select:invalid {
+  color: var(--md-outline);
+}
+
+.inputWrapper:focus-within .inputIcon {
+  color: var(--md-primary);
+}
+
+.btn {
+  width: 100%;
+  height: 48px;
+  margin-top: 8px;
+  border: none;
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  border-radius: var(--radius-btn);
+  font-weight: 500;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  background: #094AA8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.btn:active:not(:disabled) {
+  box-shadow: none;
+}
+
+.btn:disabled {
+  background: rgba(31, 31, 31, 0.12);
+  color: rgba(31, 31, 31, 0.38);
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  padding: 0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.status.show {
+  padding: 12px;
+  opacity: 1;
+}
+
+.status.error {
+  background: var(--md-error-bg);
+  color: var(--md-error);
+}
+
+.status.success {
+  background: var(--md-success-bg);
+  color: var(--md-success);
+}
+
+.status.neutral {
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+}
+</style>
+</head>
+
+<body>
+
+<div class="shell">
+  
+  <button class="backBtn" onclick="window.location.href='dashboard.html'">
+    <i class="ph-bold ph-arrow-left"></i> Back to Dashboard
+  </button>
+
+  <div class="card">
+    
+    <div class="header">
+      <div class="headerIcon">
+        <i class="ph-fill ph-clipboard-text"></i>
+      </div>
+      <h3>Record Sign In</h3>
+      <p class="subtitle">Enter your voucher and shift details.</p>
+    </div>
+
+    <div class="field">
+      <div class="inputWrapper">
+        <i class="ph ph-ticket inputIcon"></i>
+        <input id="voucher" placeholder="Voucher Number" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="inputWrapper">
+        <i class="ph ph-clock inputIcon"></i>
+        <select id="shift" required>
+          <option value="" disabled selected hidden>Select Shift Time</option>
+          <option value="0700">07:00</option>
+          <option value="0800">08:00</option>
+          <option value="0900">09:00</option>
+          <option value="1000">10:00</option>
+          <option value="1100">11:00</option>
+          <option value="1200">12:00</option>
+          <option value="1300">13:00</option>
+          <option value="1400">14:00</option>
+          <option value="1500">15:00</option>
+          <option value="1600">16:00</option>
+          <option value="1700">17:00</option>
+          <option value="1800">18:00</option>
+          <option value="1900">19:00</option>
+          <option value="2000">20:00</option>
+          <option value="2100">21:00</option>
+          <option value="2200">22:00</option>
+          <option value="2300">23:00</option>
+          <option value="0000">00:00</option>
+          <option value="0100">01:00</option>
+          <option value="0200">02:00</option>
+          <option value="0300">03:00</option>
+          <option value="0400">04:00</option>
+          <option value="0500">05:00</option>
+          <option value="0600">06:00</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="inputWrapper">
+        <i class="ph ph-buildings inputIcon"></i>
+        <select id="dept" required>
+          <option value="" disabled selected hidden>Select Department</option>
+          <option value="AV">AV</option>
+          <option value="CAT">CAT</option>
+          <option value="EXH">EXH</option>
+          <option value="FIN">FIN</option>
+          <option value="GCC">GCC</option>
+          <option value="GS">GS</option>
+          <option value="HK">HK</option>
+          <option value="HR">HR</option>
+          <option value="KIT">KIT</option>
+          <option value="LINEN">LINEN</option>
+          <option value="OPERATION">OPERATION</option>
+          <option value="PUR">PUR</option>
+          <option value="QA">QA</option>
+          <option value="SC">SC</option>
+          <option value="SETUP">SETUP</option>
+          <option value="STWD">STWD</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="submitBtn" class="btn" onclick="submitSignIn()">
+      Submit Record
+    </button>
+
+    <div class="status" id="status"></div>
+  </div>
+
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+const docNo = localStorage.getItem("mcl_doc_no");
+const voucherInput = document.getElementById("voucher");
+const shiftInput = document.getElementById("shift");
+const deptInput = document.getElementById("dept");
+const statusBox = document.getElementById("status");
+const submitBtn = document.getElementById("submitBtn");
+
+if (!docNo) {
+  // If no document number in storage, boot them back to login
+  alert("Please login first");
+  window.location.href = "index.html";
+}
+
+// Force numbers only in voucher input
+voucherInput.addEventListener("input", () => {
+  voucherInput.value = voucherInput.value.replace(/[^\d]/g, "");
+});
+
+// Submit on Enter key
+[voucherInput, shiftInput, deptInput].forEach(el => {
+  el.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      e.preventDefault();
+      submitSignIn();
+    }
+  });
+});
+
+// Material 3 Status Banner Function
+function setStatus(text, type = "") {
+  statusBox.textContent = text || "";
+  if (text) {
+    statusBox.className = "status show " + type;
+  } else {
+    statusBox.className = "status";
+  }
+}
+
+async function submitSignIn() {
+  const voucher = voucherInput.value.trim();
+  const shift = shiftInput.value;
+  const dept = deptInput.value;
+
+  if (!voucher || !shift || !dept) {
+    setStatus("Please complete all fields.", "error");
+    return;
+  }
+
+  // Loading state
+  setStatus("Submitting record...", "neutral");
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Submitting...';
+
+  try {
+    const res = await fetch(
+      `${APPS_SCRIPT_URL}?action=signIn&doc_no=${encodeURIComponent(docNo)}&voucher=${encodeURIComponent(voucher)}&shift=${encodeURIComponent(shift)}&dept=${encodeURIComponent(dept)}`
+    );
+
+    const data = await res.json();
+
+    if (data.ok) {
+      setStatus(data.message || "Sign in recorded successfully.", "success");
+      submitBtn.innerHTML = '<i class="ph-bold ph-check"></i> Success';
+      
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        voucherInput.value = "";
+        shiftInput.value = "";
+        deptInput.value = "";
+        setStatus("");
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit Record';
+        voucherInput.focus();
+      }, 3000);
+
+    } else {
+      setStatus(data.message || "An error occurred.", "error");
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Submit Record';
+    }
+
+  } catch (err) {
+    console.error(err);
+    setStatus("Connection error. Check your internet.", "error");
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = 'Submit Record';
+  }
+}
+
+window.addEventListener("load", () => {
+  voucherInput.focus();
+});
+</script>
+
+</body>
+</html>
