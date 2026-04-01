@@ -363,7 +363,7 @@
         <img
           id="headerPhoto"
           class="headerPhoto"
-          src=""
+          class=""
           alt="Profile"
           onclick="goToPage('profile.html')"
         >
@@ -398,50 +398,82 @@
     </div>
 
     <div class="card">
-      <h3 class="sectionTitle">My Account</h3>
-      <p class="sectionCopy">Basic profile info from your submitted application record.</p>
+     <main class="main">
+    <div class="container grid">
 
-      <div class="infoList">
-        <div class="infoRow"><div class="infoLabel">Name</div><div class="infoValue" id="profileName">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Email</div><div class="infoValue" id="profileEmail">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Document No.</div><div class="infoValue" id="profileDocNo">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Phone</div><div class="infoValue" id="profilePhone">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Document Type</div><div class="infoValue" id="profileDocType">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Gender</div><div class="infoValue" id="profileGender">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Address</div><div class="infoValue" id="profileAlamat">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Marital Status</div><div class="infoValue" id="profileStatusKahwin">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Bank</div><div class="infoValue" id="profileBank">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Bank Account</div><div class="infoValue" id="profileAccountNo">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Account Name</div><div class="infoValue" id="profileAccountName">-</div></div>
+      <div class="stack">
+        <section class="panel">
+          <h2 class="panel-title">Profile Picture</h2>
+          <p class="panel-copy">Photo submitted in your application record.</p>
+
+          <div style="display:flex;justify-content:center;">
+            <img
+              id="profilePhotoPreview"
+              src=""
+              alt="Profile Picture"
+              style="
+                width:160px;
+                height:160px;
+                object-fit:cover;
+                border-radius:24px;
+                border:1px solid #e5e7eb;
+                box-shadow:0 10px 24px rgba(2,18,34,.12);
+                background:#f8fafc;
+                display:none;
+              "
+            />
+          </div>
+
+          <div id="profilePhotoEmpty" style="text-align:center;color:#667085;font-size:14px;margin-top:12px;">
+            No profile picture available.
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">My Account</h2>
+          <p class="panel-copy">Basic profile info from your submitted application record.</p>
+
+          <div class="profile-list">
+            <div class="profile-row"><div class="profile-label">Name</div><div class="profile-value" id="profileName">-</div></div>
+            <div class="profile-row"><div class="profile-label">Email</div><div class="profile-value" id="profileEmail">-</div></div>
+            <div class="profile-row"><div class="profile-label">Document No.</div><div class="profile-value" id="profileDocNo">-</div></div>
+            <div class="profile-row"><div class="profile-label">Phone</div><div class="profile-value" id="profilePhone">-</div></div>
+            <div class="profile-row"><div class="profile-label">Document Type</div><div class="profile-value" id="profileDocType">-</div></div>
+            <div class="profile-row"><div class="profile-label">Gender</div><div class="profile-value" id="profileGender">-</div></div>
+            <div class="profile-row"><div class="profile-label">Address</div><div class="profile-value" id="profileAlamat">-</div></div>
+            <div class="profile-row"><div class="profile-label">Marital Status</div><div class="profile-value" id="profileStatusKahwin">-</div></div>
+            <div class="profile-row"><div class="profile-label">Bank</div><div class="profile-value" id="profileBank">-</div></div>
+            <div class="profile-row"><div class="profile-label">Bank Account</div><div class="profile-value" id="profileAccountNo">-</div></div>
+            <div class="profile-row"><div class="profile-label">Account Name</div><div class="profile-value" id="profileAccountName">-</div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Additional Details</h2>
+          <p class="panel-copy">Important submitted details for quick checking.</p>
+
+          <div class="profile-list">
+            <div class="profile-row"><div class="profile-label">Emergency Contact</div><div class="profile-value" id="profileWaris">-</div></div>
+            <div class="profile-row"><div class="profile-label">Relationship</div><div class="profile-value" id="profileHubungan">-</div></div>
+            <div class="profile-row"><div class="profile-label">Emergency No.</div><div class="profile-value" id="profileEmergencyNo">-</div></div>
+            <div class="profile-row"><div class="profile-label">Skills</div><div class="profile-value" id="profileKebolehan">-</div></div>
+            <div class="profile-row"><div class="profile-label">Typhoid</div><div class="profile-value" id="profileTyphoid">-</div></div>
+            <div class="profile-row"><div class="profile-label">Transportation</div><div class="profile-value" id="profileTransport">-</div></div>
+            <div class="profile-row"><div class="profile-label">Medical History</div><div class="profile-value" id="profileSejarah">-</div></div>
+            <div class="profile-row"><div class="profile-label">Medical Details</div><div class="profile-value" id="profileSejarahOther">-</div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Uploaded Records</h2>
+          <p class="panel-copy">Quick access to what was submitted in the application.</p>
+
+          <div class="profile-list">
+            <div class="profile-row"><div class="profile-label">IC Copy</div><div class="profile-value" id="profileIcLink">-</div></div>
+            <div class="profile-row"><div class="profile-label">Photo File</div><div class="profile-value" id="profilePhotoLink">-</div></div>
+          </div>
+        </section>
       </div>
-    </div>
-
-    <div class="card">
-      <h3 class="sectionTitle">Additional Details</h3>
-      <p class="sectionCopy">Important submitted details for quick checking.</p>
-
-      <div class="infoList">
-        <div class="infoRow"><div class="infoLabel">Emergency Contact</div><div class="infoValue" id="profileWaris">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Relationship</div><div class="infoValue" id="profileHubungan">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Emergency No.</div><div class="infoValue" id="profileEmergencyNo">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Skills</div><div class="infoValue" id="profileKebolehan">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Typhoid</div><div class="infoValue" id="profileTyphoid">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Transportation</div><div class="infoValue" id="profileTransport">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Medical History</div><div class="infoValue" id="profileSejarah">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Medical Details</div><div class="infoValue" id="profileSejarahOther">-</div></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3 class="sectionTitle">Uploaded Records</h3>
-      <p class="sectionCopy">Quick access to what was submitted in the application.</p>
-
-      <div class="infoList">
-        <div class="infoRow"><div class="infoLabel">IC Copy</div><div class="infoValue" id="profileIcLink">-</div></div>
-        <div class="infoRow"><div class="infoLabel">Photo File</div><div class="infoValue" id="profilePhotoLink">-</div></div>
-      </div>
-    </div>
-
     <div class="card">
       <button class="logoutBtn" id="logoutBtn" type="button">Logout</button>
     </div>
