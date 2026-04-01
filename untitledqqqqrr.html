@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC Worker Dashboard</title>
+  <style>
+    :root{
+      --bg:#f3f4f6;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#667085;
+      --line:#e5e7eb;
+      --primary:#0f4a82;
+      --primary-dark:#0b3d6c;
+      --soft:#f8fafc;
+      --danger:#b42318;
+      --danger-dark:#8f1d14;
+      --shadow:0 10px 28px rgba(2,18,34,.08);
+      --shadow-strong:0 16px 36px rgba(2,18,34,.14);
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    html,body{
+      margin:0;
+      padding:0;
+      min-height:100%;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    body{
+      padding:14px 12px 92px;
+    }
+
+    .shell{
+      width:100%;
+      max-width:430px;
+      margin:0 auto;
+      position:relative;
+    }
+
+    .topbarWrap{
+      position:relative;
+      margin-bottom:12px;
+    }
+
+    .topbar{
+      background:#fff;
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      padding:10px 12px;
+    }
+
+    .topbarRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .menuBtn{
+      width:46px;
+      height:42px;
+      border:none;
+      border-radius:12px;
+      background:var(--primary);
+      color:#fff;
+      font-size:20px;
+      cursor:pointer;
+      flex-shrink:0;
+    }
+
+    .brandLogoFlat{
+      width:34px;
+      height:34px;
+      object-fit:contain;
+      flex-shrink:0;
+    }
+
+    .brandTitleSingle{
+      margin:0;
+      flex:1;
+      min-width:0;
+      font-size:15px;
+      font-weight:900;
+      color:var(--primary);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .headerPhoto{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      object-fit:cover;
+      border:2px solid #e5e7eb;
+      flex-shrink:0;
+      cursor:pointer;
+      background:#fff;
+    }
+
+    .dropdownMenu{
+      position:absolute;
+      top:56px;
+      left:0;
+      right:0;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 18px 34px rgba(2,18,34,.16);
+      padding:10px;
+      z-index:1000;
+      opacity:0;
+      visibility:hidden;
+      transform:translateY(-8px);
+      transition:opacity .2s ease, transform .2s ease, visibility .2s ease;
+    }
+
+    .dropdownMenu.show{
+      opacity:1;
+      visibility:visible;
+      transform:translateY(0);
+    }
+
+    .menuList{
+      display:grid;
+      gap:8px;
+    }
+
+    .menuLink{
+      width:100%;
+      border:none;
+      background:#fff;
+      border-radius:14px;
+      box-shadow:inset 0 0 0 1px var(--line);
+      padding:13px 14px;
+      text-align:left;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      cursor:pointer;
+    }
+
+    .menuLink:hover{
+      background:#f8fafc;
+    }
+
+    .menuLink.primary{
+      background:#eef5fc;
+      box-shadow:none;
+    }
+
+    .menuLink.danger{
+      background:#fff5f5;
+      color:var(--danger);
+      box-shadow:none;
+    }
+
+    .menuLinkText{
+      display:block;
+    }
+
+    .menuLinkTitle{
+      display:block;
+      font-size:14px;
+      font-weight:800;
+      margin-bottom:2px;
+      color:inherit;
+    }
+
+    .menuLinkSub{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .menuLink.danger .menuLinkSub{
+      color:#b75b5b;
+    }
+
+    .menuArrow{
+      font-size:16px;
+      color:#98a2b3;
+      flex-shrink:0;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:28px;
+      min-height:250px;
+      padding:20px 18px 18px;
+      margin-bottom:12px;
+      background:
+        linear-gradient(rgba(7,34,63,.62), rgba(7,34,63,.74)),
+        url("https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat;
+      box-shadow:var(--shadow-strong);
+      color:#fff;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-28px;
+      bottom:-60px;
+      width:150px;
+      height:150px;
+      background:radial-gradient(circle, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 70%);
+      pointer-events:none;
+    }
+
+    .heroContent{
+      position:relative;
+      z-index:1;
+      max-width:290px;
+    }
+
+    .welcome{
+      margin:0 0 8px;
+      font-size:14px;
+      font-weight:700;
+      color:rgba(255,255,255,.88);
+    }
+
+    .heroTitle{
+      margin:0 0 10px;
+      font-size:22px;
+      line-height:1.08;
+      font-weight:900;
+      letter-spacing:-0.03em;
+      text-transform:uppercase;
+      word-break:break-word;
+    }
+
+    .heroText{
+      margin:0 0 16px;
+      font-size:13px;
+      line-height:1.55;
+      color:rgba(255,255,255,.92);
+    }
+
+    .heroActions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      max-width:260px;
+    }
+
+    .heroBtn{
+      min-height:50px;
+      border:none;
+      border-radius:16px;
+      background:#fff;
+      color:var(--primary);
+      font-size:14px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:0 12px;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(0,0,0,.10);
+    }
+
+    .heroBtn .icon{
+      font-size:16px;
+      flex-shrink:0;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:16px;
+      margin-bottom:12px;
+    }
+
+    .sectionTitle{
+      margin:0 0 10px;
+      font-size:16px;
+      font-weight:900;
+      color:var(--primary);
+    }
+
+    .miniGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+    }
+
+    .miniBox{
+      border:1px solid var(--line);
+      border-radius:15px;
+      padding:11px;
+      background:#fff;
+    }
+
+    .miniLabel{
+      display:block;
+      font-size:10px;
+      font-weight:800;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:5px;
+    }
+
+    .miniValue{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      color:var(--text);
+      word-break:break-word;
+      line-height:1.4;
+    }
+
+    .tileGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+    }
+
+    .tile{
+      border:none;
+      background:var(--soft);
+      border-radius:16px;
+      padding:13px;
+      min-height:84px;
+      text-align:left;
+      cursor:pointer;
+      box-shadow:inset 0 0 0 1px #edf0f3;
+    }
+
+    .tile.primary{
+      background:var(--primary);
+      color:#fff;
+      box-shadow:none;
+    }
+
+    .tileTitle{
+      display:block;
+      font-size:14px;
+      font-weight:800;
+      margin-bottom:5px;
+      line-height:1.22;
+    }
+
+    .tileSub{
+      display:block;
+      font-size:11px;
+      line-height:1.4;
+      opacity:.86;
+    }
+
+    .rowList{
+      display:grid;
+      gap:9px;
+    }
+
+    .rowLink{
+      width:100%;
+      border:none;
+      border-radius:16px;
+      background:#fff;
+      box-shadow:inset 0 0 0 1px var(--line);
+      padding:13px;
+      text-align:left;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      cursor:pointer;
+    }
+
+    .rowTitle{
+      display:block;
+      font-size:13px;
+      font-weight:800;
+      margin-bottom:2px;
+      color:var(--text);
+    }
+
+    .rowSub{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.4;
+    }
+
+    .arrow{
+      color:#9ca3af;
+      font-size:17px;
+      flex-shrink:0;
+    }
+
+    .logoutBtn{
+      width:100%;
+      height:48px;
+      border:none;
+      border-radius:16px;
+      background:var(--danger);
+      color:#fff;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .footerNote{
+      text-align:center;
+      font-size:11px;
+      color:#8b9099;
+      line-height:1.55;
+      padding-top:2px;
+    }
+
+    .bottomNav{
+      position:fixed;
+      left:50%;
+      bottom:14px;
+      transform:translateX(-50%);
+      width:calc(100% - 24px);
+      max-width:430px;
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      border-radius:22px;
+      box-shadow:0 12px 30px rgba(2,18,34,.14);
+      display:grid;
+      grid-template-columns:repeat(5, 1fr);
+      gap:4px;
+      padding:8px 6px;
+      z-index:999;
+    }
+
+    .bottomNavItem{
+      border:none;
+      background:transparent;
+      border-radius:16px;
+      min-height:58px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:3px;
+      color:#667085;
+      cursor:pointer;
+      font:inherit;
+      padding:6px 4px;
+    }
+
+    .bottomNavItem.active{
+      background:#edf4fb;
+      color:var(--primary);
+    }
+
+    .navIcon{
+      font-size:18px;
+      line-height:1;
+    }
+
+    .navText{
+      font-size:11px;
+      font-weight:800;
+      line-height:1.1;
+    }
+
+    @media (max-width:380px){
+      .miniGrid,
+      .tileGrid,
+      .heroActions{
+        grid-template-columns:1fr;
+      }
+
+      .hero{
+        min-height:auto;
+      }
+
+      .heroTitle{
+        font-size:20px;
+      }
+
+      .bottomNav{
+        width:calc(100% - 18px);
+        bottom:10px;
+      }
+
+      .navText{
+        font-size:10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <div class="topbarWrap">
+      <div class="topbar">
+        <div class="topbarRow">
+          <button class="menuBtn" id="menuBtn" onclick="toggleMenu()">☰</button>
+
+          <img
+            class="brandLogoFlat"
+            src="https://mitec.com.my/static/img/logos/mitec-new-logo.png"
+            alt="MITEC Logo"
+          >
+
+          <h1 class="brandTitleSingle">MITEC Casual Labour</h1>
+
+          <img
+            id="headerPhoto"
+            class="headerPhoto"
+            src="https://via.placeholder.com/100"
+            alt="Profile"
+            onclick="goToPage('profile.html')"
+          >
+        </div>
+      </div>
+
+      <div class="dropdownMenu" id="dropdownMenu">
+        <div class="menuList">
+          <button class="menuLink primary" onclick="goToPage('dashboard.html')">
+            <span class="menuLinkText">
+              <span class="menuLinkTitle">Dashboard</span>
+              <span class="menuLinkSub">Return to your main overview</span>
+            </span>
+            <span class="menuArrow">›</span>
+          </button>
+
+          <button class="menuLink" onclick="goToPage('attendance.html')">
+            <span class="menuLinkText">
+              <span class="menuLinkTitle">My Attendance</span>
+              <span class="menuLinkSub">Review sign in and sign out records</span>
+            </span>
+            <span class="menuArrow">›</span>
+          </button>
+
+          <button class="menuLink" onclick="goToPage('my-record.html')">
+            <span class="menuLinkText">
+              <span class="menuLinkTitle">My Record</span>
+              <span class="menuLinkSub">View your registered worker information</span>
+            </span>
+            <span class="menuArrow">›</span>
+          </button>
+
+          <button class="menuLink" onclick="goToPage('documents.html')">
+            <span class="menuLinkText">
+              <span class="menuLinkTitle">My Documents</span>
+              <span class="menuLinkSub">Open files and related records</span>
+            </span>
+            <span class="menuArrow">›</span>
+          </button>
+
+          <button class="menuLink" onclick="goToPage('profile.html')">
+            <span class="menuLinkText">
+              <span class="menuLinkTitle">Profile Settings</span>
+              <span class="menuLinkSub">Manage your account details</span>
+            </span>
+            <span class="menuArrow">›</span>
+          </button>
+
+          <button class="menuLink" onclick="goToPage('help.html')">
+            <span class="menuLinkText">
+              <span class="menuLinkTitle">Help & Guidance</span>
+              <span class="menuLinkSub">Important notices and instructions</span>
+            </span>
+            <span class="menuArrow">›</span>
+          </button>
+
+          <button class="menuLink danger" onclick="logout()">
+            <span class="menuLinkText">
+              <span class="menuLinkTitle">Logout</span>
+              <span class="menuLinkSub">Sign out from this device</span>
+            </span>
+            <span class="menuArrow">›</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="heroContent">
+        <p class="welcome">Welcome,</p>
+        <h2 class="heroTitle" id="heroName">WORKER NAME</h2>
+        <p class="heroText">
+          This dashboard centralises your bookings, attendance, and records into one streamlined workspace.
+        </p>
+
+        <div class="heroActions">
+          <button class="heroBtn" onclick="goToPage('signin.html')">
+            <span class="icon">☐</span>
+            <span>Sign In</span>
+          </button>
+
+          <button class="heroBtn" onclick="goToPage('https://forms.gle/zCh5wdVwkkkMFTuC6')">
+            <span class="icon">▣</span>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    
+    <div class="card">
+      <h3 class="sectionTitle">Today Summary</h3>
+      <div class="miniGrid">
+        <div class="miniBox">
+          <span class="miniLabel">Sign In Time</span>
+          <span class="miniValue" id="dashSignIn">-</span>
+        </div>
+        <div class="miniBox">
+          <span class="miniLabel">Sign Out Time</span>
+          <span class="miniValue" id="dashSignOut">-</span>
+        </div>
+        <div class="miniBox">
+          <span class="miniLabel">Voucher No</span>
+          <span class="miniValue" id="dashVoucher">-</span>
+        </div>
+        <div class="miniBox">
+          <span class="miniLabel">Hours Worked</span>
+          <span class="miniValue" id="dashHours">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+  <h3 class="sectionTitle">Records & Services</h3>
+
+  <div class="rowList">
+
+    <button class="rowLink" onclick="goToPage('signin.html')">
+      <span>
+        <span class="rowTitle">Sign In</span>
+        <span class="rowSub">Record your attendance and voucher number</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="rowLink" onclick="goToPage('129.html')">
+      <span>
+        <span class="rowTitle">Attendance</span>
+        <span class="rowSub">Submit clock in / clock out information</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="rowLink" onclick="goToPage('profile.html')">
+      <span>
+        <span class="rowTitle">My Profile</span>
+        <span class="rowSub">View your worker registration information</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="rowLink" onclick="goToPage('faq.html')">
+      <span>
+        <span class="rowTitle">FAQ - CasualMITEC</span>
+        <span class="rowSub">Important information and guidance</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+    <button class="rowLink" onclick="goToPage('feedback-form.html')">
+      <span>
+        <span class="rowTitle">Feedback</span>
+        <span class="rowSub">Submit feedback or report issues</span>
+      </span>
+      <span class="arrow">›</span>
+    </button>
+
+  </div>
+</div>
+
+
+
+    <div class="card">
+      <h3 class="sectionTitle">Records & Services</h3>
+      <div class="rowList">
+        <button class="rowLink" onclick="goToPage('my-record.html')">
+          <span>
+            <span class="rowTitle">My Record</span>
+            <span class="rowSub">Review your submitted information</span>
+          </span>
+          <span class="arrow">›</span>
+        </button>
+
+        <button class="rowLink" onclick="goToPage('documents.html')">
+          <span>
+            <span class="rowTitle">My Documents</span>
+            <span class="rowSub">Access supporting documents and files</span>
+          </span>
+          <span class="arrow">›</span>
+        </button>
+
+        <button class="rowLink" onclick="goToPage('profile.html')">
+          <span>
+            <span class="rowTitle">Profile Settings</span>
+            <span class="rowSub">View or update account details</span>
+          </span>
+          <span class="arrow">›</span>
+        </button>
+
+        <button class="rowLink" onclick="goToPage('help.html')">
+          <span>
+            <span class="rowTitle">Help & Guidance</span>
+            <span class="rowSub">Important notices and usage guidance</span>
+          </span>
+          <span class="arrow">›</span>
+        </button>
+      </div>
+    </div>
+
+    
+
+  <nav class="bottomNav">
+    <button class="bottomNavItem active" onclick="goToPage('dashboard.html')">
+      <span class="navIcon">⌂</span>
+      <span class="navText">Home</span>
+    </button>
+
+    <button class="bottomNavItem" onclick="goToPage('attendance.html')">
+      <span class="navIcon">◷</span>
+      <span class="navText">Attendance</span>
+    </button>
+
+    <button class="bottomNavItem" onclick="goToPage('my-record.html')">
+      <span class="navIcon">☰</span>
+      <span class="navText">Record</span>
+    </button>
+
+    <button class="bottomNavItem" onclick="goToPage('documents.html')">
+      <span class="navIcon">▣</span>
+      <span class="navText">Docs</span>
+    </button>
+
+    <button class="bottomNavItem" onclick="goToPage('profile.html')">
+      <span class="navIcon">◉</span>
+      <span class="navText">Profile</span>
+    </button>
+  </nav>
+
+  <script>
+    function getStoredWorker() {
+      try {
+        return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function formatHeroName(name) {
+      const str = String(name || "").trim();
+      return str || "WORKER NAME";
+    }
+
+    function getImageFromWorker(worker) {
+      return (
+        worker.photo ||
+        worker.photo_url ||
+        worker.image ||
+        worker.image_url ||
+        worker.profile_photo ||
+        worker.photoLink ||
+        ""
+      );
+    }
+
+    function fillWorkerData() {
+      const worker = getStoredWorker();
+
+      const name =
+        worker.name ||
+        worker.full_name ||
+        worker.worker_name ||
+        "Worker Name";
+
+      const dept =
+        worker.department ||
+        worker.dept ||
+        worker.unit ||
+        "Department not available";
+
+      const phone =
+        localStorage.getItem("mcl_phone") ||
+        worker.phone ||
+        worker.phone_no ||
+        "-";
+
+      const doc =
+        localStorage.getItem("mcl_doc_no") ||
+        worker.doc_no ||
+        worker.ic ||
+        worker.passport ||
+        "-";
+
+      const email =
+        worker.email ||
+        worker.worker_email ||
+        "-";
+
+      const photo = getImageFromWorker(worker);
+
+      document.getElementById("heroName").textContent = formatHeroName(name).toUpperCase();
+      document.getElementById("workerDept").textContent = dept;
+      document.getElementById("workerPhone").textContent = phone;
+      document.getElementById("workerDoc").textContent = doc;
+      document.getElementById("workerEmail").textContent = email;
+
+      if (photo) {
+        const headerImg = document.getElementById("headerPhoto");
+        if (headerImg) headerImg.src = photo;
+      }
+    }
+
+    function goToPage(page) {
+      window.location.href = page;
+    }
+
+    function toggleMenu() {
+      const menu = document.getElementById("dropdownMenu");
+      menu.classList.toggle("show");
+    }
+
+    function closeMenu() {
+      const menu = document.getElementById("dropdownMenu");
+      menu.classList.remove("show");
+    }
+
+    function logout() {
+      localStorage.removeItem("mitecWorkerRecord");
+      localStorage.removeItem("mcl_doc_no");
+      localStorage.removeItem("mcl_phone");
+      window.location.href = "index.html";
+    }
+
+    function checkLogin() {
+      const workerData = localStorage.getItem("mitecWorkerRecord");
+      if (!workerData) {
+        window.location.href = "index.html";
+        return;
+      }
+      fillWorkerData();
+    }
+
+    document.addEventListener("click", function(e) {
+      const menu = document.getElementById("dropdownMenu");
+      const menuBtn = document.getElementById("menuBtn");
+
+      if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
+        menu.classList.remove("show");
+      }
+    });
+
+    window.addEventListener("load", checkLogin);
+  </script>
+</body>
+</html>
