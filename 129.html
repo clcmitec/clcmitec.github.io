@@ -814,10 +814,10 @@
       valid = false;
     }
 
-    if (!/^601[0-9]{8,9}$/.test(phone)) {
-      showHint(phoneHint, true);
-      valid = false;
-    }
+    if (phone && !/^601[0-9]{8,9}$/.test(phone)) {
+  showHint(phoneHint, true);
+  valid = false;
+}
 
     if (!document.getElementById("agreeProceed").checked) {
       valid = false;
@@ -828,7 +828,7 @@
     setLookupStatus("Checking existing record...");
 
     try {
-      const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}&phone=${encodeURIComponent(phone)}`;
+      const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
       const res = await fetch(url);
       const result = await res.json();
 
