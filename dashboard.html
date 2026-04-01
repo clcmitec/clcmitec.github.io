@@ -1,758 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MITEC Worker Dashboard</title>
-  <style>
-    :root{
-      --bg:#f3f4f6;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#667085;
-      --line:#e5e7eb;
-      --primary:#0f4a82;
-      --primary-dark:#0b3d6c;
-      --soft:#f8fafc;
-      --danger:#b42318;
-      --shadow:0 8px 24px rgba(2,18,34,.08);
-      --shadow-strong:0 14px 30px rgba(2,18,34,.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MITEC Worker Dashboard</title>
 
-    *{box-sizing:border-box}
+<style>
 
-    html,body{
-      margin:0;
-      padding:0;
-      min-height:100%;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
+:root{
+--bg:#f3f4f6;
+--card:#ffffff;
+--text:#0f172a;
+--muted:#667085;
+--line:#e5e7eb;
+--primary:#0f4a82;
+--danger:#b42318;
+--shadow:0 10px 28px rgba(2,18,34,.08);
+--shadow-strong:0 16px 36px rgba(2,18,34,.14);
+}
 
-    body{
-      padding:14px 12px 92px;
-    }
+*{box-sizing:border-box}
 
-    .shell{
-      width:100%;
-      max-width:430px;
-      margin:0 auto;
-    }
+html,body{
+margin:0;
+padding:0;
+background:var(--bg);
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+color:var(--text);
+}
 
-    .topbar{
-      background:#fff;
-      border-radius:18px;
-      box-shadow:var(--shadow);
-      padding:10px 12px;
-      margin-bottom:12px;
-    }
+body{
+padding:14px 12px 92px;
+}
 
-    .topbarRow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
+.shell{
+width:100%;
+max-width:430px;
+margin:0 auto;
+}
 
-    .brandLogoLarge{
-      width:40px;
-      height:40px;
-      object-fit:contain;
-      flex-shrink:0;
-    }
+.topbar{
+background:#fff;
+border-radius:18px;
+box-shadow:var(--shadow);
+padding:10px 12px;
+margin-bottom:12px;
+}
 
-    .brandTitleSingle{
-      margin:0;
-      flex:1;
-      min-width:0;
-      font-size:15px;
-      font-weight:900;
-      color:var(--primary);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
+.topbarRow{
+display:flex;
+align-items:center;
+gap:10px;
+}
 
-    .headerPhoto{
-      width:40px;
-      height:40px;
-      border-radius:50%;
-      object-fit:cover;
-      border:2px solid #e5e7eb;
-      background:#fff;
-      cursor:pointer;
-      flex-shrink:0;
-    }
+.brandLogoLarge{
+width:40px;
+height:40px;
+object-fit:contain;
+}
 
-    .liveCard{
-      background:#fff;
-      border-radius:18px;
-      box-shadow:var(--shadow);
-      padding:14px 16px;
-      margin-bottom:12px;
-    }
+.brandTitleSingle{
+flex:1;
+font-size:15px;
+font-weight:900;
+color:var(--primary);
+margin:0;
+}
 
-    .liveRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-    }
+.headerPhoto{
+width:40px;
+height:40px;
+border-radius:50%;
+border:2px solid #e5e7eb;
+object-fit:cover;
+cursor:pointer;
+}
 
-    .liveLabel{
-      font-size:10px;
-      font-weight:800;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      margin-bottom:4px;
-    }
+.hero{
+border-radius:24px;
+padding:22px 18px;
+margin-bottom:12px;
+background:
+linear-gradient(rgba(8,35,66,.75), rgba(8,35,66,.82)),
+url("https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat;
+box-shadow:var(--shadow-strong);
+color:#fff;
+}
 
-    .liveDate{
-      font-size:14px;
-      font-weight:800;
-      color:var(--text);
-      line-height:1.35;
-    }
+.heroClock{
+display:flex;
+justify-content:space-between;
+align-items:flex-end;
+margin-bottom:12px;
+padding:10px 12px;
+border-radius:14px;
+background:rgba(255,255,255,.12);
+}
 
-    .liveTimeWrap{
-      text-align:right;
-    }
+.heroClockDate{
+font-size:12px;
+font-weight:700;
+}
 
-    .liveTime{
-      font-size:22px;
-      font-weight:900;
-      color:var(--primary);
-      line-height:1;
-      letter-spacing:-0.02em;
-    }
+.heroClockTime{
+font-size:22px;
+font-weight:900;
+}
 
-    .hero{
-      position:relative;
-      overflow:hidden;
-      border-radius:24px;
-      padding:22px 18px 18px;
-      margin-bottom:12px;
-      background:
-        linear-gradient(rgba(8,35,66,.74), rgba(8,35,66,.82)),
-        url("https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat;
-      box-shadow:var(--shadow-strong);
-      color:#fff;
-    }
+.heroTitle{
+margin:0 0 8px;
+font-size:22px;
+font-weight:900;
+letter-spacing:-0.02em;
+text-transform:uppercase;
+}
 
-    .heroContent{
-      position:relative;
-      z-index:1;
-    }
+.heroText{
+margin:0 0 16px;
+font-size:13px;
+line-height:1.5;
+color:rgba(255,255,255,.92);
+}
 
-    .welcome{
-      margin:0 0 8px;
-      font-size:13px;
-      font-weight:700;
-      color:rgba(255,255,255,.84);
-    }
+.heroActions{
+display:grid;
+gap:10px;
+}
 
-    .heroTitle{
-      margin:0 0 10px;
-      font-size:22px;
-      line-height:1.08;
-      font-weight:900;
-      letter-spacing:-0.03em;
-      text-transform:uppercase;
-      word-break:break-word;
-    }
+.heroBtn{
+width:100%;
+height:52px;
+border:none;
+border-radius:14px;
+background:#fff;
+color:var(--primary);
+font-weight:800;
+font-size:14px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+box-shadow:0 8px 18px rgba(0,0,0,.10);
+}
 
-    .heroText{
-      margin:0 0 16px;
-      font-size:13px;
-      line-height:1.55;
-      color:rgba(255,255,255,.92);
-      max-width:290px;
-    }
+.card{
+background:#fff;
+border-radius:20px;
+box-shadow:var(--shadow);
+padding:16px;
+margin-bottom:12px;
+}
 
-    .heroActions{
-      display:grid;
-      gap:10px;
-      max-width:100%;
-    }
+.sectionTitle{
+margin:0 0 10px;
+font-size:16px;
+font-weight:900;
+color:var(--primary);
+}
 
-    .heroBtn{
-      width:100%;
-      min-height:50px;
-      border:none;
-      border-radius:14px;
-      background:#fff;
-      color:var(--primary);
-      font-size:14px;
-      font-weight:800;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      padding:0 14px;
-      cursor:pointer;
-      box-shadow:0 8px 18px rgba(0,0,0,.10);
-    }
+.miniGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:9px;
+}
 
-    .heroBtn .icon{
-      font-size:16px;
-      flex-shrink:0;
-    }
+.miniBox{
+border:1px solid var(--line);
+border-radius:14px;
+padding:11px;
+}
 
-    .card{
-      background:var(--card);
-      border-radius:20px;
-      box-shadow:var(--shadow);
-      padding:16px;
-      margin-bottom:12px;
-    }
+.miniLabel{
+font-size:10px;
+font-weight:800;
+color:var(--muted);
+text-transform:uppercase;
+margin-bottom:5px;
+}
 
-    .sectionTitle{
-      margin:0 0 10px;
-      font-size:16px;
-      font-weight:900;
-      color:var(--primary);
-    }
+.miniValue{
+font-size:13px;
+font-weight:700;
+}
 
-    .miniGrid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:9px;
-    }
+.rowList{
+display:grid;
+gap:9px;
+}
 
-    .miniBox{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:11px;
-      background:#fff;
-    }
+.rowLink{
+width:100%;
+border:none;
+border-radius:14px;
+background:#fff;
+box-shadow:inset 0 0 0 1px var(--line);
+padding:13px 14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;
+}
 
-    .miniLabel{
-      display:block;
-      font-size:10px;
-      font-weight:800;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.04em;
-      margin-bottom:5px;
-    }
+.rowTitle{
+font-size:13px;
+font-weight:800;
+}
 
-    .miniValue{
-      display:block;
-      font-size:13px;
-      font-weight:700;
-      color:var(--text);
-      word-break:break-word;
-      line-height:1.4;
-    }
+.rowSub{
+font-size:11px;
+color:var(--muted);
+}
 
-    .rowList{
-      display:grid;
-      gap:9px;
-    }
+.arrow{
+font-size:18px;
+color:#9ca3af;
+}
 
-    .rowLink{
-      width:100%;
-      border:none;
-      border-radius:14px;
-      background:#fff;
-      box-shadow:inset 0 0 0 1px var(--line);
-      padding:13px 14px;
-      text-align:left;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
-      cursor:pointer;
-    }
+.logoutBtn{
+width:100%;
+height:48px;
+border:none;
+border-radius:14px;
+background:var(--danger);
+color:#fff;
+font-weight:800;
+cursor:pointer;
+}
 
-    .rowTitle{
-      display:block;
-      font-size:13px;
-      font-weight:800;
-      margin-bottom:2px;
-      color:var(--text);
-    }
+.footerNote{
+text-align:center;
+font-size:11px;
+color:#8b9099;
+line-height:1.55;
+}
 
-    .rowSub{
-      display:block;
-      font-size:11px;
-      color:var(--muted);
-      line-height:1.4;
-    }
+.bottomNav{
+position:fixed;
+left:50%;
+bottom:14px;
+transform:translateX(-50%);
+width:calc(100% - 24px);
+max-width:430px;
+background:rgba(255,255,255,.96);
+border-radius:20px;
+box-shadow:0 12px 30px rgba(2,18,34,.14);
+display:grid;
+grid-template-columns:repeat(5,1fr);
+padding:8px 6px;
+}
 
-    .arrow{
-      color:#9ca3af;
-      font-size:17px;
-      flex-shrink:0;
-    }
+.bottomNavItem{
+border:none;
+background:transparent;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+font-size:11px;
+color:#667085;
+cursor:pointer;
+}
 
-    .logoutBtn{
-      width:100%;
-      height:48px;
-      border:none;
-      border-radius:14px;
-      background:var(--danger);
-      color:#fff;
-      font-size:14px;
-      font-weight:800;
-      cursor:pointer;
-    }
+.bottomNavItem.active{
+color:var(--primary);
+}
 
-    .footerNote{
-      text-align:center;
-      font-size:11px;
-      color:#8b9099;
-      line-height:1.55;
-      padding-top:2px;
-    }
-
-    .bottomNav{
-      position:fixed;
-      left:50%;
-      bottom:14px;
-      transform:translateX(-50%);
-      width:calc(100% - 24px);
-      max-width:430px;
-      background:rgba(255,255,255,.96);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      border-radius:20px;
-      box-shadow:0 12px 30px rgba(2,18,34,.14);
-      display:grid;
-      grid-template-columns:repeat(5, 1fr);
-      gap:4px;
-      padding:8px 6px;
-      z-index:999;
-    }
-
-    .bottomNavItem{
-      border:none;
-      background:transparent;
-      border-radius:14px;
-      min-height:58px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:3px;
-      color:#667085;
-      cursor:pointer;
-      font:inherit;
-      padding:6px 4px;
-    }
-
-    .bottomNavItem.active{
-      background:#edf4fb;
-      color:var(--primary);
-    }
-
-    .navIcon{
-      font-size:18px;
-      line-height:1;
-    }
-
-    .navText{
-      font-size:11px;
-      font-weight:800;
-      line-height:1.1;
-    }
-
-    @media (max-width:380px){
-      .miniGrid{
-        grid-template-columns:1fr;
-      }
-
-      .heroTitle{
-        font-size:20px;
-      }
-
-      .bottomNav{
-        width:calc(100% - 18px);
-        bottom:10px;
-      }
-
-      .navText{
-        font-size:10px;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <div class="shell">
 
-    <div class="topbar">
-      <div class="topbarRow">
-        <img
-          class="brandLogoLarge"
-          src="https://mitec.com.my/static/img/logos/mitec-new-logo.png"
-          alt="MITEC Logo"
-        >
+<div class="shell">
 
-        <h1 class="brandTitleSingle">MITEC Casual Labour</h1>
+<div class="topbar">
+<div class="topbarRow">
 
-        <img
-          id="headerPhoto"
-          class="headerPhoto"
-          src="https://ui-avatars.com/api/?name=Worker&background=0f4a82&color=fff&size=200"
-          alt="Profile"
-          onclick="goToPage('profile.html')"
-        >
-      </div>
-    </div>
+<img class="brandLogoLarge"
+src="https://mitec.com.my/static/img/logos/mitec-new-logo.png">
 
-    <div class="liveCard">
-      <div class="liveRow">
-        <div>
-          <div class="liveLabel">Today</div>
-          <div class="liveDate" id="liveDate">-</div>
-        </div>
-        <div class="liveTimeWrap">
-          <div class="liveLabel">Current Time</div>
-          <div class="liveTime" id="liveTime">-</div>
-        </div>
-      </div>
-    </div>
+<h1 class="brandTitleSingle">MITEC Casual Labour</h1>
 
-    <section class="hero">
-      <div class="heroContent">
-        <p class="welcome">Welcome,</p>
-        <h2 class="heroTitle" id="heroName">WORKER NAME</h2>
-        <p class="heroText">
-          This dashboard centralises your bookings, attendance, and records into one streamlined workspace.
-        </p>
+<img id="headerPhoto"
+class="headerPhoto"
+src="https://ui-avatars.com/api/?name=Worker&background=0f4a82&color=fff&size=200"
+onclick="goToPage('profile.html')">
 
-        <div class="heroActions">
-          <button class="heroBtn" onclick="goToPage('signin.html')">
-            <span class="icon">☐</span>
-            <span>Sign In</span>
-          </button>
+</div>
+</div>
 
-          <button class="heroBtn" onclick="goToPage('https://forms.gle/cE6wDc2has6qvPhj7')">
-            <span class="icon">▣</span>
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </div>
-    </section>
 
-    <div class="card">
-      <h3 class="sectionTitle">Today Summary</h3>
-      <div class="miniGrid">
-        <div class="miniBox">
-          <span class="miniLabel">Sign In Time</span>
-          <span class="miniValue" id="dashSignIn">-</span>
-        </div>
-        <div class="miniBox">
-          <span class="miniLabel">Sign Out Time</span>
-          <span class="miniValue" id="dashSignOut">-</span>
-        </div>
-        <div class="miniBox">
-          <span class="miniLabel">Voucher No</span>
-          <span class="miniValue" id="dashVoucher">-</span>
-        </div>
-        <div class="miniBox">
-          <span class="miniLabel">Hours Worked</span>
-          <span class="miniValue" id="dashHours">-</span>
-        </div>
-      </div>
-    </div>
+<section class="hero">
 
-    <div class="card">
-      <h3 class="sectionTitle">Records & Services</h3>
-      <div class="rowList">
+<div class="heroClock">
+<div class="heroClockDate" id="liveDate">-</div>
+<div class="heroClockTime" id="liveTime">-</div>
+</div>
 
-        <button class="rowLink" onclick="goToPage('signin.html')">
-          <span>
-            <span class="rowTitle">Sign In</span>
-            <span class="rowSub">Record your attendance and voucher number</span>
-          </span>
-          <span class="arrow">›</span>
-        </button>
+<h2 class="heroTitle" id="heroName">WORKER NAME</h2>
 
-        <button class="rowLink" onclick="goToPage('129.html')">
-          <span>
-            <span class="rowTitle">Attendance</span>
-            <span class="rowSub">Submit clock in / clock out information</span>
-          </span>
-          <span class="arrow">›</span>
-        </button>
+<p class="heroText">
+This dashboard centralises your bookings, attendance and records.
+</p>
 
-        <button class="rowLink" onclick="goToPage('profile.html')">
-          <span>
-            <span class="rowTitle">My Profile</span>
-            <span class="rowSub">View your worker registration information</span>
-          </span>
-          <span class="arrow">›</span>
-        </button>
+<div class="heroActions">
 
-        <button class="rowLink" onclick="goToPage('faq.html')">
-          <span>
-            <span class="rowTitle">FAQ - CasualMITEC</span>
-            <span class="rowSub">Important information and guidance</span>
-          </span>
-          <span class="arrow">›</span>
-        </button>
+<button class="heroBtn"
+onclick="goToPage('signin.html')">
+☐ Sign In
+</button>
 
-        <button class="rowLink" onclick="goToPage('feedback-form.html')">
-          <span>
-            <span class="rowTitle">Feedback</span>
-            <span class="rowSub">Submit feedback or report issues</span>
-          </span>
-          <span class="arrow">›</span>
-        </button>
+<button class="heroBtn"
+onclick="window.location.href='https://forms.gle/cE6wDc2has6qvPhj7'">
+▣ Sign Out
+</button>
 
-      </div>
-    </div>
+</div>
 
-    <div class="card">
-      <button class="logoutBtn" onclick="logout()">Logout</button>
-    </div>
+</section>
 
-    <div class="footerNote">
-      MITEC Casual Labour Attendance System<br>
-      Human Resources Department
-    </div>
-  </div>
 
-  <nav class="bottomNav">
-    <button class="bottomNavItem active" onclick="goToPage('dashboard.html')">
-      <span class="navIcon">⌂</span>
-      <span class="navText">Home</span>
-    </button>
+<div class="card">
+<h3 class="sectionTitle">Today Summary</h3>
 
-    <button class="bottomNavItem" onclick="goToPage('129.html')">
-      <span class="navIcon">◷</span>
-      <span class="navText">Clock</span>
-    </button>
+<div class="miniGrid">
 
-    <button class="bottomNavItem" onclick="goToPage('signin.html')">
-      <span class="navIcon">📄</span>
-      <span class="navText">Sign In</span>
-    </button>
+<div class="miniBox">
+<div class="miniLabel">Sign In Time</div>
+<div class="miniValue" id="dashSignIn">-</div>
+</div>
 
-    <button class="bottomNavItem" onclick="goToPage('feedback-form.html')">
-      <span class="navIcon">📞</span>
-      <span class="navText">Docs</span>
-    </button>
+<div class="miniBox">
+<div class="miniLabel">Sign Out Time</div>
+<div class="miniValue" id="dashSignOut">-</div>
+</div>
 
-    <button class="bottomNavItem" onclick="goToPage('profile.html')">
-      <span class="navIcon">◉</span>
-      <span class="navText">Profile</span>
-    </button>
-  </nav>
+<div class="miniBox">
+<div class="miniLabel">Voucher No</div>
+<div class="miniValue" id="dashVoucher">-</div>
+</div>
 
-  <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+<div class="miniBox">
+<div class="miniLabel">Hours Worked</div>
+<div class="miniValue" id="dashHours">-</div>
+</div>
 
-    if (!localStorage.getItem("mcl_doc_no")) {
-      window.location.href = "index.html";
-    }
+</div>
+</div>
 
-    function getStoredWorker() {
-      try {
-        return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
-      } catch (e) {
-        return {};
-      }
-    }
 
-    function normalizePhone(value) {
-      return String(value || "").replace(/[^\d]/g, "").trim();
-    }
+<div class="card">
+<h3 class="sectionTitle">Records & Services</h3>
 
-    function normalizeDocNo(value) {
-      return String(value || "")
-        .replace(/[^0-9A-Za-z]/g, "")
-        .trim()
-        .toUpperCase();
-    }
+<div class="rowList">
 
-    function formatHeroName(name) {
-      const str = String(name || "").trim();
-      return str || "WORKER NAME";
-    }
+<button class="rowLink" onclick="goToPage('signin.html')">
+<div>
+<div class="rowTitle">Sign In</div>
+<div class="rowSub">Record attendance and voucher</div>
+</div>
+<div class="arrow">›</div>
+</button>
 
-    function convertDriveViewToDirect(url) {
-      const str = String(url || "").trim();
-      if (!str) return "";
+<button class="rowLink" onclick="goToPage('129.html')">
+<div>
+<div class="rowTitle">Attendance</div>
+<div class="rowSub">Clock in / clock out</div>
+</div>
+<div class="arrow">›</div>
+</button>
 
-      const fileMatch = str.match(/\/file\/d\/([^/]+)/);
-      if (fileMatch && fileMatch[1]) {
-        return "https://drive.google.com/uc?export=view&id=" + fileMatch[1];
-      }
+<button class="rowLink" onclick="goToPage('profile.html')">
+<div>
+<div class="rowTitle">My Profile</div>
+<div class="rowSub">Worker registration info</div>
+</div>
+<div class="arrow">›</div>
+</button>
 
-      const openIdMatch = str.match(/[?&]id=([^&]+)/);
-      if (openIdMatch && openIdMatch[1] && str.includes("drive.google.com")) {
-        return "https://drive.google.com/uc?export=view&id=" + openIdMatch[1];
-      }
+<button class="rowLink" onclick="goToPage('faq.html')">
+<div>
+<div class="rowTitle">FAQ</div>
+<div class="rowSub">Important guidance</div>
+</div>
+<div class="arrow">›</div>
+</button>
 
-      return str;
-    }
+<button class="rowLink" onclick="goToPage('feedback-form.html')">
+<div>
+<div class="rowTitle">Feedback</div>
+<div class="rowSub">Report issues</div>
+</div>
+<div class="arrow">›</div>
+</button>
 
-    function getImageFromWorker(worker) {
-      const possibleFields = [
-        "photo_link",
-        "photo",
-        "photo_url",
-        "gambar",
-        "gambar_link",
-        "gambar_url",
-        "image",
-        "image_url",
-        "profile_photo",
-        "photoLink",
-        "picture",
-        "img",
-        "worker_photo"
-      ];
+</div>
+</div>
 
-      for (let key of possibleFields) {
-        if (worker[key] && String(worker[key]).trim() !== "") {
-          return convertDriveViewToDirect(worker[key]);
-        }
-      }
 
-      return "";
-    }
+<div class="card">
+<button class="logoutBtn" onclick="logout()">Logout</button>
+</div>
 
-    function fillWorkerData(workerParam) {
-      const worker = workerParam || getStoredWorker();
+<div class="footerNote">
+MITEC Casual Labour Attendance System<br>
+Human Resources Department
+</div>
 
-      const name =
-        worker.name_mykad ||
-        worker.name ||
-        worker.full_name ||
-        worker.worker_name ||
-        worker.Name ||
-        "Worker Name";
+</div>
 
-      const photo = getImageFromWorker(worker);
-      const headerImg = document.getElementById("headerPhoto");
 
-      document.getElementById("heroName").textContent = formatHeroName(name).toUpperCase();
+<nav class="bottomNav">
 
-      if (headerImg) {
-        headerImg.onerror = function() {
-          headerImg.onerror = null;
-          headerImg.src =
-            "https://ui-avatars.com/api/?name=" +
-            encodeURIComponent(name) +
-            "&background=0f4a82&color=fff&size=200";
-        };
+<button class="bottomNavItem active"
+onclick="goToPage('dashboard.html')">
+⌂ Home
+</button>
 
-        if (photo) {
-          headerImg.src = photo;
-        } else {
-          headerImg.src =
-            "https://ui-avatars.com/api/?name=" +
-            encodeURIComponent(name) +
-            "&background=0f4a82&color=fff&size=200";
-        }
-      }
-    }
+<button class="bottomNavItem"
+onclick="goToPage('129.html')">
+◷ Clock
+</button>
 
-    function goToPage(page) {
-      window.location.href = page;
-    }
+<button class="bottomNavItem"
+onclick="goToPage('signin.html')">
+📄 Sign In
+</button>
 
-    function logout() {
-      localStorage.removeItem("mitecWorkerRecord");
-      localStorage.removeItem("mcl_doc_no");
-      localStorage.removeItem("mcl_phone");
-      window.location.href = "index.html";
-    }
+<button class="bottomNavItem"
+onclick="goToPage('feedback-form.html')">
+✉ Docs
+</button>
 
-    function startLiveClock() {
-      const dateEl = document.getElementById("liveDate");
-      const timeEl = document.getElementById("liveTime");
+<button class="bottomNavItem"
+onclick="goToPage('profile.html')">
+◉ Profile
+</button>
 
-      function updateClock() {
-        const now = new Date();
+</nav>
 
-        const dateText = now.toLocaleDateString("en-GB", {
-          weekday: "long",
-          day: "2-digit",
-          month: "long",
-          year: "numeric"
-        });
 
-        const timeText = now.toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false
-        });
+<script>
 
-        if (dateEl) dateEl.textContent = dateText;
-        if (timeEl) timeEl.textContent = timeText;
-      }
+function goToPage(page){
+window.location.href=page;
+}
 
-      updateClock();
-      setInterval(updateClock, 1000);
-    }
+function logout(){
+localStorage.removeItem("mitecWorkerRecord");
+localStorage.removeItem("mcl_doc_no");
+localStorage.removeItem("mcl_phone");
+window.location.href="index.html";
+}
 
-    async function loadTodaySummary() {
-      const docNo = normalizeDocNo(localStorage.getItem("mcl_doc_no"));
-      if (!docNo) return;
+function startClock(){
 
-      try {
-        const url = `${WEB_APP_URL}?action=get_today_summary&doc_no=${encodeURIComponent(docNo)}`;
-        const res = await fetch(url);
-        const data = await res.json();
+function update(){
 
-        document.getElementById("dashSignIn").textContent = data.sign_in || "-";
-        document.getElementById("dashSignOut").textContent = data.sign_out || "-";
-        document.getElementById("dashVoucher").textContent = data.voucher || "-";
-        document.getElementById("dashHours").textContent = data.hours || "-";
-      } catch (err) {
-        console.error(err);
-        document.getElementById("dashSignIn").textContent = "-";
-        document.getElementById("dashSignOut").textContent = "-";
-        document.getElementById("dashVoucher").textContent = "-";
-        document.getElementById("dashHours").textContent = "-";
-      }
-    }
+const now=new Date();
 
-    async function checkLogin() {
-      const workerData = localStorage.getItem("mitecWorkerRecord");
+const date=now.toLocaleDateString("en-GB",{
+weekday:"long",
+day:"2-digit",
+month:"long",
+year:"numeric"
+});
 
-      if (workerData) {
-        fillWorkerData();
-        loadTodaySummary();
-        return;
-      }
+const time=now.toLocaleTimeString("en-GB",{
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit"
+});
 
-      const docNo = normalizeDocNo(localStorage.getItem("mcl_doc_no"));
-      const phone = normalizePhone(localStorage.getItem("mcl_phone"));
+document.getElementById("liveDate").textContent=date;
+document.getElementById("liveTime").textContent=time;
 
-      if (!docNo || !phone) {
-        window.location.href = "index.html";
-        return;
-      }
+}
 
-      try {
-        const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}&phone=${encodeURIComponent(phone)}`;
-        const res = await fetch(url);
-        const data = await res.json();
+update();
+setInterval(update,1000);
 
-        if (data && data.ok && data.exists && data.record) {
-          localStorage.setItem("mitecWorkerRecord", JSON.stringify(data.record));
-          fillWorkerData(data.record);
-          loadTodaySummary();
-        } else {
-          window.location.href = "index.html";
-        }
-      } catch (err) {
-        console.error(err);
-        window.location.href = "index.html";
-      }
-    }
+}
 
-    window.addEventListener("load", () => {
-      startLiveClock();
-      checkLogin();
-    });
-  </script>
+window.addEventListener("load",startClock);
+
+</script>
+
 </body>
-</html>
+</html>     
