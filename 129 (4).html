@@ -1,0 +1,1287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MITEC — Application Form</title>
+
+  <style>
+    :root{
+      --bg:#f4f6f9;
+      --card:#ffffff;
+      --text:#101828;
+      --muted:#55606a;
+      --line:#d9e1ea;
+      --brand:#224289;
+      --brand2:#D4AF37;
+      --danger:#b42318;
+      --ok:#027a48;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:860px;
+      margin:24px auto;
+      padding:0 14px 34px;
+    }
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .brand{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .mitecLogo{
+      height:38px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+      background:#fff;
+      padding:6px 10px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      box-shadow:0 10px 20px rgba(0,0,0,.06);
+    }
+    @media (max-width:720px){
+      .mitecLogo{
+        height:34px;
+        padding:6px 8px;
+      }
+    }
+    .brand h1{
+      font-size:16px;
+      margin:0;
+      line-height:1.2;
+    }
+    .brand p{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .chip{
+      font-size:12px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+      color:var(--muted);
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:0 10px 26px rgba(0,0,0,.07);
+      overflow:hidden;
+    }
+    .header{
+      padding:18px 18px 14px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg,#ffffff, #fbfcfe);
+    }
+    .header h2{
+      margin:0;
+      font-size:18px;
+      color:var(--brand);
+    }
+    .header .sub{
+      margin-top:6px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .progressWrap{ padding:12px 18px 0; }
+    .progressLine{
+      height:8px;
+      border-radius:999px;
+      background:#e9eef6;
+      overflow:hidden;
+    }
+    .progressLine > div{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--brand), #355cd6);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .stepsMeta{
+      display:flex;
+      justify-content:space-between;
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    form{ padding:18px; }
+    .sectionTitle{
+      font-size:14px;
+      font-weight:750;
+      margin:6px 0 2px;
+      letter-spacing:.2px;
+    }
+    .sectionDesc{
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 14px;
+      line-height:1.45;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width:720px){
+      .grid{ grid-template-columns:1fr; }
+    }
+
+    label{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      margin:10px 0 6px;
+    }
+    .req::after{
+      content:" *";
+      color:var(--danger);
+      font-weight:900;
+    }
+
+    input, select, textarea{
+      width:100%;
+      border:2px solid #c8d2de;
+      border-radius:14px;
+      padding:14px 14px;
+      font-size:15px;
+      background:#ffffff;
+      outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow: inset 0 1px 2px rgba(16,24,40,0.03);
+    }
+
+    input::placeholder,
+    textarea::placeholder{
+      color:#98a2b3;
+      opacity:1;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:#224289;
+      box-shadow:0 0 0 4px rgba(34,66,137,.12);
+      background:#ffffff;
+    }
+
+    #lookupDocNo,
+    #lookupPhone{
+      background:#fcfdff;
+      border:2px solid #c8d2de;
+      border-radius:14px;
+      padding:14px;
+      font-size:15px;
+    }
+
+    .hint{
+      display:none;
+      font-size:12px;
+      color:var(--danger);
+      margin-top:6px;
+      line-height:1.4;
+    }
+    .hint.show{
+      display:block;
+    }
+
+    .radioRow, .checkRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 14px;
+      padding:10px 12px;
+      border:1px solid #cfd6df;
+      border-radius:12px;
+      background:#fff;
+    }
+    .radioItem, .checkItem{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      color:var(--text);
+    }
+    .radioItem input, .checkItem input{
+      width:auto;
+      transform:scale(1.05);
+    }
+
+    .fileBox{
+      border:1px dashed #b9c6d8;
+      border-radius:12px;
+      padding:12px;
+      background:#fbfdff;
+    }
+    .fileBox input{
+      border:none;
+      padding:0;
+      box-shadow:none;
+    }
+    .fileMeta{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .fileList{
+      margin:6px 0 0;
+      padding-left:16px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      margin-top:16px;
+      padding-top:14px;
+      border-top:1px solid var(--line);
+    }
+    .btn{
+      appearance:none;
+      border:0;
+      border-radius:12px;
+      padding:11px 14px;
+      font-weight:800;
+      cursor:pointer;
+      font-size:14px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btnSecondary{
+      background:#eef2f7;
+      color:#2b3640;
+    }
+    .btnPrimary{
+      background:var(--brand);
+      color:#fff;
+      box-shadow:0 10px 18px rgba(34,66,137,.18);
+    }
+    .btnPrimary:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+
+    .alert{
+      margin:12px 0 0;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(180,35,24,.25);
+      background:rgba(180,35,24,.06);
+      color:#7a271a;
+      font-size:13px;
+      display:none;
+      line-height:1.45;
+    }
+    .ok{
+      border:1px solid rgba(2,122,72,.25);
+      background:rgba(2,122,72,.06);
+      color:#03543f;
+    }
+
+    .step{ display:none; }
+    .step.active{ display:block; }
+
+    .miniNote{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:10px;
+      line-height:1.5;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-size:12px;
+      color:var(--muted);
+      margin-left:8px;
+      font-weight:700;
+    }
+
+    .summaryBox{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:12px;
+      line-height:1.6;
+      font-size:13px;
+    }
+    .summaryBox b{
+      display:inline-block;
+      min-width:170px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <img
+          class="mitecLogo"
+          src="https://mitec.com.my/static/img/logos/mitec-new-logo.png"
+          alt="MITEC"
+          loading="lazy"
+        />
+        <div>
+          <h1>MITEC — Application Form</h1>
+          <p>Casual Labour of MITEC</p>
+        </div>
+      </div>
+      <div class="chip" id="chipStep">Section 1 of 6</div>
+    </div>
+
+    <div class="card">
+      <div class="header">
+        <h2 id="stepHeading">Application Form</h2>
+        <div class="sub" id="stepSub">
+          Please complete all required fields.
+        </div>
+      </div>
+
+      <div class="progressWrap">
+        <div class="progressLine"><div id="bar"></div></div>
+        <div class="stepsMeta">
+          <div>Progress</div>
+          <div id="metaRight">17%</div>
+        </div>
+      </div>
+
+      <form id="appForm" novalidate>
+        <input type="hidden" name="form_mode" id="formMode" value="create">
+        <input type="hidden" name="existing_row" id="existingRow" value="">
+
+        <section class="step active" data-title="Application Form" data-sub="By proceeding, you acknowledge and agree with the statements below.">
+          <div class="sectionTitle">Privacy & Confidentiality</div>
+          <p class="sectionDesc">By proceeding with this form, you acknowledge and agree that:</p>
+
+          <div class="fileBox" style="border-style:solid">
+            <p class="sectionDesc" style="margin:0">
+              <b>All submitted information is Private & Confidential (P&C)</b>, accessible only to authorized personnel for attendance, coordination, and administrative purposes under MITEC.
+              <br><br>
+              Your data may be stored and processed using Google Workspace services (e.g., Google Sheets/Drive) in line with Google’s security and privacy standards.
+              <br><br>
+              You confirm that all information provided is accurate and you consent to its use for legitimate purposes related to casual employment at MITEC.
+              <br><br>
+              Any misuse, unauthorized access, or data tampering may result in access restriction, disciplinary action, or legal consequences.
+            </p>
+          </div>
+
+          <div class="fileBox" style="margin-top:14px;">
+            <div class="sectionTitle">Check Existing Submission</div>
+            <p class="sectionDesc" style="margin-top:8px;">
+              Enter your document number and phone number. If a matching record is found, the form will switch to update mode automatically. If no record is found, it will continue as a new submission.
+            </p>
+
+            <div class="grid">
+              <div>
+                <label class="req">Document Number</label>
+                <input
+                  type="text"
+                  id="lookupDocNo"
+                  required
+                  placeholder="Example: 010203145678"
+                >
+                <div class="hint" id="lookupDocHint">Please enter your document number.</div>
+              </div>
+              <div>
+                <label class="req">Phone Number</label>
+                <input
+                  type="tel"
+                  id="lookupPhone"
+                  required
+                  inputmode="numeric"
+                  maxlength="12"
+                  placeholder="Example: 60123456789"
+                >
+                <div class="hint" id="lookupPhoneHint">Please enter a valid phone number starting with 601.</div>
+              </div>
+            </div>
+
+            <div class="miniNote" id="lookupStatusNote">
+              The system will determine whether this is a new submission or an update.
+            </div>
+          </div>
+
+          <label class="req">Proceed</label>
+          <div class="checkRow" role="group" aria-label="Proceed Agreement">
+            <label class="checkItem">
+              <input type="checkbox" id="agreeProceed" required>
+              I understand and agree to proceed.
+            </label>
+          </div>
+
+          <div class="nav">
+            <span></span>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Maklumat Pemohon" data-sub="Please fill in applicant details. All items marked * are required.">
+          <div class="grid">
+            <div>
+              <label class="req">NAME As Per MyKAD</label>
+              <input type="text" name="name_mykad" id="nameMykad" required placeholder="e.g., AHMAD BIN ALI" style="text-transform:uppercase">
+              <div class="hint">Please use CAPITAL LETTERS only.</div>
+            </div>
+
+            <div>
+              <label class="req">Phone Number</label>
+              <input type="tel" name="phone" id="phoneNumber" required inputmode="numeric" autocomplete="tel"
+                     maxlength="12" pattern="^601[0-9]{8,9}$" placeholder="e.g., 60123456789">
+              <div class="hint">Must start with 601 and contain digits only. Example: 60123456789.</div>
+            </div>
+
+            <div>
+              <label class="req">Email Address</label>
+              <input type="email" name="email" id="email" required autocomplete="email"
+                     placeholder="e.g., example@gmail.com">
+              <div class="hint">Please enter a valid email address. Example: name@gmail.com.</div>
+            </div>
+          </div>
+
+          <label class="req">Document Type <span class="badge" id="docBadge">MyKAD</span></label>
+          <div class="radioRow" role="radiogroup" aria-label="Document Type">
+            <label class="radioItem"><input type="radio" name="doc_type" value="MYKAD" required checked> MyKAD</label>
+            <label class="radioItem"><input type="radio" name="doc_type" value="PASSPORT" required> Passport</label>
+          </div>
+          <div class="hint" id="docTypeHint">Please select a document type.</div>
+
+          <label class="req">MyKAD/Passport Number</label>
+          <input type="text" name="mykad_passport_no" id="docNumber" required autocomplete="off"
+                 inputmode="text" placeholder="MyKAD: 12 digits (e.g., 010203145678)" />
+          <div class="hint" id="docHint">MyKAD number must be exactly 12 digits, no dash.</div>
+
+          <label class="req">MyKAD/Passport Copy</label>
+          <div class="fileBox">
+            <input type="file" name="ic_copy" id="icCopy" required accept="image/*,.pdf">
+            <div class="fileMeta">Accepted: image/PDF.</div>
+            <div class="hint" id="icCopyHint">Please upload the required file.</div>
+            <ul class="fileList" id="icList"></ul>
+          </div>
+
+          <label class="req">ALAMAT</label>
+          <textarea name="alamat" id="alamat" required placeholder="Sila berikan alamat semasa. Nyatakan alamat kolej jika tinggal di kolej/universiti."></textarea>
+          <div class="hint">This field is required.</div>
+
+          <div class="grid">
+            <div>
+              <label class="req">GENDER</label>
+              <div class="radioRow" role="radiogroup" aria-label="Gender">
+                <label class="radioItem"><input type="radio" name="gender" value="MALE" required> MALE</label>
+                <label class="radioItem"><input type="radio" name="gender" value="FEMALE" required> FEMALE</label>
+                <label class="radioItem"><input type="radio" name="gender" value="PREFER_NOT_TO_SAY" required> PREFER NOT TO SAY</label>
+              </div>
+              <div class="hint" id="genderHint">Please select one option.</div>
+            </div>
+
+            <div>
+              <label class="req">STATUS PERKAHWINAN</label>
+              <div class="radioRow" role="radiogroup" aria-label="Marital Status">
+                <label class="radioItem"><input type="radio" name="status_perkahwinan" value="BUJANG" required> BUJANG</label>
+                <label class="radioItem"><input type="radio" name="status_perkahwinan" value="BERKAHWIN" required> BERKAHWIN</label>
+                <label class="radioItem"><input type="radio" name="status_perkahwinan" value="LAIN-LAIN" required> LAIN-LAIN</label>
+              </div>
+              <div class="hint" id="statusHint">Please select one option.</div>
+            </div>
+          </div>
+
+          <label class="req">GAMBAR (Passport-size)</label>
+          <div class="fileBox">
+            <input type="file" name="gambar" id="gambar" required accept="image/*">
+            <div class="fileMeta">Upload a clear passport-style photo.</div>
+            <div class="hint" id="gambarHint">Please upload the required file.</div>
+            <ul class="fileList" id="gambarList"></ul>
+          </div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Kecemasan" data-sub="Emergency contact details (required).">
+          <div class="grid">
+            <div>
+              <label class="req">NAMA WARIS</label>
+              <input type="text" name="nama_waris" id="namaWaris" required placeholder="e.g., SITI BINTI ALI" style="text-transform:uppercase">
+              <div class="hint">Please use CAPITAL LETTERS only.</div>
+            </div>
+            <div>
+              <label class="req">HUBUNGAN</label>
+              <input type="text" name="hubungan" id="hubungan" required placeholder="e.g., IBU / BAPA / SUAMI / ISTERI / ADIK" style="text-transform:uppercase">
+              <div class="hint">Please use CAPITAL LETTERS only.</div>
+            </div>
+          </div>
+
+          <label class="req">EMERGENCY Contact No</label>
+          <input type="tel" name="emergency_no" id="emergencyNumber" required inputmode="numeric" autocomplete="tel"
+                 maxlength="12" pattern="^601[0-9]{8,9}$" placeholder="e.g., 60123456789">
+          <div class="hint">Must start with 601 and contain digits only. Example: 60123456789.</div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Latar Belakang" data-sub="Background information (required).">
+          <label class="req">KEBOLEHAN / BAKAT / PENGALAMAN</label>
+          <textarea name="kebolehan" id="kebolehan" required placeholder="Sila nyatakan kebolehan/bakat/pengalaman anda."></textarea>
+          <div class="hint">This field is required.</div>
+
+          <div class="grid">
+            <div>
+              <label class="req">SIJIL / SUNTIKAN TYPHOID</label>
+              <div class="radioRow" role="radiogroup" aria-label="Typhoid">
+                <label class="radioItem"><input type="radio" name="typhoid" value="ADA" required> ADA</label>
+                <label class="radioItem"><input type="radio" name="typhoid" value="TIADA" required> TIADA</label>
+              </div>
+              <div class="hint" id="typhoidHint">Please select one option.</div>
+            </div>
+
+            <div>
+              <label class="req">Transportation</label>
+              <div class="radioRow" role="radiogroup" aria-label="Transport">
+                <label class="radioItem"><input type="radio" name="transportation" value="ADA" required> ADA</label>
+                <label class="radioItem"><input type="radio" name="transportation" value="TIADA" required> TIADA</label>
+              </div>
+              <div class="hint" id="transportationHint">Please select one option.</div>
+            </div>
+          </div>
+
+          <label class="req">Sejarah Kesihatan / Kemalangan</label>
+          <div class="radioRow" role="radiogroup" aria-label="Health History">
+            <label class="radioItem"><input type="radio" name="sejarah" value="TIADA" required> TIADA</label>
+            <label class="radioItem"><input type="radio" name="sejarah" value="OTHER" required> Other</label>
+          </div>
+          <div class="hint" id="sejarahHint">Please select one option.</div>
+
+          <div id="sejarahOtherWrap" style="display:none;margin-top:10px">
+            <label class="req">If Other, please specify</label>
+            <input type="text" name="sejarah_other" id="sejarahOther" placeholder="Describe briefly.">
+            <div class="hint">This field is required.</div>
+          </div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Banking Details" data-sub="Banking info for payments. Make sure it’s correct.">
+          <label class="req">Bank</label>
+          <select name="bank" id="bank" required>
+            <option value="">Select Bank</option>
+            <option>AFFIN BANK BERHAD</option>
+            <option>AGROBANK</option>
+            <option>ALLIANCE BANK MALAYSIA BERHAD</option>
+            <option>AL-RAJHI</option>
+            <option>AMBANK MALAYSIA BERHAD</option>
+            <option>BANK ISLAM MALAYSIA BERHAD</option>
+            <option>BANK KERJASAMA RAKYAT MALAYSIA BERHAD</option>
+            <option>BANK MUAMALAT MALAYSIA BHD</option>
+            <option>BANK MUAMALAT MALAYSIA BHD</option>
+            <option>BANK OF AMERICA (M) BERHAD</option>
+            <option>BANK OF CHINA (M) BERHAD</option>
+            <option>BANK SIMPANAN NASIONAL BERHAD</option>
+            <option>MUFG BANK (MALAYSIA) BERHAD</option>
+            <option>CIMB BANK BERHAD</option>
+            <option>CITIBANK BERHAD</option>
+            <option>DEUTSCHE BANK (MALAYSIA) BERHAD</option>
+            <option>HONG LEONG BANK BERHAD</option>
+            <option>HSBC BANK MALAYSIA BERHAD</option>
+            <option>INDUSTRIAL AND COMMERCIAL BANK OF CHINA (M) BERHAD</option>
+            <option>JP MORGAN CHASE BANK BERHAD</option>
+            <option>KUWAIT FINANCE HOUSE</option>
+            <option>MAYBANK BERHAD</option>
+            <option>MBSB BANK BERHAD</option>
+            <option>MIZUHO BANK (MALAYSIA) BERHAD</option>
+            <option>OCBC BANK BERHAD</option>
+            <option>PUBLIC BANK BERHAD</option>
+            <option>RHB BANK BERHAD</option>
+            <option>STANDARD CHARTERED BANK MALAYSIA BERHAD</option>
+            <option>SUMITOMO MITSUI BANKING CORPORATION (M) BERHAD</option>
+            <option>UNITED OVERSEAS BANK BERHAD (UOB)</option>
+            <option>TnGo E Wallet</option>
+          </select>
+          <div class="hint">Please select a bank.</div>
+
+          <div class="grid">
+            <div>
+              <label class="req">Account Number</label>
+              <input type="text" name="account_no" id="accountNo" required placeholder="Numbers only" inputmode="text">
+              <div class="hint">Account number must contain digits only.</div>
+            </div>
+            <div>
+              <label class="req">Account Holder Name</label>
+              <input type="text" name="account_name" id="accountName" required placeholder="As per bank record" style="text-transform:uppercase">
+              <div class="hint">Please use CAPITAL LETTERS only.</div>
+            </div>
+          </div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Akuan" data-sub="Final declarations before submission.">
+          <div class="sectionTitle">Declaration</div>
+          <p class="sectionDesc">
+            Please review your information before submission. By submitting this form, you confirm that:
+          </p>
+
+          <div class="checkRow" style="flex-direction:column; align-items:flex-start;">
+            <label class="checkItem">
+              <input type="checkbox" id="declareTrue" required>
+              The information provided is true, complete, and accurate.
+            </label>
+            <label class="checkItem">
+              <input type="checkbox" id="declareConsent" required>
+              I agree that MITEC may use my information for coordination, employment administration, and related official purposes.
+            </label>
+            <label class="checkItem">
+              <input type="checkbox" id="declareMode" required>
+              I understand that the system automatically determines whether this is a new submission or an update based on my document number and phone number.
+            </label>
+          </div>
+
+          <div class="sectionTitle" style="margin-top:16px;">Quick Review</div>
+          <div class="summaryBox" id="summaryBox">
+            Summary will appear here before submission.
+          </div>
+
+          <div class="alert" id="submitStatusBox" style="display:none;"></div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="submit" class="btn btnPrimary" id="submitBtn">Submit Form</button>
+          </div>
+
+          <div class="miniNote">
+            The system checks your document number and phone number at the beginning. If a match is found, your submission will update the existing record. Otherwise, it will be submitted as a new record.
+          </div>
+        </section>
+      </form>
+    </div>
+  </div>
+
+<script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+  const form = document.getElementById("appForm");
+  const steps = Array.from(document.querySelectorAll(".step"));
+  const stepHeading = document.getElementById("stepHeading");
+  const stepSub = document.getElementById("stepSub");
+  const chipStep = document.getElementById("chipStep");
+  const bar = document.getElementById("bar");
+  const metaRight = document.getElementById("metaRight");
+  const submitBtn = document.getElementById("submitBtn");
+  const submitStatusBox = document.getElementById("submitStatusBox");
+  const formMode = document.getElementById("formMode");
+  const existingRow = document.getElementById("existingRow");
+  const icCopy = document.getElementById("icCopy");
+  const gambar = document.getElementById("gambar");
+  const lookupStatusNote = document.getElementById("lookupStatusNote");
+
+  let current = 0;
+
+  function updateHeader() {
+    const step = steps[current];
+    stepHeading.textContent = step.dataset.title || "Application Form";
+    stepSub.textContent = step.dataset.sub || "Please complete all required fields.";
+
+    const sectionNo = current + 1;
+    chipStep.textContent = `Section ${sectionNo} of ${steps.length}`;
+    const pct = Math.round((sectionNo / steps.length) * 100);
+    bar.style.width = pct + "%";
+    metaRight.textContent = pct + "%";
+  }
+
+  function showStep(index) {
+    steps.forEach((step, i) => {
+      step.classList.toggle("active", i === index);
+    });
+    current = index;
+    updateHeader();
+    if (current === steps.length - 1) buildSummary();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showHint(el, show = true) {
+    if (!el) return;
+    el.classList.toggle("show", show);
+  }
+
+  function clearHints(step) {
+    step.querySelectorAll(".hint").forEach(h => h.classList.remove("show"));
+  }
+
+  function normalizeDigitsOnly(value) {
+    return String(value || "").replace(/[^\d]/g, "");
+  }
+
+  function applyEntryMode(mode) {
+    formMode.value = mode;
+    icCopy.setAttribute("required", "required");
+    gambar.setAttribute("required", "required");
+    submitBtn.textContent = mode === "update" ? "Update Form" : "Submit Form";
+  }
+
+  function setLookupStatus(text, ok = false) {
+    lookupStatusNote.textContent = text;
+    lookupStatusNote.style.color = ok ? "var(--ok)" : "var(--muted)";
+  }
+
+  function fillRadio(name, value) {
+    if (!value) return;
+    const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  function fillRecord(record) {
+    if (!record) return;
+
+    if (record.name_mykad) document.getElementById("nameMykad").value = String(record.name_mykad).toUpperCase();
+    if (record.phone) document.getElementById("phoneNumber").value = normalizeDigitsOnly(record.phone);
+    if (record.email) document.getElementById("email").value = record.email;
+    if (record.doc_type) fillRadio("doc_type", record.doc_type);
+    if (record.mykad_passport_no) document.getElementById("docNumber").value = record.mykad_passport_no;
+    if (record.alamat) document.getElementById("alamat").value = record.alamat;
+    if (record.gender) fillRadio("gender", record.gender);
+    if (record.status_perkahwinan) fillRadio("status_perkahwinan", record.status_perkahwinan);
+    if (record.nama_waris) document.getElementById("namaWaris").value = String(record.nama_waris).toUpperCase();
+    if (record.hubungan) document.getElementById("hubungan").value = String(record.hubungan).toUpperCase();
+    if (record.emergency_no) document.getElementById("emergencyNumber").value = normalizeDigitsOnly(record.emergency_no);
+    if (record.kebolehan) document.getElementById("kebolehan").value = record.kebolehan;
+    if (record.typhoid) fillRadio("typhoid", record.typhoid);
+    if (record.transportation) fillRadio("transportation", record.transportation);
+    if (record.sejarah) fillRadio("sejarah", record.sejarah);
+
+    if (record.sejarah === "OTHER") {
+      document.getElementById("sejarahOtherWrap").style.display = "block";
+      document.getElementById("sejarahOther").setAttribute("required", "required");
+    } else {
+      document.getElementById("sejarahOtherWrap").style.display = "none";
+      document.getElementById("sejarahOther").removeAttribute("required");
+    }
+
+    if (record.sejarah_other) document.getElementById("sejarahOther").value = record.sejarah_other;
+    if (record.bank) document.getElementById("bank").value = record.bank;
+    if (record.account_no) document.getElementById("accountNo").value = record.account_no;
+    if (record.account_name) document.getElementById("accountName").value = String(record.account_name).toUpperCase();
+
+    updateDocTypeUI(document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD");
+  }
+
+  async function lookupExistingRecord() {
+    const docNo = document.getElementById("lookupDocNo").value.trim();
+    const phone = normalizeDigitsOnly(document.getElementById("lookupPhone").value);
+    const docHint = document.getElementById("lookupDocHint");
+    const phoneHint = document.getElementById("lookupPhoneHint");
+
+    showHint(docHint, false);
+    showHint(phoneHint, false);
+
+    let valid = true;
+
+    if (!docNo) {
+      showHint(docHint, true);
+      valid = false;
+    }
+
+    if (phone && !/^601[0-9]{8,9}$/.test(phone)) {
+  showHint(phoneHint, true);
+  valid = false;
+}
+
+    if (!document.getElementById("agreeProceed").checked) {
+      valid = false;
+    }
+
+    if (!valid) return false;
+
+    setLookupStatus("Checking existing record...");
+
+    try {
+      const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
+      const res = await fetch(url);
+      const result = await res.json();
+
+      document.getElementById("docNumber").value = docNo;
+      document.getElementById("phoneNumber").value = phone;
+
+      if (result.ok && result.exists) {
+        applyEntryMode("update");
+        existingRow.value = result.row || "";
+        fillRecord(result.record || {});
+        setLookupStatus("Matching record found. Form switched to update mode.", true);
+      } else {
+        applyEntryMode("create");
+        existingRow.value = "";
+        setLookupStatus("No matching record found. Form will continue as a new submission.");
+      }
+
+      return true;
+    } catch (err) {
+      setLookupStatus("Unable to check existing record right now. Please try again.");
+      return false;
+    }
+  }
+
+  function validateStep(index) {
+    const step = steps[index];
+    let ok = true;
+    clearHints(step);
+
+    if (index === 0) {
+      return true;
+    }
+
+    const requiredFields = step.querySelectorAll("[required]");
+    requiredFields.forEach(field => {
+      if (field.type === "radio" || field.type === "checkbox") return;
+
+      const hint = field.parentElement?.querySelector(".hint") || field.nextElementSibling;
+
+      if (field.type === "file") {
+        if (!field.files || !field.files.length) {
+          ok = false;
+          showHint(hint, true);
+        }
+        return;
+      }
+
+      if (!String(field.value || "").trim()) {
+        ok = false;
+        showHint(hint, true);
+      }
+    });
+
+    const radioGroups = new Set();
+    step.querySelectorAll('input[type="radio"][required]').forEach(r => radioGroups.add(r.name));
+    radioGroups.forEach(name => {
+      const selected = step.querySelector(`input[name="${name}"]:checked`);
+      const group = step.querySelector(`input[name="${name}"]`);
+      const hint = group?.closest(".radioRow")?.nextElementSibling;
+      if (!selected) {
+        ok = false;
+        if (hint && hint.classList.contains("hint")) hint.classList.add("show");
+      }
+    });
+
+    if (index === 1) {
+      const email = document.getElementById("email");
+      const phone = document.getElementById("phoneNumber");
+      const docType = document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD";
+      const docNo = document.getElementById("docNumber");
+
+      if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+        ok = false;
+        showHint(email.nextElementSibling, true);
+      }
+
+      if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(phone.value))) {
+        ok = false;
+        showHint(phone.nextElementSibling, true);
+      }
+
+      if (docType === "MYKAD" && !/^\d{12}$/.test((docNo.value || "").trim())) {
+        ok = false;
+        showHint(document.getElementById("docHint"), true);
+      }
+
+      if (docType === "PASSPORT" && !String(docNo.value || "").trim()) {
+        ok = false;
+        showHint(document.getElementById("docHint"), true);
+      }
+    }
+
+    if (index === 2) {
+      const emergencyNo = document.getElementById("emergencyNumber");
+      if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(emergencyNo.value))) {
+        ok = false;
+        showHint(emergencyNo.nextElementSibling, true);
+      }
+    }
+
+    if (index === 3) {
+      const sejarahValue = document.querySelector('input[name="sejarah"]:checked')?.value || "";
+      const sejarahOther = document.getElementById("sejarahOther");
+      if (sejarahValue === "OTHER" && !String(sejarahOther.value || "").trim()) {
+        ok = false;
+        showHint(sejarahOther.nextElementSibling, true);
+      }
+    }
+
+    if (index === 4) {
+      const accountNo = document.getElementById("accountNo");
+      if (!/^\d+$/.test((accountNo.value || "").trim())) {
+        ok = false;
+        showHint(accountNo.nextElementSibling, true);
+      }
+    }
+
+    if (index === 5) {
+      ["declareTrue", "declareConsent", "declareMode"].forEach(id => {
+        if (!document.getElementById(id).checked) ok = false;
+      });
+    }
+
+    return ok;
+  }
+
+  document.querySelectorAll(".nextBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (current === 0) {
+        const ready = await lookupExistingRecord();
+        if (!ready) return;
+        showStep(current + 1);
+        return;
+      }
+
+      if (!validateStep(current)) return;
+      if (current < steps.length - 1) showStep(current + 1);
+    });
+  });
+
+  document.querySelectorAll(".prevBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (current > 0) showStep(current - 1);
+    });
+  });
+
+  function updateDocTypeUI(value) {
+    const docBadge = document.getElementById("docBadge");
+    const docHint = document.getElementById("docHint");
+    const docNumber = document.getElementById("docNumber");
+
+    if (value === "PASSPORT") {
+      docBadge.textContent = "Passport";
+      docHint.textContent = "Please enter your passport number.";
+      docNumber.placeholder = "Passport number";
+    } else {
+      docBadge.textContent = "MyKAD";
+      docHint.textContent = "MyKAD number must be exactly 12 digits, no dash.";
+      docNumber.placeholder = "MyKAD: 12 digits (e.g., 010203145678)";
+    }
+  }
+
+  document.querySelectorAll('input[name="doc_type"]').forEach(radio => {
+    radio.addEventListener("change", () => updateDocTypeUI(radio.value));
+  });
+
+  document.querySelectorAll('input[name="sejarah"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      const wrap = document.getElementById("sejarahOtherWrap");
+      const otherInput = document.getElementById("sejarahOther");
+
+      if (radio.value === "OTHER" && radio.checked) {
+        wrap.style.display = "block";
+        otherInput.setAttribute("required", "required");
+      } else if (radio.checked) {
+        wrap.style.display = "none";
+        otherInput.removeAttribute("required");
+        otherInput.value = "";
+      }
+    });
+  });
+
+  ["lookupPhone", "phoneNumber", "emergencyNumber", "accountNo"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener("input", () => {
+      el.value = el.value.replace(/[^\d]/g, "");
+    });
+  });
+
+  ["nameMykad", "namaWaris", "hubungan", "accountName"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      el.value = el.value.toUpperCase();
+    });
+  });
+
+  function updateFileList(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    if (!input || !list) return;
+
+    input.addEventListener("change", () => {
+      list.innerHTML = "";
+      Array.from(input.files || []).forEach(file => {
+        const li = document.createElement("li");
+        li.textContent = file.name;
+        list.appendChild(li);
+      });
+    });
+  }
+
+  updateFileList("icCopy", "icList");
+  updateFileList("gambar", "gambarList");
+
+  function safeVal(id) {
+    return (document.getElementById(id)?.value || "").trim();
+  }
+
+  function checkedText(name) {
+    return document.querySelector(`input[name="${name}"]:checked`)?.value || "-";
+  }
+
+  function buildSummary() {
+    const modeLabel = formMode.value === "update" ? "Update Existing Submission" : "New Submission";
+    const summaryBox = document.getElementById("summaryBox");
+    summaryBox.innerHTML = `
+      <div><b>Application Type:</b> ${modeLabel}</div>
+      <div><b>Name:</b> ${safeVal("nameMykad") || "-"}</div>
+      <div><b>Phone:</b> ${safeVal("phoneNumber") || "-"}</div>
+      <div><b>Email:</b> ${safeVal("email") || "-"}</div>
+      <div><b>Document Type:</b> ${checkedText("doc_type")}</div>
+      <div><b>Document Number:</b> ${safeVal("docNumber") || "-"}</div>
+      <div><b>Gender:</b> ${checkedText("gender")}</div>
+      <div><b>Marital Status:</b> ${checkedText("status_perkahwinan")}</div>
+      <div><b>Emergency Contact:</b> ${safeVal("namaWaris") || "-"} / ${safeVal("emergencyNumber") || "-"}</div>
+      <div><b>Typhoid:</b> ${checkedText("typhoid")}</div>
+      <div><b>Transportation:</b> ${checkedText("transportation")}</div>
+      <div><b>Sejarah:</b> ${checkedText("sejarah")} ${safeVal("sejarahOther") ? "- " + safeVal("sejarahOther") : ""}</div>
+      <div><b>Bank:</b> ${safeVal("bank") || "-"}</div>
+      <div><b>Account Number:</b> ${safeVal("accountNo") || "-"}</div>
+      <div><b>Account Holder:</b> ${safeVal("accountName") || "-"}</div>
+    `;
+  }
+
+  function showSubmitMessage(message, ok = false) {
+    submitStatusBox.style.display = "block";
+    submitStatusBox.textContent = message;
+    submitStatusBox.className = ok ? "alert ok" : "alert";
+  }
+
+  function compressImageFile(file, label) {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        resolve("");
+        return;
+      }
+
+      const isImage = /^image\//i.test(file.type);
+
+      if (!isImage) {
+        const reader = new FileReader();
+
+        reader.onload = function() {
+          if (!reader.result) {
+            reject(new Error("Unable to read " + label + "."));
+            return;
+          }
+          resolve(reader.result);
+        };
+
+        reader.onerror = function() {
+          reject(new Error("Unable to read " + label + ". Please choose the file again."));
+        };
+
+        reader.onabort = function() {
+          reject(new Error("Reading " + label + " was interrupted."));
+        };
+
+        try {
+          reader.readAsDataURL(file);
+        } catch (err) {
+          reject(new Error("Unable to process " + label + "."));
+        }
+
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        const img = new Image();
+
+        img.onload = function() {
+          let width = img.width;
+          let height = img.height;
+
+          const maxWidth = 1400;
+          const maxHeight = 1400;
+
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          let quality = 0.82;
+          let result = canvas.toDataURL("image/jpeg", quality);
+
+          while (result.length > 900000 && quality > 0.45) {
+            quality -= 0.08;
+            result = canvas.toDataURL("image/jpeg", quality);
+          }
+
+          resolve(result);
+        };
+
+        img.onerror = function() {
+          reject(new Error("Unable to process " + label + "."));
+        };
+
+        img.src = event.target.result;
+      };
+
+      reader.onerror = function() {
+        reject(new Error("Unable to read " + label + ". Please choose the file again."));
+      };
+
+      reader.onabort = function() {
+        reject(new Error("Reading " + label + " was interrupted."));
+      };
+
+      try {
+        reader.readAsDataURL(file);
+      } catch (err) {
+        reject(new Error("Unable to process " + label + "."));
+      }
+    });
+  }
+
+  async function buildPayload() {
+    const icFile = icCopy.files && icCopy.files[0] ? icCopy.files[0] : null;
+    const gambarFile = gambar.files && gambar.files[0] ? gambar.files[0] : null;
+
+    const payload = {
+      form_mode: formMode.value,
+      existing_row: existingRow.value,
+      name_mykad: safeVal("nameMykad"),
+      phone: safeVal("phoneNumber"),
+      email: safeVal("email"),
+      doc_type: checkedText("doc_type"),
+      mykad_passport_no: safeVal("docNumber"),
+      alamat: safeVal("alamat"),
+      gender: checkedText("gender"),
+      status_perkahwinan: checkedText("status_perkahwinan"),
+      nama_waris: safeVal("namaWaris"),
+      hubungan: safeVal("hubungan"),
+      emergency_no: safeVal("emergencyNumber"),
+      kebolehan: safeVal("kebolehan"),
+      typhoid: checkedText("typhoid"),
+      transportation: checkedText("transportation"),
+      sejarah: checkedText("sejarah"),
+      sejarah_other: safeVal("sejarahOther"),
+      bank: safeVal("bank"),
+      account_no: safeVal("accountNo"),
+      account_name: safeVal("accountName")
+    };
+
+    if (icFile) {
+      payload.ic_copy_base64 = await compressImageFile(icFile, "IC Copy");
+      payload.ic_copy_filename = icFile.name;
+    }
+
+    if (gambarFile) {
+      payload.gambar_base64 = await compressImageFile(gambarFile, "Passport Photo");
+      payload.gambar_filename = gambarFile.name;
+    }
+
+    return payload;
+  }
+
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    submitStatusBox.style.display = "none";
+    submitStatusBox.textContent = "";
+    submitStatusBox.className = "alert";
+
+    if (!validateStep(steps.length - 1)) {
+      showSubmitMessage("Please complete all required declarations before submitting.");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = formMode.value === "update" ? "Updating..." : "Submitting...";
+
+    try {
+      const payload = await buildPayload();
+
+      const response = await fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (result.ok) {
+        showSubmitMessage(
+          result.message || (formMode.value === "update"
+            ? "Record updated successfully."
+            : "Record submitted successfully."),
+          true
+        );
+
+        form.reset();
+        document.getElementById("icList").innerHTML = "";
+        document.getElementById("gambarList").innerHTML = "";
+        document.getElementById("sejarahOtherWrap").style.display = "none";
+        document.getElementById("sejarahOther").removeAttribute("required");
+        updateDocTypeUI("MYKAD");
+        applyEntryMode("create");
+        existingRow.value = "";
+        setLookupStatus("The system will determine whether this is a new submission or an update.");
+
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1200);
+      } else {
+        showSubmitMessage("Submission failed: " + (result.message || "Unknown error"));
+      }
+
+    } catch (error) {
+      console.error(error);
+      showSubmitMessage("Unable to submit the form: " + error.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = formMode.value === "update" ? "Update Form" : "Submit Form";
+    }
+  });
+
+  updateHeader();
+  updateDocTypeUI("MYKAD");
+  applyEntryMode("create");
+
+</script>
+</body>
+</html>
