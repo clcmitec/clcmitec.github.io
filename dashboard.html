@@ -238,50 +238,85 @@
   </nav>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
 
-    function getStoredWorker() {
-      return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
-    }
+  function getStoredWorker() {
+    return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+  }
 
-    async function fillWorkerData() {
-      const worker = getStoredWorker();
-      const docNo = worker.mykad_passport_no || localStorage.getItem("mcl_doc_no"); 
-
-      // Set Name & Photo
-      document.getElementById("heroName").textContent = (worker.name_mykad || "WORKER").toUpperCase();
-      const photo = worker.photo_link || "";
-      if (photo) document.getElementById("headerPhoto").src = photo;
-
-      // Fetch Today's Live Summary
-      if (docNo) {
-        try {
-          const res = await fetch(`${WEB_APP_URL}?action=get_today_summary&doc_no=${encodeURIComponent(docNo)}`, { cache: "no-cache" });
-          const data = await res.json();
-          if (data.ok && data.summary) {
-            document.getElementById("dashSignIn").textContent = data.summary.sign_in_time || "--:--";
-            document.getElementById("dashSignOut").textContent = data.summary.sign_out_time || "--:--";
-            document.getElementById("dashVoucher").textContent = data.summary.voucher_no || "-";
-            document.getElementById("dashHours").textContent = data.summary.hours_worked || "0.0";
-          }
-        } catch (e) { console.error("Summary load error", e); }
+  // Converts standard Google Drive sharing links to direct image links
+  function convertToDirectLink(url) {
+    if (!url) return "";
+    let stringUrl = String(url);
+    if (stringUrl.includes("drive.google.com")) {
+      // Regex to extract the File ID specifically
+      const match = stringUrl.match(/\/file\/d\/([^/?]+)/);
+      if (match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
       }
     }
+    return stringUrl;
+  }
 
-    function logout() {
-      localStorage.clear();
+  // Sets image with a fallback placeholder if the link fails
+  function setImageWithFallback(imgId, src, fallback) {
+    const imgEl = document.getElementById(imgId);
+    if (!imgEl) return;
+    
+    imgEl.onerror = function() {
+      this.onerror = null;
+      this.src = fallback;
+    };
+
+    const finalSrc = convertToDirectLink(src);
+    imgEl.src = (finalSrc && finalSrc.length > 10) ? finalSrc : fallback;
+  }
+
+  async function fillWorkerData() {
+    const worker = getStoredWorker();
+    const docNo = worker.mykad_passport_no || localStorage.getItem("mcl_doc_no"); 
+
+    // 1. Set Name
+    const nameStr = worker.name_mykad || worker.full_name || "WORKER";
+    document.getElementById("heroName").textContent = nameStr.toUpperCase();
+
+    // 2. Set Photos (Updated logic)
+    const photoUrl = worker.photo_link || "";
+    const fallback = "https://via.placeholder.com/160?text=MITEC";
+    
+    // Updates the top header photo
+    setImageWithFallback("headerPhoto", photoUrl, fallback);
+
+    // 3. Fetch Today's Live Summary
+    if (docNo) {
+      try {
+        const res = await fetch(`${WEB_APP_URL}?action=get_today_summary&doc_no=${encodeURIComponent(docNo)}`, { cache: "no-cache" });
+        const data = await res.json();
+        if (data.ok && data.summary) {
+          document.getElementById("dashSignIn").textContent = data.summary.sign_in_time || "--:--";
+          document.getElementById("dashSignOut").textContent = data.summary.sign_out_time || "--:--";
+          document.getElementById("dashVoucher").textContent = data.summary.voucher_no || "-";
+          document.getElementById("dashHours").textContent = data.summary.hours_worked || "0.0";
+        }
+      } catch (e) { console.error("Summary load error", e); }
+    }
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+  }
+
+  function goToPage(url) { window.location.href = url; }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("mitecWorkerRecord")) {
       window.location.href = "index.html";
+    } else {
+      fillWorkerData();
     }
+  });
+</script>
 
-    function goToPage(url) { window.location.href = url; }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      if (!localStorage.getItem("mitecWorkerRecord")) {
-        window.location.href = "index.html";
-      } else {
-        fillWorkerData();
-      }
-    });
-  </script>
 </body>
 </html>
