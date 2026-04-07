@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC Worker Profile</title>
+  <style>
+    :root{
+      --bg:#f3f4f6;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#667085;
+      --line:#e5e7eb;
+      --primary:#0f4a82;
+      --primary-dark:#0b3d6c;
+      --shadow:0 10px 28px rgba(2,18,34,.08);
+    }
+
+    *{ box-sizing:border-box; -webkit-font-smoothing: antialiased; }
+
+    html,body{
+      margin:0; padding:0; min-height:100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background:var(--bg); color:var(--text);
+    }
+
+    body{ padding:14px 12px 100px; }
+
+    .shell{ width:100%; max-width:430px; margin:0 auto; }
+
+    .topbar{
+      background:#fff; border-radius:20px; box-shadow:var(--shadow);
+      padding:12px 16px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;
+    }
+
+    .brandLogoLarge{ width:100px; height:auto; object-fit:contain; }
+
+    .headerPhoto{
+      width:40px; height:40px; border-radius:50%; object-fit:cover;
+      border:2px solid var(--line); display:none;
+    }
+
+    .statusMsg{
+      margin-bottom:12px; padding:12px; border-radius:14px; font-size:13px; font-weight:700;
+      display:none; text-align:center;
+    }
+    .statusMsg.success{ display:block; background:#ecfdf5; color:#065f46; }
+    .statusMsg.error{ display:block; background:#fef2f2; color:#991b1b; }
+
+    .card{ background:var(--card); border-radius:24px; box-shadow:var(--shadow); padding:20px; margin-bottom:12px; }
+
+    .pageTitle{ margin:0 0 4px; font-size:22px; font-weight:800; color:var(--primary); }
+    .pageCopy{ margin:0; font-size:13px; color:var(--muted); }
+
+    .sectionTitle{ margin:0 0 12px; font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:var(--primary); border-bottom: 2px solid var(--bg); padding-bottom: 8px; }
+
+    .photoWrap{ display:flex; justify-content:center; padding:10px 0; }
+    .profilePhotoPreview{ width:140px; height:140px; object-fit:cover; border-radius:20px; border:1px solid var(--line); background:#f8fafc; display:none; }
+    .emptyPhoto{ text-align:center; color:var(--muted); font-size:13px; font-style:italic; }
+
+    .infoList{ display:grid; gap:0; }
+    .infoRow{ display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--line); }
+    .infoRow:last-child{ border-bottom:none; }
+    .infoLabel{ color:var(--muted); font-size:12px; font-weight:600; text-transform:uppercase; flex:0 0 40%; }
+    .infoValue{ color:var(--text); font-weight:700; text-align:right; font-size:13px; flex:1; word-break:break-word; }
+
+    .fileLink{ color:var(--primary); font-weight:800; text-decoration:none; background: var(--bg); padding: 4px 10px; border-radius: 8px; font-size: 11px; }
+
+    .logoutBtn{ width:100%; height:50px; border:none; border-radius:16px; background:var(--danger); color:#fff; font-size:14px; font-weight:800; cursor:pointer; margin-top:10px; }
+
+    /* Bottom Nav Styles */
+    .bottomNav{ position:fixed; left:50%; bottom:14px; transform:translateX(-50%); width:calc(100% - 24px); max-width:430px; background:rgba(0,0,0,0.9); backdrop-filter:blur(10px); border-radius:22px; display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; padding:8px; z-index:999; }
+    .bottomNavItem{ border:none; background:transparent; display:flex; flex-direction:column; align-items:center; color:#fff; opacity: 0.5; cursor:pointer; padding:8px; }
+    .bottomNavItem.active{ opacity:1; }
+    .navIcon{ font-size:20px; margin-bottom: 2px;}
+    .navText{ font-size:10px; font-weight:700; }
+
+    @media (max-width:380px){
+      .infoRow{ flex-direction:column; gap:4px; }
+      .infoValue{ text-align:left; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="shell">
+    <div class="topbar">
+      <img class="brandLogoLarge" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
+      <img id="headerPhoto" class="headerPhoto" src="" alt="Profile">
+    </div>
+
+    <div id="statusMsg" class="statusMsg"></div>
+
+    <div class="card">
+      <h2 class="pageTitle" id="pageTitle">Worker Profile</h2>
+      <p class="pageCopy">Verified information from your MITEC application.</p>
+    </div>
+
+    <div class="card">
+      <h3 class="sectionTitle">Identification</h3>
+      <div class="photoWrap">
+        <img id="profilePhotoPreview" class="profilePhotoPreview" src="" alt="Profile">
+        <div id="profilePhotoEmpty" class="emptyPhoto">No photo available</div>
+      </div>
+      <div class="infoList">
+        <div class="infoRow"><div class="infoLabel">Full Name</div><div class="infoValue" id="profileName">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Doc Type</div><div class="infoValue" id="profileDocType">-</div></div>
+        <div class="infoRow"><div class="infoLabel">IC/Passport</div><div class="infoValue" id="profileDocNo">-</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sectionTitle">Contact & Personal</h3>
+      <div class="infoList">
+        <div class="infoRow"><div class="infoLabel">Email</div><div class="infoValue" id="profileEmail">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Phone</div><div class="infoValue" id="profilePhone">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Gender</div><div class="infoValue" id="profileGender">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Address</div><div class="infoValue" id="profileAlamat">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Marital Status</div><div class="infoValue" id="profileStatusKahwin">-</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sectionTitle">Emergency Contact</h3>
+      <div class="infoList">
+        <div class="infoRow"><div class="infoLabel">Next of Kin</div><div class="infoValue" id="profileWaris">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Relationship</div><div class="infoValue" id="profileHubungan">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Emergency No.</div><div class="infoValue" id="profileEmergencyNo">-</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sectionTitle">Banking & Work</h3>
+      <div class="infoList">
+        <div class="infoRow"><div class="infoLabel">Bank Name</div><div class="infoValue" id="profileBank">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Account No.</div><div class="infoValue" id="profileAccountNo">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Skills</div><div class="infoValue" id="profileKebolehan">-</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sectionTitle">Documents</h3>
+      <div class="infoList">
+        <div class="infoRow"><div class="infoLabel">IC/Passport Copy</div><div class="infoValue" id="profileIcLink">-</div></div>
+        <div class="infoRow"><div class="infoLabel">Photo Upload</div><div class="infoValue" id="profilePhotoLink">-</div></div>
+      </div>
+    </div>
+
+    <button class="logoutBtn" onclick="logout()">Sign Out</button>
+    <div style="height:20px;"></div>
+  </div>
+
+  <nav class="bottomNav">
+    <button class="bottomNavItem" onclick="goToPage('dashboard.html')">
+      <span class="navIcon">🏠</span><span class="navText">Home</span>
+    </button>
+    <button class="bottomNavItem" onclick="goToPage('attendance.html')">
+      <span class="navIcon">📊</span><span class="navText">History</span>
+    </button>
+    <button class="bottomNavItem active" onclick="goToPage('profile.html')">
+      <span class="navIcon">👤</span><span class="navText">Profile</span>
+    </button>
+  </nav>
+
+  <script>
+      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+  const fieldMap = {
+    profileName: "name_mykad",
+    profileEmail: "email",
+    profileDocNo: "mykad_passport_no",
+    profilePhone: "phone",
+    profileDocType: "doc_type",
+    profileGender: "gender",
+    profileAlamat: "alamat",
+    profileStatusKahwin: "status_perkahwinan",
+    profileBank: "bank",
+    profileAccountNo: "account_no",
+    profileWaris: "nama_waris",
+    profileHubungan: "hubungan",
+    profileEmergencyNo: "emergency_no",
+    profileKebolehan: "kebolehan"
+  };
+
+  function fillProfile(record) {
+    if (!record) return;
+
+    // 1. Batch Text Updates
+    Object.keys(fieldMap).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = record[fieldMap[id]] || "-";
+    });
+
+    // 2. Optimized Photo Handling
+    const photoUrl = record.photo_link || "";
+    const preview = document.getElementById("profilePhotoPreview");
+    const header = document.getElementById("headerPhoto");
+    const emptyMsg = document.getElementById("profilePhotoEmpty");
+
+    if (photoUrl) {
+      // If photo exists, set sources immediately
+      preview.src = photoUrl;
+      header.src = photoUrl;
+      preview.style.display = "block";
+      header.style.display = "block";
+      if (emptyMsg) emptyMsg.style.display = "none";
+    }
+
+    // 3. Link Updates
+    const icUrl = record.ic_link || "";
+    document.getElementById("profileIcLink").innerHTML = icUrl ? `<a href="${icUrl}" target="_blank" class="fileLink">View IC</a>` : "-";
+    document.getElementById("profilePhotoLink").innerHTML = photoUrl ? `<a href="${photoUrl}" target="_blank" class="fileLink">View Photo</a>` : "-";
+  }
+
+  async function loadData() {
+    const docNo = localStorage.getItem("mcl_doc_no");
+    if (!docNo) { window.location.href = "index.html"; return; }
+
+    // --- SPEED FIX 1: Instant Load from Cache ---
+    const cachedData = localStorage.getItem("mitecWorkerRecord");
+    if (cachedData) {
+      try {
+        fillProfile(JSON.parse(cachedData));
+        console.log("Loaded from cache (instant)");
+      } catch (e) { console.error("Cache error", e); }
+    }
+
+    // --- SPEED FIX 2: Background Fetch ---
+    try {
+      const url = `${APPS_SCRIPT_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (data.ok && data.record) {
+        fillProfile(data.record);
+        // Silently update cache for next time
+        localStorage.setItem("mitecWorkerRecord", JSON.stringify(data.record));
+      }
+    } catch (e) {
+      console.error("Network sync failed, keeping cached data.");
+    }
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+  }
+
+  function goToPage(p) { window.location.href = p; }
+
+  // Use DOMContentLoaded instead of Load for faster execution
+  window.addEventListener("DOMContentLoaded", loadData);
+
+  </script>
+</body>
+</html>
