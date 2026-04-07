@@ -273,38 +273,83 @@
     }
     return str;
   }
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+  // Aggressive Drive ID Extractor
+  function convertDriveLink(url) {
+    if (!url) return "";
+    let str = String(url).trim();
+    if (str.startsWith("data:") || str.includes("drive.google.com/uc")) return str;
+
+    const match = str.match(/\/file\/d\/([^/?]+)|id=([^&]+)/);
+    const fileId = match ? (match[1] || match[2]) : null;
+
+    return fileId ? `https://drive.google.com/uc?export=view&id=${fileId}` : str;
+  }
 
   function fillProfile(record) {
-    // Fill text fields
-    Object.keys(fieldMap).forEach(id => {
-      const val = record[fieldMap[id]];
-      const el = document.getElementById(id);
-      if (el) el.textContent = val || "-";
-    });
+    console.log("Filling profile with:", record);
 
-    // Handle Photos with the new converter
-    const rawPhotoUrl = record.photo_link || "";
-    const directPhotoUrl = convertDriveLink(rawPhotoUrl);
+    // 1. Identify the Name (Checks all possible keys)
+    const fullName = record.name_mykad || record.name || record.full_name || "WORKER";
     
+    // 2. Identify the Photo
+    const rawPhoto = record.photo_link || record.photo || record.foto || "";
+    const cleanPhoto = convertDriveLink(rawPhoto);
+
+    // 3. Update Text Elements
+    const elements = {
+      "pageTitle": fullName.toUpperCase(),
+      "profileName": fullName,
+      "profileEmail": record.email,
+      "profileDocNo": record.mykad_passport_no,
+      "profilePhone": record.phone,
+      "profileDocType": record.doc_type,
+      "profileGender": record.gender,
+      "profileAlamat": record.alamat,
+      "profileStatusKahwin": record.status_perkahwinan,
+      "profileBank": record.bank,
+      "profileAccountNo: ": record.account_no, // Added space to match some sheet formats
+      "profileAccountNo": record.account_no,
+      "profileWaris": record.nama_waris,
+      "profileHubungan": record.hubungan,
+      "profileEmergencyNo": record.emergency_no,
+      "profileKebolehan": record.kebolehan
+    };
+
+    for (let id in elements) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = elements[id] || "-";
+    }
+
+    // 4. Update Images
     const preview = document.getElementById("profilePhotoPreview");
     const header = document.getElementById("headerPhoto");
     const emptyMsg = document.getElementById("profilePhotoEmpty");
+    const fallback = "https://via.placeholder.com/160?text=MITEC";
 
-    if (directPhotoUrl && directPhotoUrl.length > 10) {
-      preview.src = directPhotoUrl;
-      header.src = directPhotoUrl;
-      preview.style.display = "block";
-      header.style.display = "block";
+    if (cleanPhoto && cleanPhoto.length > 10) {
+      if (preview) {
+        preview.src = cleanPhoto;
+        preview.style.display = "block";
+      }
+      if (header) {
+        header.src = cleanPhoto;
+        header.style.display = "block";
+      }
       if (emptyMsg) emptyMsg.style.display = "none";
+    } else {
+      if (preview) preview.src = fallback;
+      if (header) header.src = fallback;
     }
 
-    // Handle Document Links
-    const icUrl = record.ic_link || "";
+    // 5. Update Links
+    const icUrl = convertDriveLink(record.ic_link || "");
     const icEl = document.getElementById("profileIcLink");
     if (icEl) icEl.innerHTML = icUrl ? `<a href="${icUrl}" target="_blank" class="fileLink">View IC</a>` : "-";
     
     const photoEl = document.getElementById("profilePhotoLink");
-    if (photoEl) photoEl.innerHTML = rawPhotoUrl ? `<a href="${rawPhotoUrl}" target="_blank" class="fileLink">View Photo</a>` : "-";
+    if (photoEl) photoEl.innerHTML = rawPhoto ? `<a href="${rawPhoto}" target="_blank" class="fileLink">View Photo</a>` : "-";
   }
 
   async function loadData() {
@@ -312,21 +357,21 @@
     if (!docNo) { window.location.href = "index.html"; return; }
 
     try {
-      // Using check_existing as it's already optimized for your sheet
       const url = `${APPS_SCRIPT_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
       const res = await fetch(url);
       const data = await res.json();
 
       if (data.ok && data.record) {
         fillProfile(data.record);
-        // Refresh local cache
         localStorage.setItem("mitecWorkerRecord", JSON.stringify(data.record));
       } else {
-        setStatus("Record not found.", "error");
+        // Fallback to local storage if network fails but record exists locally
+        const localRecord = JSON.parse(localStorage.getItem("mitecWorkerRecord"));
+        if (localRecord) fillProfile(localRecord);
       }
     } catch (e) {
-      console.error("Load error:", e);
-      setStatus("Connection failed.", "error");
+      const localRecord = JSON.parse(localStorage.getItem("mitecWorkerRecord"));
+      if (localRecord) fillProfile(localRecord);
     }
   }
 
@@ -337,7 +382,8 @@
 
   function goToPage(p) { window.location.href = p; }
 
-  window.addEventListener("load", loadData);
+  // Use DOMContentLoaded to ensure the HTML exists before the script runs
+  window.addEventListener("DOMContentLoaded", loadData);
 
   </script>
 </body>
