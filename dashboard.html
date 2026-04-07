@@ -671,105 +671,108 @@
     </button>
   </nav>
 
-    <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+    <<script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
 
-    function getStoredWorker() {
+  function getStoredWorker() {
+    try {
+      return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function formatHeroName(name) {
+    const str = String(name || "").trim();
+    return str || "WORKER NAME";
+  }
+
+  function setImageWithFallback(imgEl, src, fallback) {
+    if (!imgEl) return;
+    imgEl.onerror = function () {
+      imgEl.onerror = null;
+      imgEl.src = fallback;
+    };
+    // Ensure we handle potentially empty strings or nulls from the database
+    imgEl.src = (src && src.length > 5) ? src : fallback;
+  }
+
+  async function fillWorkerData() {
+    const worker = getStoredWorker();
+    const docNo = worker.mykad_passport_no || localStorage.getItem("mcl_doc_no"); 
+
+    // 1. Update Profile Info
+    const name = worker.name_mykad || worker.full_name || "WORKER NAME";
+    const photo = worker.photo_link || worker.photo || "";
+
+    const headerImg = document.getElementById("headerPhoto");
+    const heroImg = document.getElementById("heroProfilePhoto");
+    const heroName = document.getElementById("heroName");
+    const fallbackImg = "https://via.placeholder.com/160?text=CL";
+
+    if (heroName) {
+        heroName.textContent = formatHeroName(name).toUpperCase();
+    }
+    
+    setImageWithFallback(headerImg, photo, fallbackImg);
+    setImageWithFallback(heroImg, photo, fallbackImg);
+
+    // 2. Fetch Today's Summary (Live from Google Sheets)
+    if (docNo) {
       try {
-        return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
-      } catch (e) {
-        return {};
-      }
-    }
-
-    function formatHeroName(name) {
-      const str = String(name || "").trim();
-      return str || "WORKER NAME";
-    }
-
-    function setImageWithFallback(imgEl, src, fallback) {
-      if (!imgEl) return;
-      imgEl.onerror = function () {
-        imgEl.onerror = null;
-        imgEl.src = fallback;
-      };
-      imgEl.src = src && String(src).trim() ? String(src).trim() : fallback;
-    }
-
-    async function fillWorkerData() {
-      const worker = getStoredWorker();
-      const docNo = worker.mykad_passport_no || localStorage.getItem("mcl_doc_no"); 
-
-      // --- DIAGNOSTIC POPUP ---
-      // This will show you exactly what data the dashboard thinks it has!
-      alert("Diagnostic Check! Name found: " + worker.name_mykad + " | DocNo: " + docNo);
-
-      // Pull the name
-      const name = worker.name_mykad || worker.name || "WORKER NAME";
-      const photo = worker.photo_link || worker.photo || "";
-
-      const headerImg = document.getElementById("headerPhoto");
-      const heroImg = document.getElementById("heroProfilePhoto");
-      const heroName = document.getElementById("heroName");
-      const fallbackImg = "https://via.placeholder.com/160?text=CL";
-
-      if (heroName) heroName.textContent = formatHeroName(name).toUpperCase();
-      if (headerImg) setImageWithFallback(headerImg, photo, fallbackImg);
-      if (heroImg) setImageWithFallback(heroImg, photo, fallbackImg);
-
-      // Fetch Today's Summary
-      if (docNo) {
-        try {
-          const response = await fetch(`${WEB_APP_URL}?action=get_today_summary&doc_no=${encodeURIComponent(docNo)}`);
-          const data = await response.json();
-          
-          if (data.ok && data.summary) {
-            document.getElementById("dashSignIn").textContent = data.summary.sign_in_time || "-";
-            document.getElementById("dashSignOut").textContent = data.summary.sign_out_time || "-";
-            document.getElementById("dashVoucher").textContent = data.summary.voucher_no || "-";
-            document.getElementById("dashHours").textContent = data.summary.hours_worked || "-";
-          }
-        } catch (error) {
-          console.error("Failed to load today's summary:", error);
+        const response = await fetch(`${WEB_APP_URL}?action=get_today_summary&doc_no=${encodeURIComponent(docNo)}`, {
+            cache: "no-cache" // Ensures we don't load old data
+        });
+        const data = await response.json();
+        
+        if (data.ok && data.summary) {
+          document.getElementById("dashSignIn").textContent = data.summary.sign_in_time || "-";
+          document.getElementById("dashSignOut").textContent = data.summary.sign_out_time || "-";
+          document.getElementById("dashVoucher").textContent = data.summary.voucher_no || "-";
+          document.getElementById("dashHours").textContent = data.summary.hours_worked || "-";
         }
+      } catch (error) {
+        console.error("Attendance summary failed to load:", error);
       }
     }
+  }
 
-    function goToPage(page) {
-      window.location.href = page;
-    }
+  function goToPage(page) {
+    window.location.href = page;
+  }
 
-    function toggleMenu() {
-      const menu = document.getElementById("dropdownMenu");
-      menu.classList.toggle("show");
-    }
+  function toggleMenu() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.classList.toggle("show");
+  }
 
-    function logout() {
-      localStorage.removeItem("mitecWorkerRecord");
-      localStorage.removeItem("mcl_doc_no");
+  function logout() {
+    localStorage.clear(); // Clear everything to be safe
+    window.location.href = "index.html";
+  }
+
+  function checkLogin() {
+    const workerData = localStorage.getItem("mitecWorkerRecord");
+    if (!workerData) {
       window.location.href = "index.html";
+      return;
     }
+    fillWorkerData();
+  }
 
-    function checkLogin() {
-      const workerData = localStorage.getItem("mitecWorkerRecord");
-      if (!workerData) {
-        window.location.href = "index.html";
-        return;
-      }
-      fillWorkerData();
+  // Handle menu closing
+  document.addEventListener("click", function(e) {
+    const menu = document.getElementById("dropdownMenu");
+    const menuBtn = document.getElementById("menuBtn");
+    if (menu && menuBtn && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
+      menu.classList.remove("show");
     }
+  });
 
-    document.addEventListener("click", function(e) {
-      const menu = document.getElementById("dropdownMenu");
-      const menuBtn = document.getElementById("menuBtn");
+  // Start the check when the page is fully loaded
+  window.addEventListener("DOMContentLoaded", checkLogin);
+</script>
 
-      if (menu && menuBtn && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
-        menu.classList.remove("show");
-      }
-    });
-
-    window.addEventListener("load", checkLogin);
-  </script>
 
 </body>
 </html>
