@@ -15,19 +15,15 @@
 :root {
   --bg: #f4f7f9;
   --surface: #ffffff;
-
   --primary: #0f4a82;
   --primary-hover: #0b3d6c;
   --primary-light: #e0f0ff;
-
   --text-main: #0f172a;
   --text-muted: #64748b;
-
   --error: #b42318;
   --error-bg: #fef2f2;
   --success: #027a48;
   --success-bg: #ecfdf3;
-
   --radius-card: 28px;
   --radius-input: 16px;
   --radius-btn: 16px;
@@ -57,12 +53,6 @@ body {
   max-width: 380px;
 }
 
-.topNav {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
 .backBtn {
   background: transparent;
   border: none;
@@ -76,6 +66,7 @@ body {
   padding: 8px 12px 8px 0;
   font-family: inherit;
   transition: color 0.2s;
+  margin-bottom: 20px;
 }
 
 .backBtn:hover {
@@ -406,17 +397,20 @@ async function submitSignIn() {
     const data = await res.json();
 
     if (data.ok) {
-  setStatus(data.message || "Sign in recorded successfully.", "success");
-  submitBtn.innerHTML = '<i class="ph-bold ph-check"></i> Success';
+      setStatus(data.message || "Sign in recorded successfully.", "success");
 
-  setTimeout(() => {
-    window.location.href = "dashboard.html";
-  }, 1200);
-} else {
-      setStatus(data.message || "An error occurred.", "error");
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = 'Submit Record <i class="ph-bold ph-paper-plane-right"></i>';
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 3000);
+
+    } else {
+      setStatus(data.message || "Voucher has already been used.", "error");
+
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 3000);
     }
+
   } catch (err) {
     setStatus("Connection error. Check your internet.", "error");
     submitBtn.disabled = false;
