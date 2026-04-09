@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC Premium Dashboard</title>
+  <style>
+    :root {
+      --mitec-blue: #050b24;
+      --mitec-blue-dark: #07223f;
+      --bg-base: #f4f5f8; 
+      --card-bg: #ffffff;
+      --text-main: #1d1d1f;
+      --text-muted: #86868b;
+      --shadow-soft: 0 12px 36px rgba(0,0,0,0.04);
+    }
+
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+    
+    body { 
+      margin: 0; 
+      padding: 20px 16px 120px; 
+      background-color: var(--bg-base);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      color: var(--text-main);
+    }
+
+    .shell { max-width: 440px; margin: 0 auto; }
+
+    /* Premium Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 36px;
+    }
+    
+    .brand-img { height: 26px; width: auto; }
+
+    .profile-trigger {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .profile-trigger:active { transform: scale(0.92); }
+
+    /* Sleek Greeting */
+    .welcome-wrap { margin-bottom: 32px; text-align: left; }
+    .welcome-text { font-size: 14px; font-weight: 500; color: var(--text-muted); margin: 0 0 4px 2px; letter-spacing: 0.02em; }
+    .worker-name { 
+      font-size: 26px; 
+      font-weight: 800; 
+      color: var(--text-main); 
+      margin: 0; 
+      letter-spacing: -0.01em;
+    }
+
+    /* PARTITIONS / GROUPING */
+    .partition { margin-bottom: 48px; }
+    .partition:last-child { margin-bottom: 0; }
+
+    /* Ultra-refined Section Labels */
+    .section-label { 
+      font-size: 11px; font-weight: 700; text-transform: uppercase; 
+      letter-spacing: 0.12em; color: var(--text-muted); margin: 0 0 6px 4px; 
+      display: block; 
+    }
+    .section-desc {
+      font-size: 12px; font-weight: 400; color: #6e6e73;
+      margin: 0 0 16px 4px; line-height: 1.5;
+    }
+
+    /* 1. Highlighted Today Summary (Dark Blue Marble Texture) */
+    .summary-highlight {
+      background: url('dark-blue-marble-plain-photo-wallpapers (1).jpg') center/cover no-repeat;
+      background-color: var(--mitec-blue-dark); /* Fallback color */
+      border-radius: 28px;
+      padding: 24px;
+      color: #fff;
+      box-shadow: 0 20px 40px rgba(7, 34, 63, 0.15);
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle dark overlay so text stays readable over the silver marble veins */
+    .summary-highlight::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 28px;
+      z-index: 0;
+    }
+
+    .loader-wrap {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; z-index: 1; position: relative;
+    }
+    .loader-text {
+      font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.8);
+      letter-spacing: 0.05em; margin-top: 14px; animation: pulse 1.5s infinite;
+    }
+
+    .summary-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; z-index: 1; position: relative;
+    }
+
+    .summary-item {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 16px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .item-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.6); display: block; margin-bottom: 6px; }
+    .item-value { font-size: 18px; font-weight: 700; color: #fff; display: block; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+
+    /* 2. Elevated White Cards */
+    .action-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(0,0,0,0.03);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .action-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+
+    /* Solid Classic Buttons */
+    .duty-btn {
+      height: 56px; border: none; border-radius: 18px;
+      font-size: 14px; font-weight: 600; letter-spacing: 0.01em;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .duty-btn:active { transform: scale(0.96); }
+
+    .btn-in { 
+      background: var(--mitec-blue); 
+      color: #fff; 
+    }
+    .btn-out { 
+       background: var(--mitec-blue); 
+      color: #fff; 
+    }
+
+    /* 3. Services List Grouping */
+    .services-group {
+      background: var(--card-bg);
+      border: 1px solid rgba(0,0,0,0.03);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .nav-row {
+      padding: 18px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      text-decoration: none; color: var(--text-main);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      transition: background 0.2s;
+    }
+    .nav-row:active { background: #f9f9f9; }
+    .nav-row:last-child { border-bottom: none; }
+
+    .nav-info { display: flex; align-items: center; gap: 12px; }
+    .nav-title { font-size: 15px; font-weight: 600; }
+    
+    .chevron-icon {
+      color: #c7c7cc;
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Floating Dock - Matching Dark Marble Theme & Card Radius */
+    .bottom-nav {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 48px); max-width: 360px;
+      background: url('dark-blue-marble-plain-photo-wallpapers (1).jpg') center/cover no-repeat;
+      background-color: var(--mitec-blue-dark);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 28px; /* Changed to match the other cards */
+      display: flex; justify-content: space-around;
+      padding: 12px 8px; box-shadow: 0 15px 35px rgba(7, 34, 63, 0.4);
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    /* Overlay for the bottom nav to keep icons readable */
+    .bottom-nav::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 0;
+    }
+    
+    .nav-item { 
+      color: rgba(255,255,255,0.4); /* Inactive icons are dim white */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px; 
+      transition: all 0.2s ease; 
+      position: relative;
+      z-index: 1; /* Keeps icons above the dark overlay */
+    }
+    
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    /* Active icon is bright white with a soft glowing shadow */
+    .nav-item.active { 
+      color: #ffffff; 
+      filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
+    }
+
+    /* Loading Animations */
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .spinner-large {
+      display: inline-block; width: 32px; height: 32px;
+      border: 3px solid rgba(255,255,255,0.2); border-radius: 50%;
+      border-top-color: #fff; animation: spin 1s linear infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+
+    <div class="shell">
+    
+    <header class="header">
+      <img class="brand-img" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
+      <img id="headerPhoto" class="profile-trigger" src="https://via.placeholder.com/100" onclick="goToPage('profile.html')">
+    </header>
+
+    <div class="welcome-wrap">
+      <p class="welcome-text">Hi,</p>
+      <h1 class="worker-name" id="heroName">LOADING...</h1>
+    </div>
+
+    <div class="partition">
+      <span class="section-label">Shift Activity</span>
+      <p class="section-desc">Your live attendance record and tracked hours for today.</p>
+
+      <section class="summary-highlight">
+        <div id="loaderState" class="loader-wrap">
+          <div class="spinner-large"></div>
+          <span class="loader-text" id="loaderText">Syncing Data...</span>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid" style="display: none;">
+          <div class="summary-item">
+            <span class="item-label">Time In</span>
+            <span class="item-value" id="dashSignIn">--:--</span>
+          </div>
+          <div class="summary-item">
+            <span class="item-label">Time Out</span>
+            <span class="item-value" id="dashSignOut">--:--</span>
+          </div>
+          <div class="summary-item">
+            <span class="item-label">Voucher No.</span>
+            <span class="item-value" id="dashVoucher">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="item-label">Logged Hours</span>
+            <span class="item-value" id="dashHours">0.0</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="partition">
+      <span class="section-label">Clocking</span>
+      <p class="section-desc">Please sign in and sign out for every shift, the voucher number you receive from the West Gate Entrance will be required here.</p>
+
+      <div class="action-card">
+        <div class="action-grid">
+          <button class="duty-btn btn-in" onclick="goToPage('signin.html')">
+            Sign In
+          </button>
+          <button class="duty-btn btn-out" onclick="goToPage('https://forms.gle/zCh5wdVwkkkMFTuC6')">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="partition">
+      <span class="section-label">Services & Account</span>
+      
+      <div class="services-group">
+        
+        <a href="https://lookerstudio.google.com/reporting/9b8a64f0-2e03-430d-aa29-bdb31989a35e" class="nav-row">
+          <div class="nav-info">
+            <span class="nav-title">Attendance History</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+
+        <a href="#" class="nav-row">
+          <div class="nav-info">
+            <span class="nav-title">Shift Schedule</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+
+        <a href="https://lookerstudio.google.com/reporting/4ef7eb70-747a-45cf-926a-8fb2f0a82b2c" class="nav-row">
+          <div class="nav-info">
+            <span class="nav-title">Voucher Replacement</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+
+        <a href="https://lookerstudio.google.com/reporting/f540ed91-c48c-4d4a-a8e7-50d03577879f" class="nav-row">
+          <div class="nav-info">
+            <span class="nav-title">Third Party Bank Count Consent Form</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+
+        <a href="faq.html" class="nav-row">
+          <div class="nav-info">
+            <span class="nav-title">Help & Support</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+
+        <a href="feedback-form.html" class="nav-row">
+          <div class="nav-info">
+            <span class="nav-title">Contact Us</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+
+        <a href="#" onclick="logout()" class="nav-row">
+          <div class="nav-info">
+            <span class="nav-title" style="color: #ff3b30;">Logout</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+    </a>
+    <a href="https://lookerstudio.google.com/reporting/9b8a64f0-2e03-430d-aa29-bdb31989a35e" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+    </a>
+    <a href="profile.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </a>
+  </nav>
+
+  <script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+  function getStoredWorker() {
+    return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+  }
+
+  function convertToDirectLink(url) {
+    if (!url) return "";
+    let stringUrl = String(url);
+    if (stringUrl.includes("drive.google.com")) {
+      const match = stringUrl.match(/\/file\/d\/([^/?]+)/);
+      if (match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      }
+    }
+    return stringUrl;
+  }
+
+  function setImageWithFallback(imgId, src, fallback) {
+    const imgEl = document.getElementById(imgId);
+    if (!imgEl) return;
+    
+    imgEl.onerror = function() {
+      this.onerror = null;
+      this.src = fallback;
+    };
+
+    const finalSrc = convertToDirectLink(src);
+    imgEl.src = (finalSrc && finalSrc.length > 10) ? finalSrc : fallback;
+  }
+
+  async function fillWorkerData() {
+    const worker = getStoredWorker();
+    const docNo = worker.mykad_passport_no || localStorage.getItem("mcl_doc_no"); 
+
+    const nameStr = worker.name_mykad || worker.full_name || "WORKER";
+    document.getElementById("heroName").textContent = nameStr.toUpperCase();
+
+    const photoUrl = worker.photo_link || "";
+    const fallback = "https://via.placeholder.com/160?text=MITEC";
+    setImageWithFallback("headerPhoto", photoUrl, fallback);
+
+    if (docNo) {
+      const loaderState = document.getElementById("loaderState");
+      const summaryGrid = document.getElementById("summaryGrid");
+      const loaderText = document.getElementById("loaderText");
+      
+      const inVal = document.getElementById("dashSignIn");
+      const outVal = document.getElementById("dashSignOut");
+      const vouchVal = document.getElementById("dashVoucher");
+      const hoursVal = document.getElementById("dashHours");
+      
+      loaderState.style.display = "flex";
+      summaryGrid.style.display = "none";
+      loaderText.textContent = "Syncing Data...";
+
+      try {
+        const res = await fetch(`${WEB_APP_URL}?action=get_today_summary&doc_no=${encodeURIComponent(docNo)}`, { cache: "no-cache" });
+        const data = await res.json();
+        
+        loaderState.style.display = "none";
+        summaryGrid.style.display = "grid";
+
+        if (data.ok && data.summary) {
+          inVal.textContent = data.summary.sign_in_time || "--:--";
+          outVal.textContent = data.summary.sign_out_time || "--:--";
+          vouchVal.textContent = data.summary.voucher_no || "-";
+          hoursVal.textContent = data.summary.hours_worked || "0.0";
+        } else {
+          inVal.textContent = "--:--";
+          outVal.textContent = "--:--";
+          vouchVal.textContent = "-";
+          hoursVal.textContent = "0.0";
+        }
+      } catch (e) { 
+        console.error("Summary load error", e); 
+        loaderText.textContent = "Connection Error";
+        loaderText.style.color = "#ff3b30";
+        document.querySelector(".spinner-large").style.display = "none";
+      }
+    }
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+  }
+
+  function goToPage(url) { window.location.href = url; }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("mitecWorkerRecord")) {
+      window.location.href = "index.html";
+    } else {
+      fillWorkerData();
+    }
+  });
+  </script>
+</body>
+</html>
