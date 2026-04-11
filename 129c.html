@@ -1237,8 +1237,241 @@
       nama_waris: safeVal("namaWaris"), hubungan: safeVal("hubungan"),
       emergency_no: safeVal("emergencyNumber"), kebolehan: safeVal("kebolehan"),
       typhoid: checkedText("typhoid"), transportation: checkedText("transportation"),
-      sejarah: checkedText("sejarah"), sejarah_other: safeVal("sejarahOther"),
-      bank: safeVal("bank"), account_no: safeVal("accountNo"), account_name: safeVal("accountName")
+<script>
+  // Executive Backend Configuration
+  // CRITICAL: Ensure this matches your latest "New Version" Deployment URL
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+  const form = document.getElementById("appForm");
+  const steps = Array.from(document.querySelectorAll(".step"));
+  const stepHeading = document.getElementById("stepHeading");
+  const stepSub = document.getElementById("stepSub");
+  const chipStep = document.getElementById("chipStep");
+  const bar = document.getElementById("bar");
+  const submitBtn = document.getElementById("submitBtn");
+  const submitStatusBox = document.getElementById("submitStatusBox");
+  const formMode = document.getElementById("formMode");
+  const existingRow = document.getElementById("existingRow");
+  const icCopy = document.getElementById("icCopy");
+  const lookupStatusNote = document.getElementById("lookupStatusNote");
+
+  // CAMERA ENGINE VARIABLES
+  const cameraFeed = document.getElementById('cameraFeed');
+  const cameraPreview = document.getElementById('cameraPreview');
+  const startCameraBtn = document.getElementById('startCameraBtn');
+  const captureBtn = document.getElementById('captureBtn');
+  const retakeBtn = document.getElementById('retakeBtn');
+  const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+  const cameraControls = document.getElementById('cameraControls');
+  const previewControls = document.getElementById('previewControls');
+  const capturedPhotoData = document.getElementById('capturedPhotoData');
+  const gambarHint = document.getElementById('gambarHint');
+  const cameraMetaText = document.getElementById('cameraMetaText');
+
+  let current = 0;
+  let cameraStream = null;
+
+  // --- 1. CAMERA ENGINE LOGIC ---
+  function stopCamera() {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+    }
+  }
+
+  startCameraBtn.addEventListener('click', async () => {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      cameraFeed.srcObject = cameraStream;
+      cameraPlaceholder.style.display = 'none';
+      cameraFeed.style.display = 'block';
+      cameraControls.style.display = 'flex';
+      showHint(gambarHint, false);
+    } catch (err) {
+      alert("Camera access denied. Please ensure you are using HTTPS (GitHub Pages) and have granted permissions.");
+    }
+  });
+
+  captureBtn.addEventListener('click', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = cameraFeed.videoWidth;
+    canvas.height = cameraFeed.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+    
+    const base64 = canvas.toDataURL('image/jpeg', 0.85);
+    cameraPreview.src = base64;
+    capturedPhotoData.value = base64;
+    
+    cameraFeed.style.display = 'none';
+    cameraControls.style.display = 'none';
+    cameraPreview.style.display = 'block';
+    previewControls.style.display = 'flex';
+    
+    stopCamera(); 
+  });
+
+  retakeBtn.addEventListener('click', () => {
+    cameraPreview.style.display = 'none';
+    previewControls.style.display = 'none';
+    capturedPhotoData.value = '';
+    startCameraBtn.click();
+  });
+
+  // --- 2. NAVIGATION & UI LOGIC ---
+  function updateHeader() {
+    const step = steps[current];
+    stepHeading.textContent = step.dataset.title || "Application Form";
+    stepSub.textContent = step.dataset.sub || "";
+
+    const sectionNo = current + 1;
+    chipStep.textContent = `STEP ${sectionNo} OF ${steps.length}`;
+    bar.style.width = Math.round((sectionNo / steps.length) * 100) + "%";
+  }
+
+  function showStep(index) {
+    steps.forEach((step, i) => step.classList.toggle("active", i === index));
+    current = index;
+    updateHeader();
+    if (current === steps.length - 1) buildSummary();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showHint(el, show = true) {
+    if (el) el.classList.toggle("show", show);
+  }
+
+  function clearHints(step) {
+    step.querySelectorAll(".hint").forEach(h => h.classList.remove("show"));
+  }
+
+  function normalizeDigitsOnly(value) {
+    return String(value || "").replace(/[^\d]/g, "");
+  }
+
+  function applyEntryMode(mode) {
+    formMode.value = mode;
+    const docNumber = document.getElementById("docNumber");
+    const docLockedHint = document.getElementById("docLockedHint");
+
+    if (mode === "update") {
+      docNumber.readOnly = true; // Still accessible by script
+      if (docLockedHint) docLockedHint.classList.add("show");
+      icCopy.removeAttribute("required");
+      document.getElementById("icCopyHint").textContent = "Optional for profile update.";
+      cameraMetaText.textContent = "Optional: Capture new photo to update profile.";
+    } else {
+      docNumber.readOnly = false;
+      if (docLockedHint) docLockedHint.classList.remove("show");
+      icCopy.setAttribute("required", "required");
+      document.getElementById("icCopyHint").textContent = "Document upload required.";
+      cameraMetaText.textContent = "Live capture required for identity verification.";
+    }
+    submitBtn.textContent = mode === "update" ? "Update Registry" : "Submit Registry";
+  }
+
+  // --- 3. DATA LOOKUP LOGIC ---
+  function fillRecord(record) {
+    if (!record) return;
+    document.getElementById("nameMykad").value = (record.name_mykad || "").toUpperCase();
+    document.getElementById("phoneNumber").value = normalizeDigitsOnly(record.phone);
+    document.getElementById("email").value = record.email || "";
+    if (record.doc_type) fillRadio("doc_type", record.doc_type);
+    
+    // CRITICAL: Re-fill the docNumber field so it's ready for the payload
+    document.getElementById("docNumber").value = record.mykad_passport_no || "";
+    
+    document.getElementById("alamat").value = record.alamat || "";
+    if (record.gender) fillRadio("gender", record.gender);
+    if (record.status_perkahwinan) fillRadio("status_perkahwinan", record.status_perkahwinan);
+    document.getElementById("namaWaris").value = (record.nama_waris || "").toUpperCase();
+    document.getElementById("hubungan").value = (record.hubungan || "").toUpperCase();
+    document.getElementById("emergencyNumber").value = normalizeDigitsOnly(record.emergency_no);
+    document.getElementById("kebolehan").value = record.kebolehan || "";
+    if (record.typhoid) fillRadio("typhoid", record.typhoid);
+    if (record.transportation) fillRadio("transportation", record.transportation);
+    if (record.sejarah) fillRadio("sejarah", record.sejarah);
+    
+    const wrap = document.getElementById("sejarahOtherWrap");
+    if (record.sejarah === "OTHER") {
+      wrap.style.display = "block";
+      document.getElementById("sejarahOther").value = record.sejarah_other || "";
+    } else {
+      wrap.style.display = "none";
+    }
+    
+    document.getElementById("bank").value = record.bank || "";
+    document.getElementById("accountNo").value = record.account_no || "";
+    document.getElementById("accountName").value = (record.account_name || "").toUpperCase();
+    
+    updateDocTypeUI(document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD");
+  }
+
+  async function lookupExistingRecord() {
+    const docNo = document.getElementById("lookupDocNo").value.trim();
+    if (!docNo) return false;
+
+    setLookupStatus("Initiating secure profile scan...");
+    try {
+      const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
+      const res = await fetch(url);
+      const result = await res.json();
+
+      // Ensure the hidden/readonly field gets the number immediately
+      document.getElementById("docNumber").value = docNo;
+
+      if (result.ok && result.exists) {
+        fillRecord(result.record || {});
+        applyEntryMode("update");
+        existingRow.value = result.row || "";
+        showLookupPreview(result.record || {});
+        setLookupStatus("Profile verified. Initializing update protocol.", true);
+      } else {
+        applyEntryMode("create");
+        existingRow.value = "";
+        hideLookupPreview();
+        setLookupStatus("No profile detected. Initializing new registry protocol.");
+      }
+      return true;
+    } catch (err) {
+      setLookupStatus("System connection interrupted. (Check HTTPS/GitHub Pages)");
+      return false;
+    }
+  }
+
+  // --- 4. SUBMISSION LOGIC ---
+  async function buildPayload() {
+    const icFile = icCopy.files && icCopy.files[0] ? icCopy.files[0] : null;
+    
+    // CRITICAL: Force grab the MyKAD/Passport number to prevent Column 6 data loss
+    const mykadValue = document.getElementById("docNumber").value.trim();
+    
+    if (!mykadValue) {
+      throw new Error("Critical Error: Document Number is missing. Refresh the page.");
+    }
+
+    const payload = {
+      form_mode: formMode.value,
+      existing_row: existingRow.value,
+      mykad_passport_no: mykadValue, // Column 6 Key
+      name_mykad: safeVal("nameMykad"),
+      phone: safeVal("phoneNumber"),
+      email: safeVal("email"),
+      doc_type: checkedText("doc_type"),
+      alamat: safeVal("alamat"),
+      gender: checkedText("gender"),
+      status_perkahwinan: checkedText("status_perkahwinan"),
+      nama_waris: safeVal("namaWaris"),
+      hubungan: safeVal("hubungan"),
+      emergency_no: safeVal("emergencyNumber"),
+      kebolehan: safeVal("kebolehan"),
+      typhoid: checkedText("typhoid"),
+      transportation: checkedText("transportation"),
+      sejarah: checkedText("sejarah"),
+      sejarah_other: safeVal("sejarahOther"),
+      bank: safeVal("bank"),
+      account_no: safeVal("accountNo"),
+      account_name: safeVal("accountName")
     };
 
     if (icFile) {
@@ -1246,7 +1479,6 @@
       payload.ic_copy_filename = icFile.name;
     }
     
-    // Inject the live camera Base64 string directly
     if (capturedPhotoData.value) {
       payload.gambar_base64 = capturedPhotoData.value;
       payload.gambar_filename = "live_capture.jpg";
@@ -1258,38 +1490,126 @@
   form.addEventListener("submit", async function(e) {
     e.preventDefault();
     submitStatusBox.style.display = "none";
-    submitStatusBox.className = "alert";
 
     if (!validateStep(steps.length - 1)) {
-      showSubmitMessage("Declaration protocols must be verified prior to transmission.");
+      showSubmitMessage("Please verify all declarations.");
       return;
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = formMode.value === "update" ? "Executing Update..." : "Transmitting Data...";
+    submitBtn.textContent = "Transmitting Data...";
 
     try {
       const payload = await buildPayload();
-      const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
+      
+      const response = await fetch(WEB_APP_URL, { 
+        method: "POST", 
+        body: JSON.stringify(payload) 
+      });
       const result = await response.json();
 
       if (result.ok) {
-        showSubmitMessage(result.message || "Protocol completed successfully.", true);
-        setTimeout(() => window.location.reload(), 1500);
+        showSubmitMessage(result.message || "Protocol completed.", true);
+        setTimeout(() => window.location.reload(), 2000);
       } else {
-        showSubmitMessage("Transmission Failed: " + (result.message || "Unknown anomaly"));
+        showSubmitMessage("Error: " + result.message);
       }
     } catch (error) {
-      showSubmitMessage("Network Disconnect: " + error.message);
+      showSubmitMessage("Connection Error: " + error.message);
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = formMode.value === "update" ? "Update Registry" : "Submit Registry";
     }
   });
 
+  // --- HELPER UTILITIES ---
+  function safeVal(id) { return (document.getElementById(id)?.value || "").trim(); }
+  function checkedText(name) { return document.querySelector(`input[name="${name}"]:checked`)?.value || "-"; }
+  function fillRadio(name, value) {
+    const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  function showLookupPreview(record) {
+    const card = document.getElementById("lookupPreviewCard");
+    const photo = document.getElementById("lookupPreviewPhoto");
+    if (!card) return;
+    document.getElementById("previewName").textContent = record?.name_mykad || "-";
+    document.getElementById("previewDocNo").textContent = record?.mykad_passport_no || "-";
+    if (record?.photo_link) {
+      photo.src = record.photo_link;
+      photo.style.display = "block";
+    } else {
+      photo.style.display = "none";
+    }
+    card.style.display = "block";
+  }
+
+  function hideLookupPreview() {
+    const card = document.getElementById("lookupPreviewCard");
+    if (card) card.style.display = "none";
+  }
+
+  function buildSummary() {
+    const summaryBox = document.getElementById("summaryBox");
+    summaryBox.innerHTML = `
+      <div class="summaryGrid">
+        <div class="summaryItem"><span class="summaryLabel">Name</span><span class="summaryValue">${safeVal("nameMykad")}</span></div>
+        <div class="summaryItem"><span class="summaryLabel">ID No.</span><span class="summaryValue">${safeVal("docNumber")}</span></div>
+        <div class="summaryItem"><span class="summaryLabel">Bank</span><span class="summaryValue">${safeVal("bank")}</span></div>
+      </div>
+    `;
+  }
+
+  // Event Listeners for Validation and UI
+  document.querySelectorAll(".nextBtn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      if (current === 0) {
+        if (!validateStep(0)) return;
+        btn.disabled = true;
+        const ready = await lookupExistingRecord();
+        btn.disabled = false;
+        if (!ready) return;
+      }
+      if (!validateStep(current)) return;
+      showStep(current + 1);
+    });
+  });
+
+  document.querySelectorAll(".prevBtn").forEach(btn => {
+    btn.addEventListener("click", () => showStep(current - 1));
+  });
+
+  function validateStep(index) {
+    const step = steps[index];
+    let ok = true;
+    clearHints(step);
+    const required = step.querySelectorAll("[required]");
+    required.forEach(f => {
+      if (f.type === "radio") {
+        const checked = step.querySelector(`input[name="${f.name}"]:checked`);
+        if (!checked) ok = false;
+      } else if (f.type === "checkbox") {
+        if (!f.checked) ok = false;
+      } else if (!f.value.trim()) {
+        ok = false;
+      }
+    });
+    return ok;
+  }
+
+  function updateDocTypeUI(val) {
+    const lbl = document.getElementById("docLabel");
+    lbl.textContent = (val === "PASSPORT") ? "Passport Number" : "MyKAD Number";
+  }
+
+  document.querySelectorAll('input[name="doc_type"]').forEach(r => {
+    r.addEventListener("change", () => updateDocTypeUI(r.value));
+  });
+
+  // Initial Setup
   updateHeader();
-  updateDocTypeUI("MYKAD");
   applyEntryMode("create");
 </script>
-</body>
+
 </html>
