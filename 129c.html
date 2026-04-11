@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MITEC — Application Form</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      /* Frost & Steel Executive Palette */
+      --midnight: #224289;
+      --midnight-light: #1E293B;
+      --steel: #64748B;
+      --steel-light: #94A3B8;
+      --silver: #E2E8F0;
+      --frost: #F8FAFC;
+      --white: #FFFFFF;
+      --accent: #2563EB;
+      --danger: #DC2626;
+      --danger-bg: #FEF2F2;
+      --ok: #059669;
+      --ok-bg: #ECFDF5;
+      
+      --radius: 12px;
+      --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 10px 25px rgba(15, 23, 42, 0.08);
+      --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      font-family: var(--font-stack);
+      background: var(--frost);
+      color: var(--midnight);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 32px auto;
+      padding: 0 16px 40px;
+    }
+
+    /* Executive Branding Header */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 0 8px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .mitecLogo {
+      height: 42px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin: 0;
+      color: var(--midnight);
+      text-transform: uppercase;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--steel);
+      letter-spacing: 0.2px;
+    }
+
+    /* Step Indicator Pill */
+    .chip {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border: 1px solid var(--silver);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--steel);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Premium Card Design */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--silver);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--silver);
+      background: var(--white);
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--midnight);
+      letter-spacing: -0.3px;
+    }
+
+    .header .sub {
+      margin-top: 6px;
+      font-size: 14px;
+      color: var(--steel);
+    }
+
+    /* Sleek Progress Bar */
+    .progressWrap { padding: 0; }
+    .progressLine {
+      height: 3px;
+      background: var(--silver);
+      width: 100%;
+    }
+    .progressLine > div {
+      height: 100%;
+      width: 0%;
+      background: var(--midnight);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    form { padding: 28px; }
+
+    .sectionTitle {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--midnight);
+      margin: 0 0 6px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .sectionDesc {
+      font-size: 13px;
+      color: var(--steel);
+      margin: 0 0 20px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 20px;
+    }
+
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      form { padding: 20px; }
+      .header { padding: 20px; }
+    }
+
+    /* Typography & Spacing for Inputs */
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--midnight-light);
+      margin: 16px 0 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .req::after {
+      content: " *";
+      color: var(--danger);
+    }
+
+    input[type="text"], input[type="tel"], input[type="email"], select, textarea {
+      width: 100%;
+      border: 1px solid var(--steel-light);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-family: var(--font-stack);
+      background: var(--white);
+      color: var(--midnight);
+      outline: none;
+      transition: all 0.2s ease;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    input::placeholder, textarea::placeholder { color: var(--steel-light); }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--midnight);
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+    }
+
+    input[readonly] {
+      background: var(--frost);
+      color: var(--steel);
+      border-color: var(--silver);
+      cursor: not-allowed;
+    }
+
+    /* Lookups & Hints */
+    #lookupDocNo {
+      font-size: 16px;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .hint {
+      display: none;
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 6px;
+      font-weight: 500;
+    }
+    .hint.show { display: block; }
+
+    /* Modernized Radio/Checkbox Rows */
+    .radioRow, .checkRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .radioItem, .checkItem {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--midnight);
+      background: var(--white);
+      border: 1px solid var(--silver);
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 1;
+      min-width: fit-content;
+    }
+
+    .radioItem:hover, .checkItem:hover { border-color: var(--steel-light); }
+    
+    .radioItem input, .checkItem input {
+      accent-color: var(--midnight);
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    /* File Upload Area */
+    .fileBox {
+      border: 1.5px dashed var(--steel-light);
+      border-radius: var(--radius);
+      padding: 20px;
+      background: var(--frost);
+      text-align: center;
+      transition: border-color 0.2s ease;
+    }
+    .fileBox:hover { border-color: var(--midnight); }
+    .fileBox input {
+      width: 100%;
+      font-size: 13px;
+      color: var(--steel);
+      cursor: pointer;
+    }
+    .fileBox input::file-selector-button {
+      background: var(--white);
+      border: 1px solid var(--silver);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--midnight);
+      cursor: pointer;
+      margin-right: 12px;
+      transition: all 0.2s;
+    }
+    .fileBox input::file-selector-button:hover { background: var(--frost); }
+    
+    .fileMeta {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--steel);
+      font-weight: 500;
+    }
+
+    /* Navigation Buttons */
+    .nav {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--silver);
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btnSecondary {
+      background: var(--white);
+      color: var(--midnight);
+      border: 1px solid var(--silver);
+    }
+    .btnSecondary:hover { background: var(--frost); }
+
+    .btnPrimary {
+      background: var(--midnight);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    .btnPrimary:hover {
+      background: var(--midnight-light);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+    }
+    .btnPrimary:disabled {
+      background: var(--steel-light);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Alerts & Notes */
+    .alert {
+      margin: 16px 0 0;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--danger);
+      background: var(--danger-bg);
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+    }
+    .alert.ok {
+      border-color: var(--ok);
+      background: var(--ok-bg);
+      color: var(--ok);
+    }
+
+    .step { display: none; animation: fadeIn 0.3s ease; }
+    .step.active { display: block; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .miniNote {
+      font-size: 12px;
+      color: var(--steel);
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--frost);
+      border: 1px solid var(--silver);
+      font-size: 11px;
+      color: var(--steel);
+      margin-left: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .summaryBox {
+      border: 1px solid var(--silver);
+      border-radius: var(--radius);
+      background: var(--frost);
+      padding: 16px;
+      font-size: 13px;
+      color: var(--midnight);
+    }
+    .summaryGrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .summaryItem {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--silver);
+      padding-bottom: 8px;
+    }
+    .summaryItem:last-child { border-bottom: none; padding-bottom: 0; }
+    .summaryLabel { color: var(--steel); font-weight: 500; }
+    .summaryValue { font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <img class="mitecLogo" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC" loading="lazy" />
+        <div>
+          <h1>Application Form</h1>
+          <p>Casual Labour Registry</p>
+        </div>
+      </div>
+      <div class="chip" id="chipStep">1 / 6</div>
+    </div>
+
+    <div class="card">
+      <div class="progressWrap"><div class="progressLine"><div id="bar"></div></div></div>
+      
+      <div class="header">
+        <h2 id="stepHeading">Application Form</h2>
+        <div class="sub" id="stepSub">Please complete all required fields.</div>
+      </div>
+
+      <form id="appForm" novalidate>
+        <input type="hidden" name="form_mode" id="formMode" value="create">
+        <input type="hidden" name="existing_row" id="existingRow" value="">
+
+        <section class="step active" data-title="System Verification" data-sub="Secure authorization and record lookup.">
+          <div class="sectionTitle">Data Privacy Protocol</div>
+          <div class="summaryBox" style="margin-bottom: 24px; background: var(--white);">
+            <p class="sectionDesc" style="margin:0; font-size: 13px;">
+              <b>Private & Confidential (P&amp;C)</b><br><br>
+              Information is strictly accessible only to authorized MITEC personnel for official coordination and administration. Your data is processed via secure Workspace infrastructure.
+            </p>
+          </div>
+
+          <div class="sectionTitle">Applicant Verification</div>
+          <p class="sectionDesc">Enter your Document Number to verify your identity. The system will automatically route you to a new application or update your existing profile.</p>
+
+          <label class="req">Document Number</label>
+          <input type="text" id="lookupDocNo" required placeholder="Enter MyKAD / Passport No">
+          <div class="hint" id="lookupDocHint">Document number is required for verification.</div>
+
+          <div class="miniNote" id="lookupStatusNote" style="font-weight: 500;">
+            Awaiting input verification...
+          </div>
+
+          <div id="lookupPreviewCard" style="display:none; margin-top:16px;">
+            <div class="summaryBox" style="display:flex; gap:16px; align-items:center; background: var(--white); border-color: var(--midnight);">
+              <img id="lookupPreviewPhoto" src="" alt="Profile" style="width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--silver);" />
+              <div style="flex:1;">
+                <div style="font-size:12px; font-weight:700; color:var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom:4px;">Profile Located</div>
+                <div style="font-size:15px; font-weight:700; color:var(--midnight);" id="previewName">-</div>
+                <div style="font-size:13px; color:var(--steel);" id="previewDocNo">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px;">
+            <label class="req">Authorization</label>
+            <div class="checkRow">
+              <label class="checkItem" style="width: 100%;">
+                <input type="checkbox" id="agreeProceed" required>
+                I acknowledge the privacy protocol and authorize this verification.
+              </label>
+            </div>
+            <div class="hint" id="proceedHint">Authorization is required to proceed.</div>
+          </div>
+
+          <div class="nav">
+            <span></span>
+            <button type="button" class="btn btnPrimary nextBtn">Verify & Proceed</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Personal Profile" data-sub="Official identification and contact information.">
+          <label class="req">Full Name (As Per Official Document)</label>
+          <input type="text" name="name_mykad" id="nameMykad" required placeholder="AHMAD BIN ALI" style="text-transform:uppercase">
+          <div class="hint">Please use capital letters matching your document.</div>
+
+          <div class="grid">
+            <div>
+              <label class="req">Phone Number</label>
+              <input type="tel" name="phone" id="phoneNumber" required inputmode="numeric" maxlength="12" placeholder="60123456789">
+              <div class="hint">Format: 601XXXXXXXX</div>
+            </div>
+            <div>
+              <label class="req">Email Address</label>
+              <input type="email" name="email" id="email" required placeholder="name@domain.com">
+              <div class="hint">Valid email required.</div>
+            </div>
+          </div>
+
+          <label class="req">Document Type <span class="badge" id="docBadge">MyKAD</span></label>
+          <div class="radioRow">
+            <label class="radioItem"><input type="radio" name="doc_type" value="MYKAD" required checked> MyKAD</label>
+            <label class="radioItem"><input type="radio" name="doc_type" value="PASSPORT" required> Passport</label>
+          </div>
+          
+          <label class="req" id="docLabel">MyKAD Number</label>
+          <input type="text" name="mykad_passport_no" id="docNumber" required autocomplete="off" placeholder="12 digits without dashes">
+          <div class="hint" id="docHint">Invalid document format.</div>
+          <div class="hint" id="docLockedHint" style="color:var(--steel);">Locked during profile update.</div>
+
+          <label class="req">Document Scan / Copy</label>
+          <div class="fileBox" style="padding: 12px 20px;">
+            <input type="file" name="ic_copy" id="icCopy" required accept="image/*,.pdf">
+            <div class="fileMeta" style="margin-top: 6px;">Format: JPG, PNG, PDF. Max Size: 5MB.</div>
+            <div class="hint" id="icCopyHint">Document upload required.</div>
+          </div>
+
+          <label class="req">Current Address</label>
+          <textarea name="alamat" id="alamat" required placeholder="Provide full residential or college address..."></textarea>
+          <div class="hint">Address is required.</div>
+
+          <div class="grid">
+            <div>
+              <label class="req">Gender</label>
+              <div class="radioRow">
+                <label class="radioItem"><input type="radio" name="gender" value="MALE" required> Male</label>
+                <label class="radioItem"><input type="radio" name="gender" value="FEMALE" required> Female</label>
+              </div>
+              <div class="hint" id="genderHint">Selection required.</div>
+            </div>
+            <div>
+              <label class="req">Marital Status</label>
+              <div class="radioRow">
+                <label class="radioItem"><input type="radio" name="status_perkahwinan" value="BUJANG" required> Bujang</label>
+                <label class="radioItem"><input type="radio" name="status_perkahwinan" value="BERKAHWIN" required> Berkahwin</label>
+              </div>
+              <div class="hint" id="statusHint">Selection required.</div>
+            </div>
+          </div>
+
+          <label class="req">Profile Photo (Live Capture)</label>
+          <div class="fileBox" id="cameraContainer" style="padding: 16px;">
+            <div id="cameraPlaceholder">
+              <div class="fileMeta" id="cameraMetaText">Live capture required for identity verification.</div>
+              <button type="button" class="btn btnSecondary" id="startCameraBtn" style="margin-top: 12px; width: 100%;">Initialize Camera</button>
+            </div>
+            
+            <video id="cameraFeed" autoplay playsinline style="width: 100%; border-radius: 8px; display: none; background: var(--midnight);"></video>
+            <img id="cameraPreview" style="width: 100%; border-radius: 8px; display: none; border: 1px solid var(--silver);" />
+            
+            <div id="cameraControls" style="display: none; justify-content: center; margin-top: 12px;">
+              <button type="button" class="btn btnPrimary" id="captureBtn" style="width: 100%;">Snap Photo</button>
+            </div>
+            
+            <div id="previewControls" style="display: none; justify-content: space-between; margin-top: 12px; gap: 10px;">
+              <button type="button" class="btn btnSecondary" id="retakeBtn" style="flex: 1;">Retake</button>
+            </div>
+            
+            <input type="hidden" id="capturedPhotoData">
+            <div class="hint" id="gambarHint">Photo capture is required.</div>
+          </div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Emergency Contact" data-sub="Next of kin details for emergency protocol.">
+          <label class="req">Contact Name</label>
+          <input type="text" name="nama_waris" id="namaWaris" required placeholder="SITI BINTI ALI" style="text-transform:uppercase">
+          <div class="hint">Name is required.</div>
+
+          <div class="grid">
+            <div>
+              <label class="req">Relationship</label>
+              <input type="text" name="hubungan" id="hubungan" required placeholder="IBU / BAPA / ISTERI" style="text-transform:uppercase">
+              <div class="hint">Relationship required.</div>
+            </div>
+            <div>
+              <label class="req">Phone Number</label>
+              <input type="tel" name="emergency_no" id="emergencyNumber" required inputmode="numeric" maxlength="12" placeholder="601XXXXXXXX">
+              <div class="hint">Format: 601XXXXXXXX</div>
+            </div>
+          </div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Professional Background" data-sub="Skills and logistical capabilities.">
+          <label class="req">Skills & Experience</label>
+          <textarea name="kebolehan" id="kebolehan" required placeholder="Briefly detail your event, hospitality, or relevant experience..."></textarea>
+          <div class="hint">Experience detail is required.</div>
+
+          <div class="grid">
+            <div>
+              <label class="req">Typhoid Vaccination</label>
+              <div class="radioRow">
+                <label class="radioItem"><input type="radio" name="typhoid" value="ADA" required> Valid</label>
+                <label class="radioItem"><input type="radio" name="typhoid" value="TIADA" required> None</label>
+              </div>
+              <div class="hint" id="typhoidHint">Selection required.</div>
+            </div>
+
+            <div>
+              <label class="req">Personal Transport</label>
+              <div class="radioRow">
+                <label class="radioItem"><input type="radio" name="transportation" value="ADA" required> Yes</label>
+                <label class="radioItem"><input type="radio" name="transportation" value="TIADA" required> No</label>
+              </div>
+              <div class="hint" id="transportationHint">Selection required.</div>
+            </div>
+          </div>
+
+          <label class="req">Medical History / Accidents</label>
+          <div class="radioRow">
+            <label class="radioItem"><input type="radio" name="sejarah" value="TIADA" required> Clear Record</label>
+            <label class="radioItem"><input type="radio" name="sejarah" value="OTHER" required> Has History</label>
+          </div>
+          <div class="hint" id="sejarahHint">Selection required.</div>
+
+          <div id="sejarahOtherWrap" style="display:none; margin-top:16px;">
+            <label class="req">Medical Specification</label>
+            <input type="text" name="sejarah_other" id="sejarahOther" placeholder="Please provide brief details...">
+            <div class="hint">Specification required.</div>
+          </div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Financial Details" data-sub="Banking registry for remuneration processing.">
+          <div class="alert" style="display:block; border-color:var(--steel-light); background:var(--frost); color:var(--midnight); margin-bottom: 20px;">
+            Ensure the account belongs to the applicant. Third-party accounts are strictly prohibited.
+          </div>
+
+          <label class="req">Bank Institution</label>
+          <select name="bank" id="bank" required>
+            <option value="">Select Official Bank</option>
+            <option>AEON Bank</option>
+            <option>AFFIN BANK BERHAD</option>
+            <option>AGROBANK</option>
+            <option>ALLIANCE BANK MALAYSIA BERHAD</option>
+            <option>AL-RAJHI</option>
+            <option>AMBANK MALAYSIA BERHAD</option>
+            <option>BANK ISLAM MALAYSIA BERHAD</option>
+            <option>BANK KERJASAMA RAKYAT MALAYSIA BERHAD</option>
+            <option>BANK MUAMALAT MALAYSIA BHD</option>
+            <option>BANK OF AMERICA (M) BERHAD</option>
+            <option>BANK OF CHINA (M) BERHAD</option>
+            <option>BANK OF TOKYO</option>
+            <option>BANK SIMPANAN NASIONAL BERHAD</option>
+            <option>BeezFintech</option>
+            <option>BigPay Malaysia Sdn Bhd</option>
+            <option>BNP PARIBAS MALAYSIA BERHAD</option>
+            <option>Boost</option>
+            <option>Boost Bank</option>
+            <option>BoostConnect</option>
+            <option>CHINA CONSTRUCTION BANK (MALAYSIA) BERHAD</option>
+            <option>CIMB BANK BERHAD</option>
+            <option>CITIBANK BERHAD</option>
+            <option>Curlec</option>
+            <option>DEUTSCHE BANK (MALAYSIA) BERHAD</option>
+            <option>Fasspay</option>
+            <option>Fave</option>
+            <option>FINEXUS CARDS SDN. BHD.</option>
+            <option>GHL</option>
+            <option>GLOBAL PAYMENTS ASIA-PACIFIC</option>
+            <option>GrabPay</option>
+            <option>GXBank</option>
+            <option>HONG LEONG BANK BERHAD</option>
+            <option>HSBC BANK MALAYSIA BERHAD</option>
+            <option>INDUSTRIAL AND COMMERCIAL BANK OF CHINA (M) BERHAD</option>
+            <option>InstaPay</option>
+            <option>iPay88</option>
+            <option>JP MORGAN CHASE BANK BERHAD</option>
+            <option>KAF INVESTMENT BANK BERHAD</option>
+            <option>Kiplepay</option>
+            <option>KUWAIT FINANCE HOUSE</option>
+            <option>MAYBANK</option>
+            <option>MBSB BANK BERHAD</option>
+            <option>Merchantrade</option>
+            <option>MIZUHO BANK (MALAYSIA) BERHAD</option>
+            <option>MobilityOne</option>
+            <option>OCBC BANK BERHAD</option>
+            <option>Payex</option>
+            <option>PIDM</option>
+            <option>PUBLIC BANK BERHAD</option>
+            <option>Razer Merchant Services</option>
+            <option>Revenue</option>
+            <option>RHB BANK BERHAD</option>
+            <option>SEAMONEY CAPITAL MALAYSIA SDN BHD</option>
+            <option>Setel</option>
+            <option>Shopee</option>
+            <option>SiliconNet</option>
+            <option>STANDARD CHARTERED BANK MALAYSIA BERHAD</option>
+            <option>Stripe</option>
+            <option>SUMITOMO MITSUI BANKING CORPORATION (M) BERHAD</option>
+            <option>Touch n Go eWallet</option>
+            <option>UNITED OVERSEAS BANK BERHAD (UOB)</option>
+          </select>
+          <div class="hint">Institution selection is required.</div>
+
+          <label class="req">Account Number</label>
+          <input type="text" name="account_no" id="accountNo" required placeholder="Digits strictly" inputmode="numeric">
+          <div class="hint">Numeric format required.</div>
+
+          <label class="req">Account Holder Name</label>
+          <input type="text" name="account_name" id="accountName" required placeholder="EXACT NAME ON STATEMENT" style="text-transform:uppercase">
+          <div class="hint">Exact name required.</div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="button" class="btn btnPrimary nextBtn">Next</button>
+          </div>
+        </section>
+
+        <section class="step" data-title="Final Submission" data-sub="Review and finalize your registry input.">
+          
+          <div class="sectionTitle">Registry Summary</div>
+          <div class="summaryBox" id="summaryBox" style="margin-bottom: 24px;">
+            </div>
+
+          <div class="sectionTitle">Applicant Declarations</div>
+          <div class="checkRow" style="flex-direction:column; align-items:flex-start; margin-top: 12px;">
+            <label class="checkItem" style="width:100%; justify-content: flex-start; padding: 14px 16px;">
+              <input type="checkbox" id="declareTrue" required>
+              I certify that all provided information is factual and accurate.
+            </label>
+            <label class="checkItem" style="width:100%; justify-content: flex-start; padding: 14px 16px;">
+              <input type="checkbox" id="declareConsent" required>
+              I consent to the administrative processing of my details by MITEC.
+            </label>
+          </div>
+
+          <div class="alert" id="submitStatusBox"></div>
+
+          <div class="nav">
+            <button type="button" class="btn btnSecondary prevBtn">Back</button>
+            <button type="submit" class="btn btnPrimary" id="submitBtn" style="min-width: 140px;">Submit Registry</button>
+          </div>
+        </section>
+      </form>
+    </div>
+  </div>
+
+<script>
+  // Executive Backend Configuration
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrwJOWtdhgYXq68exQ_g3ilaEwtsePumDBPiBbQzr5hGgcFmtUrfNRzAx4ho8dYjQKyw/exec";
+
+  const form = document.getElementById("appForm");
+  const steps = Array.from(document.querySelectorAll(".step"));
+  const stepHeading = document.getElementById("stepHeading");
+  const stepSub = document.getElementById("stepSub");
+  const chipStep = document.getElementById("chipStep");
+  const bar = document.getElementById("bar");
+  const submitBtn = document.getElementById("submitBtn");
+  const submitStatusBox = document.getElementById("submitStatusBox");
+  const formMode = document.getElementById("formMode");
+  const existingRow = document.getElementById("existingRow");
+  const icCopy = document.getElementById("icCopy");
+  const lookupStatusNote = document.getElementById("lookupStatusNote");
+
+  // CAMERA ENGINE VARIABLES
+  const cameraFeed = document.getElementById('cameraFeed');
+  const cameraPreview = document.getElementById('cameraPreview');
+  const startCameraBtn = document.getElementById('startCameraBtn');
+  const captureBtn = document.getElementById('captureBtn');
+  const retakeBtn = document.getElementById('retakeBtn');
+  const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+  const cameraControls = document.getElementById('cameraControls');
+  const previewControls = document.getElementById('previewControls');
+  const capturedPhotoData = document.getElementById('capturedPhotoData');
+  const gambarHint = document.getElementById('gambarHint');
+  const cameraMetaText = document.getElementById('cameraMetaText');
+
+  let current = 0;
+  let cameraStream = null;
+
+  // --- CAMERA ENGINE LOGIC ---
+  function stopCamera() {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+    }
+  }
+
+  startCameraBtn.addEventListener('click', async () => {
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      cameraFeed.srcObject = cameraStream;
+      cameraPlaceholder.style.display = 'none';
+      cameraFeed.style.display = 'block';
+      cameraControls.style.display = 'flex';
+      showHint(gambarHint, false);
+    } catch (err) {
+      alert("Camera access denied. Please ensure you have granted browser permissions and are using a secure HTTPS connection.");
+    }
+  });
+
+  captureBtn.addEventListener('click', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = cameraFeed.videoWidth;
+    canvas.height = cameraFeed.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+    
+    const base64 = canvas.toDataURL('image/jpeg', 0.85);
+    cameraPreview.src = base64;
+    capturedPhotoData.value = base64;
+    
+    cameraFeed.style.display = 'none';
+    cameraControls.style.display = 'none';
+    cameraPreview.style.display = 'block';
+    previewControls.style.display = 'flex';
+    
+    stopCamera(); 
+  });
+
+  retakeBtn.addEventListener('click', () => {
+    cameraPreview.style.display = 'none';
+    previewControls.style.display = 'none';
+    capturedPhotoData.value = '';
+    startCameraBtn.click();
+  });
+
+  // --- FORM LOGIC ---
+  function updateHeader() {
+    const step = steps[current];
+    stepHeading.textContent = step.dataset.title || "Application Form";
+    stepSub.textContent = step.dataset.sub || "";
+
+    const sectionNo = current + 1;
+    chipStep.textContent = `STEP ${sectionNo} OF ${steps.length}`;
+    bar.style.width = Math.round((sectionNo / steps.length) * 100) + "%";
+  }
+
+  function showStep(index) {
+    steps.forEach((step, i) => step.classList.toggle("active", i === index));
+    current = index;
+    updateHeader();
+    if (current === steps.length - 1) buildSummary();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showHint(el, show = true) {
+    if (el) el.classList.toggle("show", show);
+  }
+
+  function clearHints(step) {
+    step.querySelectorAll(".hint").forEach(h => h.classList.remove("show"));
+  }
+
+  function normalizeDigitsOnly(value) {
+    return String(value || "").replace(/[^\d]/g, "");
+  }
+
+  function applyEntryMode(mode) {
+    formMode.value = mode;
+    const docNumber = document.getElementById("docNumber");
+    const docLockedHint = document.getElementById("docLockedHint");
+
+    if (mode === "update") {
+      docNumber.readOnly = true;
+      if (docLockedHint) docLockedHint.classList.add("show");
+      icCopy.removeAttribute("required");
+      document.getElementById("icCopyHint").textContent = "Optional for profile update.";
+      cameraMetaText.textContent = "Optional: Capture new photo to update profile.";
+    } else {
+      docNumber.readOnly = false;
+      if (docLockedHint) docLockedHint.classList.remove("show");
+      icCopy.setAttribute("required", "required");
+      document.getElementById("icCopyHint").textContent = "Document upload required.";
+      cameraMetaText.textContent = "Live capture required for identity verification.";
+    }
+    submitBtn.textContent = mode === "update" ? "Update Registry" : "Submit Registry";
+  }
+
+  function setLookupStatus(text, ok = false) {
+    lookupStatusNote.textContent = text;
+    lookupStatusNote.style.color = ok ? "var(--ok)" : "var(--steel)";
+  }
+
+  function fillRadio(name, value) {
+    if (!value) return;
+    const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  function fillRecord(record) {
+    if (!record) return;
+    if (record.name_mykad) document.getElementById("nameMykad").value = String(record.name_mykad).toUpperCase();
+    if (record.phone) document.getElementById("phoneNumber").value = normalizeDigitsOnly(record.phone);
+    if (record.email) document.getElementById("email").value = record.email;
+    if (record.doc_type) fillRadio("doc_type", record.doc_type);
+    if (record.mykad_passport_no) document.getElementById("docNumber").value = record.mykad_passport_no;
+    if (record.alamat) document.getElementById("alamat").value = record.alamat;
+    if (record.gender) fillRadio("gender", record.gender);
+    if (record.status_perkahwinan) fillRadio("status_perkahwinan", record.status_perkahwinan);
+    if (record.nama_waris) document.getElementById("namaWaris").value = String(record.nama_waris).toUpperCase();
+    if (record.hubungan) document.getElementById("hubungan").value = String(record.hubungan).toUpperCase();
+    if (record.emergency_no) document.getElementById("emergencyNumber").value = normalizeDigitsOnly(record.emergency_no);
+    if (record.kebolehan) document.getElementById("kebolehan").value = record.kebolehan;
+    if (record.typhoid) fillRadio("typhoid", record.typhoid);
+    if (record.transportation) fillRadio("transportation", record.transportation);
+    if (record.sejarah) fillRadio("sejarah", record.sejarah);
+    if (record.sejarah === "OTHER") {
+      document.getElementById("sejarahOtherWrap").style.display = "block";
+      document.getElementById("sejarahOther").setAttribute("required", "required");
+    } else {
+      document.getElementById("sejarahOtherWrap").style.display = "none";
+      document.getElementById("sejarahOther").removeAttribute("required");
+    }
+    if (record.sejarah_other) document.getElementById("sejarahOther").value = record.sejarah_other;
+    if (record.bank) document.getElementById("bank").value = record.bank;
+    if (record.account_no) document.getElementById("accountNo").value = record.account_no;
+    if (record.account_name) document.getElementById("accountName").value = String(record.account_name).toUpperCase();
+    
+    updateDocTypeUI(document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD");
+  }
+
+  function showLookupPreview(record) {
+    const card = document.getElementById("lookupPreviewCard");
+    const photo = document.getElementById("lookupPreviewPhoto");
+    if (!card) return;
+    document.getElementById("previewName").textContent = record?.name_mykad || "-";
+    document.getElementById("previewDocNo").textContent = record?.mykad_passport_no || "-";
+    if (record?.photo_link) {
+      photo.src = record.photo_link;
+      photo.style.display = "block";
+    } else {
+      photo.style.display = "none";
+    }
+    card.style.display = "block";
+  }
+
+  function hideLookupPreview() {
+    const card = document.getElementById("lookupPreviewCard");
+    if (card) card.style.display = "none";
+  }
+
+  async function lookupExistingRecord() {
+    const docNo = document.getElementById("lookupDocNo").value.trim();
+    const docHint = document.getElementById("lookupDocHint");
+    showHint(docHint, false);
+
+    setLookupStatus("Initiating secure profile scan...");
+    hideLookupPreview();
+
+    try {
+      const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
+      const res = await fetch(url);
+      const result = await res.json();
+
+      document.getElementById("docNumber").value = docNo;
+
+      if (result.ok && result.exists) {
+        fillRecord(result.record || {});
+        applyEntryMode("update");
+        existingRow.value = result.row || "";
+        showLookupPreview(result.record || {});
+        setLookupStatus("Profile verified. Initializing update protocol.", true);
+      } else {
+        applyEntryMode("create");
+        existingRow.value = "";
+        hideLookupPreview();
+        setLookupStatus("No profile detected. Initializing new registry protocol.");
+      }
+      return true;
+    } catch (err) {
+      hideLookupPreview();
+      setLookupStatus("System connection interrupted. Please attempt again.");
+      return false;
+    }
+  }
+
+  function validateStep(index) {
+    const step = steps[index];
+    let ok = true;
+    clearHints(step);
+
+    if (index === 0) {
+      if (!document.getElementById("lookupDocNo").value.trim()) {
+        showHint(document.getElementById("lookupDocHint"), true);
+        ok = false;
+      }
+      if (!document.getElementById("agreeProceed").checked) {
+        showHint(document.getElementById("proceedHint"), true);
+        ok = false;
+      }
+      return ok;
+    }
+
+    const requiredFields = step.querySelectorAll("[required]");
+    requiredFields.forEach(field => {
+      if (field.type === "radio" || field.type === "checkbox") return;
+      const hint = field.parentElement?.querySelector(".hint") || field.nextElementSibling;
+      if (field.type === "file") {
+        if (!field.files || !field.files.length) { ok = false; showHint(hint, true); }
+        return;
+      }
+      if (!String(field.value || "").trim()) { ok = false; showHint(hint, true); }
+    });
+
+    const radioGroups = new Set();
+    step.querySelectorAll('input[type="radio"][required]').forEach(r => radioGroups.add(r.name));
+    radioGroups.forEach(name => {
+      const selected = step.querySelector(`input[name="${name}"]:checked`);
+      const group = step.querySelector(`input[name="${name}"]`);
+      const hint = group?.closest(".radioRow")?.nextElementSibling;
+      if (!selected) {
+        ok = false;
+        if (hint && hint.classList.contains("hint")) hint.classList.add("show");
+      }
+    });
+
+    if (index === 1) {
+      const email = document.getElementById("email");
+      const phone = document.getElementById("phoneNumber");
+      const docType = document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD";
+      const docNo = document.getElementById("docNumber");
+
+      if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+        ok = false; showHint(email.nextElementSibling, true);
+      }
+      if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(phone.value))) {
+        ok = false; showHint(phone.nextElementSibling, true);
+      }
+      if (docType === "MYKAD" && !/^\d{12}$/.test((docNo.value || "").trim())) {
+        ok = false; showHint(document.getElementById("docHint"), true);
+      }
+      if (docType === "PASSPORT" && !String(docNo.value || "").trim()) {
+        ok = false; showHint(document.getElementById("docHint"), true);
+      }
+      if (formMode.value === "create" && !capturedPhotoData.value) {
+        ok = false; showHint(gambarHint, true);
+      }
+    }
+
+    if (index === 2) {
+      const emergencyNo = document.getElementById("emergencyNumber");
+      if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(emergencyNo.value))) {
+        ok = false; showHint(emergencyNo.nextElementSibling, true);
+      }
+    }
+
+    if (index === steps.length - 1) { 
+      ["declareTrue", "declareConsent"].forEach(id => {
+        const checkbox = document.getElementById(id);
+        const labelText = checkbox.closest('.checkItem');
+        if (!checkbox.checked) {
+          ok = false;
+          labelText.style.color = "var(--danger)";
+          labelText.style.borderColor = "var(--danger)";
+        } else {
+          labelText.style.color = "inherit";
+          labelText.style.borderColor = "var(--silver)";
+        }
+      });
+      ["declareTrue", "declareConsent"].forEach(id => {
+         document.getElementById(id).addEventListener('change', function() {
+            this.closest('.checkItem').style.color = "inherit";
+            this.closest('.checkItem').style.borderColor = "var(--silver)";
+         });
+      });
+    }
+    return ok;
+  }
+
+  document.querySelectorAll(".nextBtn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      if (current === 0) {
+        if (!validateStep(0)) return; 
+        const originalText = e.target.textContent;
+        e.target.disabled = true;
+        e.target.textContent = "Verifying...";
+        const ready = await lookupExistingRecord();
+        e.target.disabled = false;
+        e.target.textContent = originalText;
+        if (!ready) return;
+        showStep(current + 1);
+        return;
+      }
+      if (!validateStep(current)) return;
+      if (current < steps.length - 1) showStep(current + 1);
+    });
+  });
+
+  document.querySelectorAll(".prevBtn").forEach(btn => {
+    btn.addEventListener("click", () => { if (current > 0) showStep(current - 1); });
+  });
+
+  function updateDocTypeUI(value) {
+    const docBadge = document.getElementById("docBadge");
+    const docLabel = document.getElementById("docLabel");
+    const docHint = document.getElementById("docHint");
+    const docNumber = document.getElementById("docNumber");
+
+    if (value === "PASSPORT") {
+      docBadge.textContent = "Passport";
+      docLabel.textContent = "Passport Number";
+      docHint.textContent = "Valid passport format required.";
+      docNumber.placeholder = "Enter Alpha-numeric Passport ID";
+    } else {
+      docBadge.textContent = "MyKAD";
+      docLabel.textContent = "MyKAD Number";
+      docHint.textContent = "Strictly 12 digits (No Dashes).";
+      docNumber.placeholder = "12 digits without dashes";
+    }
+  }
+
+  document.querySelectorAll('input[name="doc_type"]').forEach(radio => {
+    radio.addEventListener("change", () => updateDocTypeUI(radio.value));
+  });
+
+  document.querySelectorAll('input[name="sejarah"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      const wrap = document.getElementById("sejarahOtherWrap");
+      const otherInput = document.getElementById("sejarahOther");
+      if (radio.value === "OTHER" && radio.checked) {
+        wrap.style.display = "block";
+        otherInput.setAttribute("required", "required");
+      } else if (radio.checked) {
+        wrap.style.display = "none";
+        otherInput.removeAttribute("required");
+        otherInput.value = "";
+      }
+    });
+  });
+
+  ["phoneNumber", "emergencyNumber", "accountNo"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", () => el.value = el.value.replace(/[^\d]/g, ""));
+  });
+
+  ["nameMykad", "namaWaris", "hubungan", "accountName"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", () => el.value = el.value.toUpperCase());
+  });
+
+  function safeVal(id) { return (document.getElementById(id)?.value || "").trim(); }
+  function checkedText(name) { return document.querySelector(`input[name="${name}"]:checked`)?.value || "-"; }
+
+  function buildSummary() {
+    const modeLabel = formMode.value === "update" ? "Profile Update" : "New Registration";
+    const summaryBox = document.getElementById("summaryBox");
+    summaryBox.innerHTML = `
+      <div class="summaryGrid">
+        <div class="summaryItem"><span class="summaryLabel">Protocol Type</span><span class="summaryValue">${modeLabel}</span></div>
+        <div class="summaryItem"><span class="summaryLabel">Applicant Name</span><span class="summaryValue">${safeVal("nameMykad") || "-"}</span></div>
+        <div class="summaryItem"><span class="summaryLabel">Identity No.</span><span class="summaryValue">${safeVal("docNumber") || "-"}</span></div>
+        <div class="summaryItem"><span class="summaryLabel">Bank Inst.</span><span class="summaryValue">${safeVal("bank") || "-"}</span></div>
+        <div class="summaryItem"><span class="summaryLabel">Bank Account</span><span class="summaryValue">${safeVal("accountNo") || "-"}</span></div>
+      </div>
+    `;
+  }
+
+  function showSubmitMessage(message, ok = false) {
+    submitStatusBox.style.display = "block";
+    submitStatusBox.textContent = message;
+    submitStatusBox.className = ok ? "alert ok" : "alert";
+  }
+
+  function compressImageFile(file, label) {
+    return new Promise((resolve, reject) => {
+      if (!file) { resolve(""); return; }
+      const isImage = /^image\//i.test(file.type);
+      if (!isImage) {
+        const reader = new FileReader();
+        reader.onload = function() {
+          if (!reader.result) reject(new Error("Data processing failed for " + label));
+          else resolve(reader.result);
+        };
+        reader.onerror = () => reject(new Error("File integrity compromised for " + label));
+        try { reader.readAsDataURL(file); } catch (err) { reject(new Error("Format unsupported.")); }
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          let width = img.width, height = img.height;
+          const maxDim = 1200;
+          if (width > maxDim || height > maxDim) {
+            const ratio = Math.min(maxDim / width, maxDim / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          let quality = 0.8, result = canvas.toDataURL("image/jpeg", quality);
+          while (result.length > 900000 && quality > 0.4) {
+            quality -= 0.1; result = canvas.toDataURL("image/jpeg", quality);
+          }
+          resolve(result);
+        };
+        img.onerror = () => reject(new Error("Corrupted image stream."));
+        img.src = event.target.result;
+      };
+      reader.onerror = () => reject(new Error("Read execution blocked."));
+      try { reader.readAsDataURL(file); } catch (err) { reject(new Error("Stream timeout.")); }
+    });
+  }
+
+  async function buildPayload() {
+    const icFile = icCopy.files && icCopy.files[0] ? icCopy.files[0] : null;
+    const MAX_SIZE = 5242880; 
+
+    if (icFile && icFile.size > MAX_SIZE) throw new Error("Document scan exceeds 5MB limit.");
+
+    const payload = {
+      form_mode: formMode.value, existing_row: existingRow.value,
+      name_mykad: safeVal("nameMykad"), phone: safeVal("phoneNumber"),
+      email: safeVal("email"), doc_type: checkedText("doc_type"),
+      mykad_passport_no: safeVal("docNumber"), alamat: safeVal("alamat"),
+      gender: checkedText("gender"), status_perkahwinan: checkedText("status_perkahwinan"),
+      nama_waris: safeVal("namaWaris"), hubungan: safeVal("hubungan"),
+      emergency_no: safeVal("emergencyNumber"), kebolehan: safeVal("kebolehan"),
+      typhoid: checkedText("typhoid"), transportation: checkedText("transportation"),
+      sejarah: checkedText("sejarah"), sejarah_other: safeVal("sejarahOther"),
+      bank: safeVal("bank"), account_no: safeVal("accountNo"), account_name: safeVal("accountName")
+    };
+
+    if (icFile) {
+      payload.ic_copy_base64 = await compressImageFile(icFile, "Document");
+      payload.ic_copy_filename = icFile.name;
+    }
+    
+    // Inject the live camera Base64 string directly
+    if (capturedPhotoData.value) {
+      payload.gambar_base64 = capturedPhotoData.value;
+      payload.gambar_filename = "live_capture.jpg";
+    }
+
+    return payload;
+  }
+
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+    submitStatusBox.style.display = "none";
+    submitStatusBox.className = "alert";
+
+    if (!validateStep(steps.length - 1)) {
+      showSubmitMessage("Declaration protocols must be verified prior to transmission.");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = formMode.value === "update" ? "Executing Update..." : "Transmitting Data...";
+
+    try {
+      const payload = await buildPayload();
+      const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
+      const result = await response.json();
+
+      if (result.ok) {
+        showSubmitMessage(result.message || "Protocol completed successfully.", true);
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        showSubmitMessage("Transmission Failed: " + (result.message || "Unknown anomaly"));
+      }
+    } catch (error) {
+      showSubmitMessage("Network Disconnect: " + error.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = formMode.value === "update" ? "Update Registry" : "Submit Registry";
+    }
+  });
+
+  updateHeader();
+  updateDocTypeUI("MYKAD");
+  applyEntryMode("create");
+</script>
+</body>
+</html>
