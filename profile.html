@@ -162,8 +162,10 @@
     </button>
   </nav>
 
-  <script>
-      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyq0EucoCN7Y1O1k2mik8Ne7bZbPDfPonyJ9ac73UkzpBMCxsBBhVJ__0ZAC-Fr6OT5/exec;
+   <script>
+  // FIXED: Added the closing quotation mark
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyq0EucoCN7Y1O1k2mik8Ne7bZbPDfPonyJ9ac73UkzpBMCxsBBhVJ__0ZAC-Fr6OT5/exec";
+  
   const fieldMap = {
     profileName: "name_mykad",
     profileEmail: "email",
@@ -226,7 +228,8 @@
 
     // --- SPEED FIX 2: Background Fetch ---
     try {
-      const url = `${APPS_SCRIPT_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
+      // FIXED: Changed action to get_full_profile
+      const url = `${APPS_SCRIPT_URL}?action=get_full_profile&doc_no=${encodeURIComponent(docNo)}`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -251,5 +254,6 @@
   window.addEventListener("DOMContentLoaded", loadData);
 
   </script>
+
 </body>
 </html>
