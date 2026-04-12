@@ -965,10 +965,11 @@
     setLookupStatus("Initiating secure profile scan...");
     hideLookupPreview();
 
-    try {
-      const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
+        try {
+      const url = `${WEB_APP_URL}?action=get_full_profile&doc_no=${encodeURIComponent(docNo)}`;
       const res = await fetch(url);
       const result = await res.json();
+
 
       document.getElementById("docNumber").value = docNo;
 
