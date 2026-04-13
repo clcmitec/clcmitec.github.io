@@ -762,8 +762,7 @@
     </div>
   </div>
 
-<script>
-  // Executive Backend Configuration
+  <script>
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyq0EucoCN7Y1O1k2mik8Ne7bZbPDfPonyJ9ac73UkzpBMCxsBBhVJ__0ZAC-Fr6OT5/exec";
 
   const form = document.getElementById("appForm");
@@ -779,23 +778,21 @@
   const icCopy = document.getElementById("icCopy");
   const lookupStatusNote = document.getElementById("lookupStatusNote");
 
-  // CAMERA ENGINE VARIABLES
-  const cameraFeed = document.getElementById('cameraFeed');
-  const cameraPreview = document.getElementById('cameraPreview');
-  const startCameraBtn = document.getElementById('startCameraBtn');
-  const captureBtn = document.getElementById('captureBtn');
-  const retakeBtn = document.getElementById('retakeBtn');
-  const cameraPlaceholder = document.getElementById('cameraPlaceholder');
-  const cameraControls = document.getElementById('cameraControls');
-  const previewControls = document.getElementById('previewControls');
-  const capturedPhotoData = document.getElementById('capturedPhotoData');
-  const gambarHint = document.getElementById('gambarHint');
-  const cameraMetaText = document.getElementById('cameraMetaText');
+  const cameraFeed = document.getElementById("cameraFeed");
+  const cameraPreview = document.getElementById("cameraPreview");
+  const startCameraBtn = document.getElementById("startCameraBtn");
+  const captureBtn = document.getElementById("captureBtn");
+  const retakeBtn = document.getElementById("retakeBtn");
+  const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+  const cameraControls = document.getElementById("cameraControls");
+  const previewControls = document.getElementById("previewControls");
+  const capturedPhotoData = document.getElementById("capturedPhotoData");
+  const gambarHint = document.getElementById("gambarHint");
+  const cameraMetaText = document.getElementById("cameraMetaText");
 
   let current = 0;
   let cameraStream = null;
 
-  // --- CAMERA ENGINE LOGIC ---
   function stopCamera() {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
@@ -803,46 +800,48 @@
     }
   }
 
-  startCameraBtn.addEventListener('click', async () => {
+  startCameraBtn.addEventListener("click", async () => {
     try {
-      cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+        audio: false
+      });
       cameraFeed.srcObject = cameraStream;
-      cameraPlaceholder.style.display = 'none';
-      cameraFeed.style.display = 'block';
-      cameraControls.style.display = 'flex';
+      cameraPlaceholder.style.display = "none";
+      cameraFeed.style.display = "block";
+      cameraControls.style.display = "flex";
       showHint(gambarHint, false);
     } catch (err) {
       alert("Camera access denied. Please ensure you have granted browser permissions and are using a secure HTTPS connection.");
     }
   });
 
-  captureBtn.addEventListener('click', () => {
-    const canvas = document.createElement('canvas');
+  captureBtn.addEventListener("click", () => {
+    const canvas = document.createElement("canvas");
     canvas.width = cameraFeed.videoWidth;
     canvas.height = cameraFeed.videoHeight;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
-    
-    const base64 = canvas.toDataURL('image/jpeg', 0.85);
+
+    const base64 = canvas.toDataURL("image/jpeg", 0.85);
     cameraPreview.src = base64;
     capturedPhotoData.value = base64;
-    
-    cameraFeed.style.display = 'none';
-    cameraControls.style.display = 'none';
-    cameraPreview.style.display = 'block';
-    previewControls.style.display = 'flex';
-    
-    stopCamera(); 
+
+    cameraFeed.style.display = "none";
+    cameraControls.style.display = "none";
+    cameraPreview.style.display = "block";
+    previewControls.style.display = "flex";
+
+    stopCamera();
   });
 
-  retakeBtn.addEventListener('click', () => {
-    cameraPreview.style.display = 'none';
-    previewControls.style.display = 'none';
-    capturedPhotoData.value = '';
+  retakeBtn.addEventListener("click", () => {
+    cameraPreview.style.display = "none";
+    previewControls.style.display = "none";
+    capturedPhotoData.value = "";
     startCameraBtn.click();
   });
 
-  // --- FORM LOGIC ---
   function updateHeader() {
     const step = steps[current];
     stepHeading.textContent = step.dataset.title || "Application Form";
@@ -873,6 +872,40 @@
     return String(value || "").replace(/[^\d]/g, "");
   }
 
+  function clearFormFieldsForCreate() {
+    document.getElementById("nameMykad").value = "";
+    document.getElementById("phoneNumber").value = "";
+    document.getElementById("email").value = "";
+    document.querySelector('input[name="doc_type"][value="MYKAD"]').checked = true;
+    document.getElementById("docNumber").value = document.getElementById("lookupDocNo").value.trim();
+    document.getElementById("alamat").value = "";
+    document.querySelectorAll('input[name="gender"]').forEach(el => el.checked = false);
+    document.querySelectorAll('input[name="status_perkahwinan"]').forEach(el => el.checked = false);
+    document.getElementById("namaWaris").value = "";
+    document.getElementById("hubungan").value = "";
+    document.getElementById("emergencyNumber").value = "";
+    document.getElementById("kebolehan").value = "";
+    document.querySelectorAll('input[name="typhoid"]').forEach(el => el.checked = false);
+    document.querySelectorAll('input[name="transportation"]').forEach(el => el.checked = false);
+    document.querySelectorAll('input[name="sejarah"]').forEach(el => el.checked = false);
+    document.getElementById("sejarahOther").value = "";
+    document.getElementById("sejarahOtherWrap").style.display = "none";
+    document.getElementById("sejarahOther").removeAttribute("required");
+    document.getElementById("bank").value = "";
+    document.getElementById("accountNo").value = "";
+    document.getElementById("accountName").value = "";
+    icCopy.value = "";
+    capturedPhotoData.value = "";
+    cameraPreview.src = "";
+    cameraPreview.style.display = "none";
+    previewControls.style.display = "none";
+    cameraFeed.style.display = "none";
+    cameraControls.style.display = "none";
+    cameraPlaceholder.style.display = "block";
+    stopCamera();
+    updateDocTypeUI("MYKAD");
+  }
+
   function applyEntryMode(mode) {
     formMode.value = mode;
     const docNumber = document.getElementById("docNumber");
@@ -881,9 +914,9 @@
     if (mode === "update") {
       docNumber.readOnly = true;
       if (docLockedHint) docLockedHint.classList.add("show");
-      icCopy.removeAttribute("required");
-      document.getElementById("icCopyHint").textContent = "Optional for profile update.";
-      cameraMetaText.textContent = "Optional: Capture new photo to update profile.";
+      icCopy.setAttribute("required", "required");
+      document.getElementById("icCopyHint").textContent = "Document upload required for profile update.";
+      cameraMetaText.textContent = "Live capture required for profile update.";
     } else {
       docNumber.readOnly = false;
       if (docLockedHint) docLockedHint.classList.remove("show");
@@ -891,6 +924,7 @@
       document.getElementById("icCopyHint").textContent = "Document upload required.";
       cameraMetaText.textContent = "Live capture required for identity verification.";
     }
+
     submitBtn.textContent = mode === "update" ? "Update Registry" : "Submit Registry";
   }
 
@@ -922,6 +956,7 @@
     if (record.typhoid) fillRadio("typhoid", record.typhoid);
     if (record.transportation) fillRadio("transportation", record.transportation);
     if (record.sejarah) fillRadio("sejarah", record.sejarah);
+
     if (record.sejarah === "OTHER") {
       document.getElementById("sejarahOtherWrap").style.display = "block";
       document.getElementById("sejarahOther").setAttribute("required", "required");
@@ -929,11 +964,12 @@
       document.getElementById("sejarahOtherWrap").style.display = "none";
       document.getElementById("sejarahOther").removeAttribute("required");
     }
+
     if (record.sejarah_other) document.getElementById("sejarahOther").value = record.sejarah_other;
     if (record.bank) document.getElementById("bank").value = record.bank;
     if (record.account_no) document.getElementById("accountNo").value = record.account_no;
     if (record.account_name) document.getElementById("accountName").value = String(record.account_name).toUpperCase();
-    
+
     updateDocTypeUI(document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD");
   }
 
@@ -941,14 +977,17 @@
     const card = document.getElementById("lookupPreviewCard");
     const photo = document.getElementById("lookupPreviewPhoto");
     if (!card) return;
-    document.getElementById("previewName").textContent = record?.name_mykad || "-";
+
+    document.getElementById("previewName").textContent = record?.name_mykad || record?.full_name || "-";
     document.getElementById("previewDocNo").textContent = record?.mykad_passport_no || "-";
+
     if (record?.photo_link) {
       photo.src = record.photo_link;
       photo.style.display = "block";
     } else {
       photo.style.display = "none";
     }
+
     card.style.display = "block";
   }
 
@@ -965,26 +1004,31 @@
     setLookupStatus("Initiating secure profile scan...");
     hideLookupPreview();
 
-        try {
-      const url = `${WEB_APP_URL}?action=get_full_profile&doc_no=${encodeURIComponent(docNo)}`;
+    try {
+      const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
       const res = await fetch(url);
       const result = await res.json();
-
 
       document.getElementById("docNumber").value = docNo;
 
       if (result.ok && result.exists) {
         fillRecord(result.record || {});
         applyEntryMode("update");
-        existingRow.value = result.row || "";
+        existingRow.value = "";
         showLookupPreview(result.record || {});
         setLookupStatus("Profile verified. Initializing update protocol.", true);
-      } else {
+      } else if (result.ok && !result.exists) {
+        clearFormFieldsForCreate();
         applyEntryMode("create");
         existingRow.value = "";
         hideLookupPreview();
         setLookupStatus("No profile detected. Initializing new registry protocol.");
+      } else {
+        hideLookupPreview();
+        setLookupStatus(result.message || "Verification failed.");
+        return false;
       }
+
       return true;
     } catch (err) {
       hideLookupPreview();
@@ -1015,10 +1059,16 @@
       if (field.type === "radio" || field.type === "checkbox") return;
       const hint = field.parentElement?.querySelector(".hint") || field.nextElementSibling;
       if (field.type === "file") {
-        if (!field.files || !field.files.length) { ok = false; showHint(hint, true); }
+        if (!field.files || !field.files.length) {
+          ok = false;
+          showHint(hint, true);
+        }
         return;
       }
-      if (!String(field.value || "").trim()) { ok = false; showHint(hint, true); }
+      if (!String(field.value || "").trim()) {
+        ok = false;
+        showHint(hint, true);
+      }
     });
 
     const radioGroups = new Set();
@@ -1040,33 +1090,43 @@
       const docNo = document.getElementById("docNumber");
 
       if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-        ok = false; showHint(email.nextElementSibling, true);
+        ok = false;
+        showHint(email.nextElementSibling, true);
       }
+
       if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(phone.value))) {
-        ok = false; showHint(phone.nextElementSibling, true);
+        ok = false;
+        showHint(phone.nextElementSibling, true);
       }
+
       if (docType === "MYKAD" && !/^\d{12}$/.test((docNo.value || "").trim())) {
-        ok = false; showHint(document.getElementById("docHint"), true);
+        ok = false;
+        showHint(document.getElementById("docHint"), true);
       }
+
       if (docType === "PASSPORT" && !String(docNo.value || "").trim()) {
-        ok = false; showHint(document.getElementById("docHint"), true);
+        ok = false;
+        showHint(document.getElementById("docHint"), true);
       }
-      if (formMode.value === "create" && !capturedPhotoData.value) {
-        ok = false; showHint(gambarHint, true);
+
+      if (!capturedPhotoData.value) {
+        ok = false;
+        showHint(gambarHint, true);
       }
     }
 
     if (index === 2) {
       const emergencyNo = document.getElementById("emergencyNumber");
       if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(emergencyNo.value))) {
-        ok = false; showHint(emergencyNo.nextElementSibling, true);
+        ok = false;
+        showHint(emergencyNo.nextElementSibling, true);
       }
     }
 
-    if (index === steps.length - 1) { 
+    if (index === steps.length - 1) {
       ["declareTrue", "declareConsent"].forEach(id => {
         const checkbox = document.getElementById(id);
-        const labelText = checkbox.closest('.checkItem');
+        const labelText = checkbox.closest(".checkItem");
         if (!checkbox.checked) {
           ok = false;
           labelText.style.color = "var(--danger)";
@@ -1076,20 +1136,15 @@
           labelText.style.borderColor = "var(--silver)";
         }
       });
-      ["declareTrue", "declareConsent"].forEach(id => {
-         document.getElementById(id).addEventListener('change', function() {
-            this.closest('.checkItem').style.color = "inherit";
-            this.closest('.checkItem').style.borderColor = "var(--silver)";
-         });
-      });
     }
+
     return ok;
   }
 
   document.querySelectorAll(".nextBtn").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       if (current === 0) {
-        if (!validateStep(0)) return; 
+        if (!validateStep(0)) return;
         const originalText = e.target.textContent;
         e.target.disabled = true;
         e.target.textContent = "Verifying...";
@@ -1100,13 +1155,16 @@
         showStep(current + 1);
         return;
       }
+
       if (!validateStep(current)) return;
       if (current < steps.length - 1) showStep(current + 1);
     });
   });
 
   document.querySelectorAll(".prevBtn").forEach(btn => {
-    btn.addEventListener("click", () => { if (current > 0) showStep(current - 1); });
+    btn.addEventListener("click", () => {
+      if (current > 0) showStep(current - 1);
+    });
   });
 
   function updateDocTypeUI(value) {
@@ -1157,8 +1215,13 @@
     if (el) el.addEventListener("input", () => el.value = el.value.toUpperCase());
   });
 
-  function safeVal(id) { return (document.getElementById(id)?.value || "").trim(); }
-  function checkedText(name) { return document.querySelector(`input[name="${name}"]:checked`)?.value || "-"; }
+  function safeVal(id) {
+    return (document.getElementById(id)?.value || "").trim();
+  }
+
+  function checkedText(name) {
+    return document.querySelector(`input[name="${name}"]:checked`)?.value || "-";
+  }
 
   function buildSummary() {
     const modeLabel = formMode.value === "update" ? "Profile Update" : "New Registration";
@@ -1182,22 +1245,31 @@
 
   function compressImageFile(file, label) {
     return new Promise((resolve, reject) => {
-      if (!file) { resolve(""); return; }
+      if (!file) {
+        resolve("");
+        return;
+      }
+
       const isImage = /^image\//i.test(file.type);
       if (!isImage) {
         const reader = new FileReader();
-        reader.onload = function() {
+        reader.onload = function () {
           if (!reader.result) reject(new Error("Data processing failed for " + label));
           else resolve(reader.result);
         };
         reader.onerror = () => reject(new Error("File integrity compromised for " + label));
-        try { reader.readAsDataURL(file); } catch (err) { reject(new Error("Format unsupported.")); }
+        try {
+          reader.readAsDataURL(file);
+        } catch (err) {
+          reject(new Error("Format unsupported."));
+        }
         return;
       }
+
       const reader = new FileReader();
-      reader.onload = function(event) {
+      reader.onload = function (event) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
           let width = img.width, height = img.height;
           const maxDim = 1200;
           if (width > maxDim || height > maxDim) {
@@ -1206,12 +1278,15 @@
             height = Math.round(height * ratio);
           }
           const canvas = document.createElement("canvas");
-          canvas.width = width; canvas.height = height;
+          canvas.width = width;
+          canvas.height = height;
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, height);
-          let quality = 0.8, result = canvas.toDataURL("image/jpeg", quality);
+          let quality = 0.8;
+          let result = canvas.toDataURL("image/jpeg", quality);
           while (result.length > 900000 && quality > 0.4) {
-            quality -= 0.1; result = canvas.toDataURL("image/jpeg", quality);
+            quality -= 0.1;
+            result = canvas.toDataURL("image/jpeg", quality);
           }
           resolve(result);
         };
@@ -1219,35 +1294,49 @@
         img.src = event.target.result;
       };
       reader.onerror = () => reject(new Error("Read execution blocked."));
-      try { reader.readAsDataURL(file); } catch (err) { reject(new Error("Stream timeout.")); }
+      try {
+        reader.readAsDataURL(file);
+      } catch (err) {
+        reject(new Error("Stream timeout."));
+      }
     });
   }
 
   async function buildPayload() {
     const icFile = icCopy.files && icCopy.files[0] ? icCopy.files[0] : null;
-    const MAX_SIZE = 5242880; 
+    const MAX_SIZE = 5242880;
 
     if (icFile && icFile.size > MAX_SIZE) throw new Error("Document scan exceeds 5MB limit.");
 
     const payload = {
-      form_mode: formMode.value, existing_row: existingRow.value,
-      name_mykad: safeVal("nameMykad"), phone: safeVal("phoneNumber"),
-      email: safeVal("email"), doc_type: checkedText("doc_type"),
-      mykad_passport_no: safeVal("docNumber"), alamat: safeVal("alamat"),
-      gender: checkedText("gender"), status_perkahwinan: checkedText("status_perkahwinan"),
-      nama_waris: safeVal("namaWaris"), hubungan: safeVal("hubungan"),
-      emergency_no: safeVal("emergencyNumber"), kebolehan: safeVal("kebolehan"),
-      typhoid: checkedText("typhoid"), transportation: checkedText("transportation"),
-      sejarah: checkedText("sejarah"), sejarah_other: safeVal("sejarahOther"),
-      bank: safeVal("bank"), account_no: safeVal("accountNo"), account_name: safeVal("accountName")
+      form_mode: formMode.value,
+      existing_row: existingRow.value,
+      name_mykad: safeVal("nameMykad"),
+      phone: safeVal("phoneNumber"),
+      email: safeVal("email"),
+      doc_type: checkedText("doc_type"),
+      mykad_passport_no: safeVal("docNumber"),
+      alamat: safeVal("alamat"),
+      gender: checkedText("gender"),
+      status_perkahwinan: checkedText("status_perkahwinan"),
+      nama_waris: safeVal("namaWaris"),
+      hubungan: safeVal("hubungan"),
+      emergency_no: safeVal("emergencyNumber"),
+      kebolehan: safeVal("kebolehan"),
+      typhoid: checkedText("typhoid"),
+      transportation: checkedText("transportation"),
+      sejarah: checkedText("sejarah"),
+      sejarah_other: safeVal("sejarahOther"),
+      bank: safeVal("bank"),
+      account_no: safeVal("accountNo"),
+      account_name: safeVal("accountName")
     };
 
     if (icFile) {
       payload.ic_copy_base64 = await compressImageFile(icFile, "Document");
       payload.ic_copy_filename = icFile.name;
     }
-    
-    // Inject the live camera Base64 string directly
+
     if (capturedPhotoData.value) {
       payload.gambar_base64 = capturedPhotoData.value;
       payload.gambar_filename = "live_capture.jpg";
@@ -1256,7 +1345,7 @@
     return payload;
   }
 
-  form.addEventListener("submit", async function(e) {
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
     submitStatusBox.style.display = "none";
     submitStatusBox.className = "alert";
@@ -1271,7 +1360,10 @@
 
     try {
       const payload = await buildPayload();
-      const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(payload) });
+      const response = await fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
       const result = await response.json();
 
       if (result.ok) {
@@ -1293,4 +1385,4 @@
   applyEntryMode("create");
 </script>
 </body>
-</html>
+      </html>
