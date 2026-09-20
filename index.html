@@ -5,17 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MITEC — Casual Labour Portal</title>
 
-  <!-- ⚡ Speed Optimization: Pre-connect to Google Apps Script -->
+  <!-- ⚡ Speed Optimizations -->
   <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link rel="dns-prefetch" href="https://script.google.com">
-
-  <!-- Add this line for the Google Search Logo -->
-  <link rel="icon" href="https://mitec.com.my/static/img/logos/logo-footer.png" type="image/png">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+  <link rel="icon" href="https://mitec.com.my/static/img/logos/logo-footer.png" type="image/png">
+
+  <!-- Non-blocking asynchronous font loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+
+  <!-- Deferred script loading to prevent render blocking -->
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
   <style>
     :root {
@@ -55,7 +58,6 @@
       border: 1px solid rgba(9, 34, 83, 0.05);
     }
 
-    /* Spacing Refinement: Logo and Title */
     .brand { margin-bottom: 54px; }
     .brand img { width: 130px; height: auto; object-fit: contain; margin-bottom: 24px; }
 
@@ -65,7 +67,6 @@
     }
     .sub { font-size: 14px; color: var(--text-muted); margin: 0; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
 
-    /* Elegant Input Wrapper */
     .input-group { position: relative; margin-bottom: 28px; text-align: left; margin-top: 32px;}
 
     .input-icon {
@@ -106,7 +107,6 @@
       font-weight: 800;
     }
 
-    /* Marble Action Button */
     .btn-primary {
       width: 100%; height: 60px; border: none; border-radius: 20px;
       background: var(--marble-url) center/cover no-repeat;
@@ -143,10 +143,9 @@
     .msg.error { color: var(--error); }
     .msg.success { color: var(--success); }
 
-    /* Refined Footer: Multi-line Support */
     .footer {
       width: 100%;
-      max-width: 320px; /* Constrained for better wrapping aesthetics */
+      max-width: 320px;
       margin: 54px auto 32px;
       text-align: center;
     }
@@ -159,7 +158,7 @@
       letter-spacing: 0.15em;
       text-transform: uppercase;
       margin-bottom: 12px;
-      line-height: 1.4; /* Better spacing between wrapped lines */
+      line-height: 1.4;
       display: block;
     }
 
@@ -198,7 +197,6 @@
     <div class="card">
       <div class="brand">
         <img src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC Logo">
-
         <p class="sub">Casual Labour Portal</p>
       </div>
 
@@ -229,21 +227,23 @@
   </div>
 
   <script>
-    // 🔗 Live Active Web App Deployment URL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyBP0-dwtWZV-bxbg12bYTIUvkoBtdwnzjKFIj8hSc1my2g0gUHQ-xD2vW_rb8KT4JJSw/exec";
+
+    // Immediate session check before full DOM rendering
+    (function checkSession() {
+      const savedDoc = localStorage.getItem("mcl_doc_no");
+      const savedRecord = localStorage.getItem("mitecWorkerRecord");
+      if (savedDoc && savedRecord) {
+        window.location.href = "dashboard.html";
+      }
+    })();
 
     const docInput = document.getElementById("docInput");
     const loginBtn = document.getElementById("loginBtn");
     const msg = document.getElementById("loginMessage");
 
     window.addEventListener("DOMContentLoaded", () => {
-      const savedDoc = localStorage.getItem("mcl_doc_no");
-      const savedRecord = localStorage.getItem("mitecWorkerRecord");
-      if (savedDoc && savedRecord) {
-        window.location.href = "dashboard.html";
-      } else {
-        docInput.focus();
-      }
+      if (docInput) docInput.focus();
     });
 
     function showStatus(text, isError = true) {
@@ -268,7 +268,6 @@
       showStatus("");
 
       try {
-        // ⚡ Fast direct query call with cache bypass
         const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
         const res = await fetch(url, { method: "GET", cache: "no-cache" });
         const data = await res.json();
@@ -277,21 +276,22 @@
           showStatus("Identity Verified. Entering...", false);
           localStorage.setItem("mitecWorkerRecord", JSON.stringify(data.record));
           localStorage.setItem("mcl_doc_no", docNo);
-          // ⚡ Snappier redirect delay
-          setTimeout(() => { window.location.href = "dashboard.html"; }, 200);
+          setTimeout(() => { window.location.href = "dashboard.html"; }, 150);
         } else {
           showStatus(data.message || "Record not found. Access denied.");
           loginBtn.disabled = false;
-          loginBtn.querySelector('span').textContent = "Authorize & Enter";
+          loginBtn.querySelector('span').textContent = "Access";
         }
       } catch (err) {
         showStatus("Registry Timeout. Please retry.");
         loginBtn.disabled = false;
-        loginBtn.querySelector('span').textContent = "Authorize & Enter";
+        loginBtn.querySelector('span').textContent = "Access";
       }
     }
 
-    docInput.addEventListener("keypress", (e) => { if(e.key === "Enter") handleLogin(); });
+    if (docInput) {
+      docInput.addEventListener("keypress", (e) => { if(e.key === "Enter") handleLogin(); });
+    }
   </script>
 
 </body>
