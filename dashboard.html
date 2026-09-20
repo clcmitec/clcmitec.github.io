@@ -1,35 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Defer Google Tag so it NEVER delays your Attendance Data -->
-<script>
-  window.addEventListener('load', function() {
-    setTimeout(function() {
-      var gtagScript = document.createElement('script');
-      gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-S3RRBZB4NJ";
-      gtagScript.async = true;
-      document.head.appendChild(gtagScript);
-
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', 'G-S3RRBZB4NJ');
-    }, 1000); // ⚡ Waits 1 second AFTER the UI loads to send analytics
-  });
-</script>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Casual Labour Dashboard</title>
 
-  <!-- ⚡ Speed Optimization: Pre-connect to Google Apps Script -->
+  <!-- ⚡ Speed Optimizations: Pre-connect to External Services -->
   <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link rel="dns-prefetch" href="https://script.google.com">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Non-blocking asynchronous font loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+
+  <!-- Defer Google Tag so it NEVER delays UI or attendance data -->
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-S3RRBZB4NJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-S3RRBZB4NJ');
+  </script>
 
   <style>
     :root {
@@ -57,7 +49,7 @@
       margin: 0; 
       padding: 12px 12px 100px; 
       background-color: var(--bg-base);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, sans-serif;
       color: var(--text-main);
       min-height: 100vh;
     }
@@ -75,12 +67,13 @@
     .profile-trigger {
       width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15); object-fit: cover; cursor: pointer; transition: transform 0.2s ease;
+      background: rgba(255,255,255,0.1);
     }
     .profile-trigger:active { transform: scale(0.92); }
 
     .welcome-wrap { margin-bottom: 16px; text-align: left; padding: 0 4px; }
-    .welcome-text { font-family: 'Caveat', cursive; font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 2px; }
-    .worker-name { font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700; color: var(--text-main); margin: 0; line-height: 1.2; letter-spacing: 0.01em; }
+    .welcome-text { font-family: 'Caveat', cursive, sans-serif; font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 2px; }
+    .worker-name { font-family: 'Caveat', cursive, sans-serif; font-size: 22px; font-weight: 700; color: var(--text-main); margin: 0; line-height: 1.2; letter-spacing: 0.01em; }
 
     /* COMPACT ANNOUNCEMENT STYLING */
     .announcement-wrapper {
@@ -108,7 +101,7 @@
     .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .section-title { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
     .section-mini { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
-    .section-desc { font-family: 'Caveat', cursive; font-size: 15px; font-weight: 600; color: var(--primary); margin: 0 0 12px 4px; line-height: 1.4; }
+    .section-desc { font-family: 'Caveat', cursive, sans-serif; font-size: 15px; font-weight: 600; color: var(--primary); margin: 0 0 12px 4px; line-height: 1.4; }
 
     /* MARBLE SHIFT ACTIVITY CARD */
     .summary-highlight {
@@ -145,7 +138,7 @@
     @keyframes spinVertical { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
     .person { display: flex; align-items: center; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 14px; padding: 10px 14px; min-height: 40px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
     .person-name { font-size: 12px; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-    .birthday-blessing-footer { text-align: center; font-family: 'Caveat', cursive; font-size: 18px; font-weight: 700; color: #ffffff; padding-top: 10px; margin-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.2); letter-spacing: 0.03em; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+    .birthday-blessing-footer { text-align: center; font-family: 'Caveat', cursive, sans-serif; font-size: 18px; font-weight: 700; color: #ffffff; padding-top: 10px; margin-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.2); letter-spacing: 0.03em; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
 
     /* FLOATING BOTTOM NAV MATRIX */
     .bottom-nav {
@@ -189,7 +182,8 @@
 
     <header class="header">
       <img class="brand-img" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
-      <img id="headerPhoto" class="profile-trigger" src="https://via.placeholder.com/100" onclick="goToPage('profile.html')">
+      <!-- Lightweight SVG Fallback Avatar -->
+      <img id="headerPhoto" class="profile-trigger" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a2e66'/></svg>" onclick="goToPage('profile.html')">
     </header>
 
     <div class="welcome-wrap">
@@ -301,7 +295,6 @@
   </nav>
 
   <script>
-  // 🔗 Live Active Web App Deployment URL
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyBP0-dwtWZV-bxbg12bYTIUvkoBtdwnzjKFIj8hSc1my2g0gUHQ-xD2vW_rb8KT4JJSw/exec";
 
   function getStoredWorker() { return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}"); }
@@ -312,7 +305,7 @@
     let stringUrl = String(url);
     if (stringUrl.includes("drive.google.com")) {
       const match = stringUrl.match(/\/file\/d\/([^/?]+)/) || stringUrl.match(/id=([^&]+)/);
-      if (match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}`;
+      if (match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=s160`; // ⚡ Google CDN direct link
     }
     return stringUrl;
   }
@@ -322,7 +315,7 @@
     if (!imgEl) return;
     imgEl.onerror = function() { this.onerror = null; this.src = fallback; };
     const finalSrc = convertToDirectLink(src);
-    imgEl.src = (finalSrc && finalSrc.length > 10) ? finalSrc : fallback;
+    if (finalSrc && finalSrc.length > 10) imgEl.src = finalSrc;
   }
 
   async function fillWorkerData() {
@@ -331,8 +324,10 @@
     const nameStr = worker.name_mykad || worker.nama_mykad || worker.full_name || "Worker";
     document.getElementById("heroName").textContent = toProperCase(nameStr);
 
-    const photoUrl = worker.photo_link || "";
-    setImageWithFallback("headerPhoto", photoUrl, "https://via.placeholder.com/160?text=MITEC");
+    const fallbackSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a2e66'/></svg>";
+    if (worker.photo_link) {
+      setImageWithFallback("headerPhoto", worker.photo_link, fallbackSvg);
+    }
 
     if (docNo) {
       const loaderState = document.getElementById("loaderState");
@@ -345,7 +340,6 @@
       const hoursVal = document.getElementById("dashHours");
 
       try {
-        // ⚡ Speed Optimization: Cache Bypass fetch request
         const res = await fetch(`${WEB_APP_URL}?action=get_today_summary&doc_no=${encodeURIComponent(docNo)}`, { cache: "no-cache" });
         const data = await res.json();
         loaderState.style.display = "none";
@@ -359,7 +353,8 @@
         }
       } catch (e) { 
         loaderText.textContent = "Connection Error";
-        document.querySelector(".spinner-large").style.display = "none";
+        const spinner = document.querySelector(".spinner-large");
+        if (spinner) spinner.style.display = "none";
       }
     }
   }
@@ -423,15 +418,17 @@
 
   function goToPage(url) { window.location.href = url; }
 
-  window.addEventListener("DOMContentLoaded", () => {
+  function initDashboard() {
     if (!localStorage.getItem("mitecWorkerRecord")) {
       window.location.href = "indexc.html";
     } else {
-      // ⚡ Execute both background queries in parallel for instant display
       fillWorkerData();
       loadHubSpreadsheetData();
     }
-  });
+  }
+
+  // Run immediately without waiting for full DOM rendering
+  initDashboard();
   </script>
 </body>
 </html>
