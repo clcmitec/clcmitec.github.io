@@ -664,6 +664,20 @@
 
         let cleanedShiftTime = formatAttendanceTime(b.time);
 
+        // ⚡ Match with cached master shift to extract notes/spotlight
+        const masterShift = cachedShifts.find(s => s.id === b.shift_id);
+        const hasNotes = masterShift && masterShift.notes && String(masterShift.notes).trim() !== "";
+        const noteText = hasNotes ? masterShift.notes : (b.notes && String(b.notes).trim() !== "" ? b.notes : "");
+
+        let notesHtml = '';
+        if (noteText) {
+          notesHtml = `
+            <div class="spotlight-banner" style="margin-bottom: 12px;">
+              <i class="ph ph-lightning" style="font-size: 16px; color: var(--accent-amber);"></i>
+              <span>${noteText}</span>
+            </div>`;
+        }
+
         let waGroupBtnHtml = '';
         if (!isWait && b.wa_link && String(b.wa_link).trim() !== "") {
           waGroupBtnHtml = `
@@ -675,6 +689,7 @@
 
         htmlBuffer += `
           <div class="card" style="border-left: 4px solid ${isWait ? 'var(--accent-amber)' : 'var(--mitec-blue)'}">
+            ${notesHtml}
             <div class="card-header">
               <h3 class="card-title">${b.dept}</h3>
               <span class="status-pill ${isWait ? 'pill-wait' : 'pill-confirmed'}">${displayStatusText}</span>
