@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W18GC0F7SG"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MITEC — Casual Labour Portal</title>
+
+  <!-- ⚡ Speed Optimizations -->
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
+  <link rel="dns-prefetch" href="https://script.google.com">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+  <!-- Defer Google Tag so it NEVER delays Shift Syncing -->
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-W18GC0F7SG"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-W18GC0F7SG');
   </script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MITEC — Casual Labour Portal</title>
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Deferred script loading to prevent render blocking -->
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
   <style>
     :root {
       --mitec-blue: #092253;
@@ -36,7 +44,7 @@
       --accent-amber: #b45309;
       --accent-gold: #d97706;
       --accent-red: #be123c;
-      --font-main: 'Trebuchet MS', sans-serif;
+      --font-main: 'Trebuchet MS', -apple-system, sans-serif;
     }
 
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -111,7 +119,7 @@
       background: radial-gradient(circle, rgba(217, 119, 6, 0.25) 0%, rgba(255,255,255,0) 70%);
       pointer-events: none;
     }
-    .avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); object-fit: cover; }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); object-fit: cover; background: rgba(255,255,255,0.1); }
     .profile-info span { font-size: 9px; text-transform: uppercase; opacity: 0.75; letter-spacing: 0.8px; }
     .profile-info h2 { font-size: 15px; margin: 2px 0 0 0; font-weight: 700; line-height: 1.2; letter-spacing: 0.2px; }
 
@@ -341,7 +349,8 @@
 
   <div class="container">
     <div class="profile-card">
-      <img id="userAvatar" class="avatar" src="https://via.placeholder.com/150">
+      <!-- Lightweight SVG avatar fallback -->
+      <img id="userAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a2e66'/></svg>" alt="Avatar">
       <div class="profile-info"><span>Current User</span><h2 id="userNameDisplay">MITEC Casual Labour</h2></div>
     </div>
 
@@ -360,14 +369,14 @@
   </nav>
 
   <script>
-    const REQUIRED_APP_VERSION = "v1.1"; 
-
-    if (localStorage.getItem("mcl_app_version") !== REQUIRED_APP_VERSION) {
-      localStorage.removeItem("mcl_doc_no");
-      localStorage.removeItem("mitecWorkerRecord");
-      localStorage.setItem("mcl_app_version", REQUIRED_APP_VERSION);
-      window.location.href = "index.html"; 
-    }
+    // ⚡ Direct Session Protection Check
+    (function checkAuth() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const userDocNo = urlParams.get('id') || localStorage.getItem("mcl_doc_no");
+      if (!userDocNo) {
+        window.location.href = "index.html";
+      }
+    })();
 
     const SPREADSHEET_URL = "https://script.google.com/macros/s/AKfycbwcC4H4Nl-MyxnoMhEM67okwHAP9Ha7NKya6WbangXT-U069ayqPfEY53Puxqguu7zf/exec"; 
 
@@ -376,6 +385,16 @@
     let cachedShifts = [];
     let cachedBookings = [];
     let activeFilterDept = "ALL";
+
+    function convertToDirectLink(url) {
+      if (!url) return "";
+      let stringUrl = String(url);
+      if (stringUrl.includes("drive.google.com")) {
+        const match = stringUrl.match(/\/file\/d\/([^/?]+)/) || stringUrl.match(/id=([^&]+)/);
+        if (match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=s160`;
+      }
+      return stringUrl;
+    }
 
     window.onload = () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -391,7 +410,9 @@
 
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       document.getElementById("userNameDisplay").textContent = record.full_name || "MITEC STAFF";
-      if (record.photo_link) document.getElementById("userAvatar").src = record.photo_link;
+      if (record.photo_link) {
+        document.getElementById("userAvatar").src = convertToDirectLink(record.photo_link);
+      }
 
       refreshData(cleanDocNo);
     };
@@ -429,7 +450,7 @@
     function renderDepartmentChips(shifts) {
       const filterContainer = document.getElementById('filter-container');
       const depts = [...new Set(shifts.map(s => s.dept))];
-      
+
       if (depts.length === 0) {
         filterContainer.style.display = 'none';
         return;
@@ -437,7 +458,7 @@
 
       filterContainer.style.display = 'flex';
       let chipsHtml = `<div class="chip ${activeFilterDept === 'ALL' ? 'active' : ''}" onclick="applyDeptFilter('ALL')">ALL</div>`;
-      
+
       depts.forEach(d => {
         chipsHtml += `<div class="chip ${activeFilterDept === d ? 'active' : ''}" onclick="applyDeptFilter('${d}')">${d}</div>`;
       });
@@ -507,7 +528,6 @@
 
     function renderAvailable(shifts, bookings) {
       const container = document.getElementById('available-view');
-      container.innerHTML = '';
       const today = new Date(); today.setHours(0,0,0,0);
 
       let upcomingShifts = shifts.filter(s => parseDateString(s.date) >= today);
@@ -524,8 +544,10 @@
       upcomingShifts.sort((a, b) => parseDateString(a.date) - parseDateString(b.date));
       const dates = [...new Set(upcomingShifts.map(s => s.date))];
 
+      let htmlBuffer = "";
+
       dates.forEach(date => {
-        container.innerHTML += `<div class="date-label">${date}</div>`;
+        htmlBuffer += `<div class="date-label">${date}</div>`;
         const hasBookingToday = bookings.some(b => b.date === date && String(b.status).toUpperCase() !== 'CANCELLED');
 
         upcomingShifts.filter(s => s.date === date).forEach(s => {
@@ -533,7 +555,7 @@
           const isMyShift = !!myBooking;
           const isFull = s.slotsLeft <= 0;
           const isLockedByPolicy = hasBookingToday && !isMyShift;
-          
+
           const hasSpotlight = s.notes && String(s.notes).trim() !== "";
 
           let pillClass = 'pill-open';
@@ -561,7 +583,7 @@
               </div>`;
           }
 
-          container.innerHTML += `
+          htmlBuffer += `
             <div class="card ${hasSpotlight && !isMyShift && !isLockedByPolicy ? 'spotlight' : ''} ${isFull && !isMyShift && !isLockedByPolicy ? 'full-shift' : ''} ${isLockedByPolicy ? 'locked' : ''}">
               ${spotlightHtml}
               <div class="card-header">
@@ -585,13 +607,15 @@
             </div>`;
         });
       });
+
+      container.innerHTML = htmlBuffer;
     }
 
     function renderBooked(bookings) {
       const container = document.getElementById('booked-view');
-      container.innerHTML = '<div class="date-label">My Registered Schedule</div>';
+      let htmlBuffer = '<div class="date-label">My Registered Schedule</div>';
 
-      container.innerHTML += `
+      htmlBuffer += `
         <div class="schedule-notice-box">
           <div class="notice-row">
             <i class="ph ph-info" style="font-size: 16px; margin-top: 1px; color: var(--pill-teal-text);"></i>
@@ -610,7 +634,7 @@
       const upcomingBookings = activeBookings.filter(b => parseDateString(b.date) >= today);
 
       if (upcomingBookings.length === 0) { 
-        container.innerHTML += '<p style="text-align:center; padding:50px; color:#94a3b8;">No upcoming duties registered.</p>'; 
+        container.innerHTML = htmlBuffer + '<p style="text-align:center; padding:50px; color:#94a3b8;">No upcoming duties registered.</p>'; 
         return; 
       }
 
@@ -649,7 +673,7 @@
             </a>`;
         }
 
-        container.innerHTML += `
+        htmlBuffer += `
           <div class="card" style="border-left: 4px solid ${isWait ? 'var(--accent-amber)' : 'var(--mitec-blue)'}">
             <div class="card-header">
               <h3 class="card-title">${b.dept}</h3>
@@ -668,12 +692,12 @@
             }
           </div>`;
       });
+
+      container.innerHTML = htmlBuffer;
     }
 
     function renderHistoryLog(bookings) {
       const container = document.getElementById('history-view');
-      container.innerHTML = '<div class="date-label">Attendance History Ledger</div>';
-
       const today = new Date(); today.setHours(0,0,0,0);
 
       const pastBookings = bookings.filter(b => {
@@ -682,13 +706,14 @@
       });
 
       if (pastBookings.length === 0) {
-        container.innerHTML += '<p style="text-align:center; padding:50px; color:#94a3b8; font-style:italic;">No past attendance records discovered.</p>';
+        container.innerHTML = '<div class="date-label">Attendance History Ledger</div><p style="text-align:center; padding:50px; color:#94a3b8; font-style:italic;">No past attendance records discovered.</p>';
         return;
       }
 
       pastBookings.sort((a, b) => parseDateString(a.date) - parseDateString(b.date));
 
       let tableMarkup = `
+        <div class="date-label">Attendance History Ledger</div>
         <div class="history-table-wrapper">
           <table class="history-table">
             <thead>
@@ -731,7 +756,7 @@
       });
 
       tableMarkup += `</tbody></table></div>`;
-      container.innerHTML += tableMarkup;
+      container.innerHTML = tableMarkup;
     }
 
     function switchTab(index) {
