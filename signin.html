@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MITEC — Staff Duty Entry</title>
 
-  <!-- ⚡ Speed Optimization: Pre-connect to Google Apps Script -->
+  <!-- ⚡ Speed Optimizations -->
   <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link rel="dns-prefetch" href="https://script.google.com">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <!-- Defer loading of icon library to prevent render blocking -->
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
   <style>
     :root {
       --mitec-blue: #092253;
@@ -103,7 +106,6 @@
     }
     .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top: 3px solid var(--mitec-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-
   </style>
 </head>
 <body>
@@ -114,15 +116,16 @@
     </div>
 
     <div class="profile-card">
-      <img id="workerAvatar" class="avatar" src="https://via.placeholder.com/100" alt="Profile">
+      <!-- Fast inline SVG placeholder -->
+      <img id="workerAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a2e66'/></svg>" alt="Profile">
       <div class="profile-info">
         <span class="profile-label">Current User</span>
-        <h2 class="profile-name" id="workerName">Loading Profile...</h2>
+        <h2 class="profile-name" id="workerName">Staff Member</h2>
       </div>
     </div>
 
     <div class="form-card">
-      <span class="section-title">Duty Registration</span>
+      <span class="section-title">Portal Sign IN  </span>
 
       <div class="field">
         <div class="input-wrapper">
@@ -152,6 +155,7 @@
             <option value="QA">QA</option>
             <option value="SC">SC</option>
             <option value="SETUP">SETUP</option>
+            <option value="SH">SC</option>
             <option value="STWD">STWD</option>
           </select>
         </div>
@@ -205,7 +209,6 @@
   </div>
 
   <script>
-    // 🔗 Live Active Web App Deployment URL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyBP0-dwtWZV-bxbg12bYTIUvkoBtdwnzjKFIj8hSc1my2g0gUHQ-xD2vW_rb8KT4JJSw/exec";
 
     function convertToDirectLink(url) {
@@ -213,17 +216,28 @@
       let stringUrl = String(url);
       if (stringUrl.includes("drive.google.com")) {
         const match = stringUrl.match(/\/file\/d\/([^/?]+)/) || stringUrl.match(/id=([^&]+)/);
-        if (match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}`;
+        if (match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=s200`; // ⚡ Faster CDN direct link
       }
       return stringUrl;
     }
 
-    function loadIdentity() {
+    function initPage() {
+      const docNo = localStorage.getItem("mcl_doc_no");
+      if (!docNo) {
+        window.location.href = "index.html";
+        return;
+      }
+
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       const nameEl = document.getElementById("workerName");
       const avatarEl = document.getElementById("workerAvatar");
-      nameEl.textContent = (record.name_mykad || record.nama_mykad || record.full_name || "Staff Member");
-      if (record.photo_link) avatarEl.src = convertToDirectLink(record.photo_link);
+      
+      if (record.name_mykad || record.nama_mykad || record.full_name) {
+        nameEl.textContent = record.name_mykad || record.nama_mykad || record.full_name;
+      }
+      if (record.photo_link) {
+        avatarEl.src = convertToDirectLink(record.photo_link);
+      }
     }
 
     async function submitAttendance() {
@@ -253,7 +267,6 @@
       closeBtn.style.display = "none";
 
       try {
-        // ⚡ Fast direct query call with cache bypass
         const url = `${WEB_APP_URL}?action=signin&doc_no=${encodeURIComponent(docNo)}&voucher=${encodeURIComponent(voucher)}&dept=${encodeURIComponent(dept)}&shift=${encodeURIComponent(shift)}`;
         const res = await fetch(url, { method: "GET", cache: "no-cache" });
         const data = await res.json();
@@ -299,10 +312,8 @@
       }
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      if (!localStorage.getItem("mcl_doc_no")) window.location.href = "index.html";
-      else loadIdentity();
-    });
+    // Run auth & identity immediately without waiting for DOM completion
+    initPage();
   </script>
 
 </body>
