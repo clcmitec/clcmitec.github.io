@@ -85,6 +85,7 @@
       box-shadow: 0 4px 12px rgba(15,23,42,.015);
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       position: relative; overflow: hidden;
+      cursor: pointer;
     }
 
     .animated-nav-card::after {
@@ -244,8 +245,8 @@
         <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </a>
 
-      <!-- UPDATED TO TARGET VOUCHER REPLACEMENT FORM PAGE DIRECTLY -->
-      <a href="replacement_voucher.html" class="animated-nav-card">
+      <!-- VOUCHER REPLACEMENT CARD WITH ACTIVE SESSION FORWARDING -->
+      <a href="#" onclick="navigateToVoucherReplacement(event)" class="animated-nav-card">
         <div class="nav-card-left">
           <div class="icon-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
@@ -369,8 +370,21 @@
     document.getElementById("statOvernight").textContent = "--";
   }
 
+  function navigateToVoucherReplacement(e) {
+    e.preventDefault();
+    const docNo = localStorage.getItem('active_doc_no') || sessionStorage.getItem('active_doc_no') || localStorage.getItem('mykad_passport_no') || "";
+    const fullName = localStorage.getItem('active_user_name') || sessionStorage.getItem('active_user_name') || localStorage.getItem('full_name') || "";
+
+    if (docNo) {
+      window.location.href = `voucher_replacement.html?doc_no=${encodeURIComponent(docNo)}&full_name=${encodeURIComponent(fullName)}`;
+    } else {
+      window.location.href = "voucher_replacement.html";
+    }
+  }
+
   function logout() {
     localStorage.clear();
+    sessionStorage.clear();
     window.location.href = "index.html";
   }
 
