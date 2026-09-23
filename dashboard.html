@@ -141,7 +141,7 @@
       background: #ffffff;
     }
 
-    /* SIDE NAVIGATION DRAWER & GROUPED ACCORDIONS */
+    /* SIDE NAVIGATION DRAWER & FLEX LAYOUT */
     .side-nav {
       position: fixed;
       top: 0;
@@ -150,11 +150,12 @@
       height: 100vh;
       z-index: 1200;
       background: linear-gradient(180deg, #ffffff, #f4f7fb);
-      padding: 70px 16px 85px 16px; /* Added proper bottom spacing for sticky logout */
       border-right: 1px solid rgba(0, 0, 0, 0.08);
       transition: 0.45s cubic-bezier(.77, 0, .18, 1);
       box-shadow: 0 0 60px rgba(15, 23, 42, 0.12);
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .side-nav.active { left: 0; }
@@ -178,6 +179,13 @@
 
     .close-btn:hover { background: #e2e8f0; }
     .close-btn span { font-size: 18px; color: #111827; }
+
+    /* Scrollable Menu Area */
+    .nav-content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 70px 16px 20px 16px;
+    }
 
     .dropdown-item {
       display: flex;
@@ -238,14 +246,13 @@
       color: var(--mitec-accent);
     }
 
-    /* Fixed Bottom Logout Button Inside Drawer */
+    /* Fixed Bottom Logout Container */
     .logout-footer-container {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      padding: 14px 16px;
-      background: linear-gradient(180deg, rgba(244,247,251,0), rgba(244,247,251,0.95) 40%);
+      flex-shrink: 0;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
     }
 
     .logout-footer-btn {
@@ -710,88 +717,91 @@
   <!-- OVERLAY -->
   <div class="overlay" id="overlay" onclick="toggleSideNav()"></div>
 
-  <!-- SIDE NAVIGATION DRAWER WITH GROUPED SUBMENUS & LOGOUT FOOTER -->
+  <!-- SIDE NAVIGATION DRAWER WITH FLEX LAYOUT & PINNED FOOTER -->
   <aside class="side-nav" id="sideNav">
     <button class="close-btn" id="closeBtn" onclick="toggleSideNav()" aria-label="Close Navigation">
       <span class="material-symbols-outlined">close</span>
     </button>
 
-    <!-- Group 1: Core Navigation -->
-    <a href="dashboard.html" class="dropdown-item"><i class="ph-bold ph-house"></i> Home</a>
-    <a href="hub.html" class="dropdown-item"><i class="ph-bold ph-squares-four"></i> Services</a>
-    <a href="booking.html" class="dropdown-item"><i class="ph-bold ph-calendar"></i> Schedule</a>
-    <a href="history.html" class="dropdown-item"><i class="ph-bold ph-clock-counter-clockwise"></i> History</a>
-    <a href="profile.html" class="dropdown-item"><i class="ph-bold ph-user"></i> Profile</a>
+    <!-- Scrollable Menu Content Area -->
+    <div class="nav-content-scroll">
+      <!-- Group 1: Core Navigation -->
+      <a href="dashboard.html" class="dropdown-item"><i class="ph-bold ph-house"></i> Home</a>
+      <a href="hub.html" class="dropdown-item"><i class="ph-bold ph-squares-four"></i> Services</a>
+      <a href="booking.html" class="dropdown-item"><i class="ph-bold ph-calendar"></i> Schedule</a>
+      <a href="history.html" class="dropdown-item"><i class="ph-bold ph-clock-counter-clockwise"></i> History</a>
+      <a href="profile.html" class="dropdown-item"><i class="ph-bold ph-user"></i> Profile</a>
 
-    <!-- Group 2: Shift & Attendance Group -->
-    <div class="dropdown-item" onclick="toggleGroupMenu('shiftGroupSubmenu', 'shiftCaret')" style="cursor: pointer;">
-      <i class="ph-bold ph-timer"></i> Shift & Attendance
-      <i class="ph-bold ph-caret-down" id="shiftCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
-    </div>
-    <div id="shiftGroupSubmenu" class="dropdown-submenu">
-      <a href="booking.html" class="submenu-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        Shift Schedule
-      </a>
-      <a href="https://lookerstudio.google.com/reporting/9b8a64f0-2e03-430d-aa29-bdb31989a35e" target="_blank" class="submenu-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
-        Attendance History
-      </a>
-      <a href="#" onclick="navigateToVoucherReplacement(event)" class="submenu-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-        Voucher Replacement
-      </a>
+      <!-- Group 2: Shift & Attendance Group -->
+      <div class="dropdown-item" onclick="toggleGroupMenu('shiftGroupSubmenu', 'shiftCaret')" style="cursor: pointer;">
+        <i class="ph-bold ph-timer"></i> Shift & Attendance
+        <i class="ph-bold ph-caret-down" id="shiftCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
+      </div>
+      <div id="shiftGroupSubmenu" class="dropdown-submenu">
+        <a href="booking.html" class="submenu-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Shift Schedule
+        </a>
+        <a href="https://datastudio.google.com/reporting/ceef08d6-46de-4dae-b5b4-f6bab6ce275f" target="_blank" class="submenu-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+          Attendance History
+        </a>
+        <a href="#" onclick="navigateToVoucherReplacement(event)" class="submenu-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+          Voucher Replacement
+        </a>
+      </div>
+
+      <!-- Group 3: Account & Finance Group -->
+      <div class="dropdown-item" onclick="toggleGroupMenu('financeGroupSubmenu', 'financeCaret')" style="cursor: pointer;">
+        <i class="ph-bold ph-wallet"></i> Account & Finance
+        <i class="ph-bold ph-caret-down" id="financeCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
+      </div>
+      <div id="financeGroupSubmenu" class="dropdown-submenu">
+        <a href="https://lookerstudio.google.com/reporting/f540ed91-c48c-4d4a-a8e7-50d03577879f" target="_blank" class="submenu-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          Third Party Bank Consent
+        </a>
+      </div>
+
+      <!-- Group 4: About & Information Group -->
+      <div class="dropdown-item" onclick="toggleGroupMenu('infoGroupSubmenu', 'infoCaret')" style="cursor: pointer;">
+        <i class="ph-bold ph-info"></i> Information & Guides
+        <i class="ph-bold ph-caret-down" id="infoCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
+      </div>
+      <div id="infoGroupSubmenu" class="dropdown-submenu">
+        <a href="industry .html" class="submenu-item"><i class="ph-bold ph-info"></i> About MITEC</a>
+        <a href="calendar.html" class="submenu-item"><i class="ph-bold ph-calendar-blank"></i> Event Calendar</a>
+        <a href="student.html" class="submenu-item"><i class="ph-bold ph-student"></i> Student Ambassador Programme</a>
+        <a href="twuw.html" class="submenu-item"><i class="ph-bold ph-map-pin-line"></i> How to Get to MITEC</a>
+        <a href="faq.html" class="submenu-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Help & Support
+        </a>
+        <a href="feedback-form.html" class="submenu-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          Contact Us
+        </a>
+      </div>
+
+      <!-- Group 5: Quick Links Group -->
+      <div class="dropdown-item" onclick="toggleGroupMenu('quickLinksSubmenu', 'quickLinksCaret')" style="cursor: pointer;">
+        <i class="ph-bold ph-link-simple"></i> Quick Links 
+        <i class="ph-bold ph-caret-down" id="quickLinksCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
+      </div>
+      <div id="quickLinksSubmenu" class="dropdown-submenu">
+        <div class="submenu-header">User Notice</div>
+        <a href="https://docs.google.com/document/d/1M5Q6ol49IeireDOHodFfg-dQaL5ZXEcW6uD-_CPR2GM/edit?usp=sharing" target="_blank" class="submenu-item"><i class="ph-bold ph-shield-check"></i> Privacy Policy</a>
+        <a href="https://docs.google.com/document/d/1S0ib_XFouz-HGwIMfo5uk7YVkuBLe1632WTDEriw404/edit?usp=drivesdk" target="_blank" class="submenu-item"><i class="ph-bold ph-file-text"></i> Terms of Use</a>
+
+        <div class="submenu-header">Official Sites</div>
+        <a href="https://www.mitec.com.my" target="_blank" class="submenu-item"><i class="ph-bold ph-globe-hemisphere-west"></i> MITEC</a>
+        <a href="https://www.qube.com.my" target="_blank" class="submenu-item"><i class="ph-bold ph-buildings"></i> Qube</a>
+        <a href="https://matrade.gov.my" target="_blank" class="submenu-item"><i class="ph-bold ph-briefcase"></i> MATRADE</a>
+      </div>
     </div>
 
-    <!-- Group 3: Account & Finance Group -->
-    <div class="dropdown-item" onclick="toggleGroupMenu('financeGroupSubmenu', 'financeCaret')" style="cursor: pointer;">
-      <i class="ph-bold ph-wallet"></i> Account & Finance
-      <i class="ph-bold ph-caret-down" id="financeCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
-    </div>
-    <div id="financeGroupSubmenu" class="dropdown-submenu">
-      <a href="https://lookerstudio.google.com/reporting/f540ed91-c48c-4d4a-a8e7-50d03577879f" target="_blank" class="submenu-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        Third Party Bank Consent
-      </a>
-    </div>
-
-    <!-- Group 4: About & Information Group -->
-    <div class="dropdown-item" onclick="toggleGroupMenu('infoGroupSubmenu', 'infoCaret')" style="cursor: pointer;">
-      <i class="ph-bold ph-info"></i> Information & Guides
-      <i class="ph-bold ph-caret-down" id="infoCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
-    </div>
-    <div id="infoGroupSubmenu" class="dropdown-submenu">
-      <a href="industry .html" class="submenu-item"><i class="ph-bold ph-info"></i> About MITEC</a>
-      <a href="calendar.html" class="submenu-item"><i class="ph-bold ph-calendar-blank"></i> Event Calendar</a>
-      <a href="student.html" class="submenu-item"><i class="ph-bold ph-student"></i> Student Ambassador Programme</a>
-      <a href="twuw.html" class="submenu-item"><i class="ph-bold ph-map-pin-line"></i> How to Get to MITEC</a>
-      <a href="faq.html" class="submenu-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Help & Support
-      </a>
-      <a href="feedback-form.html" class="submenu-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        Contact Us
-      </a>
-    </div>
-
-    <!-- Group 5: Quick Links Group -->
-    <div class="dropdown-item" onclick="toggleGroupMenu('quickLinksSubmenu', 'quickLinksCaret')" style="cursor: pointer;">
-      <i class="ph-bold ph-link-simple"></i> Quick Links 
-      <i class="ph-bold ph-caret-down" id="quickLinksCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
-    </div>
-    <div id="quickLinksSubmenu" class="dropdown-submenu">
-      <div class="submenu-header">User Notice</div>
-      <a href="https://docs.google.com/document/d/1M5Q6ol49IeireDOHodFfg-dQaL5ZXEcW6uD-_CPR2GM/edit?usp=sharing" target="_blank" class="submenu-item"><i class="ph-bold ph-shield-check"></i> Privacy Policy</a>
-      <a href="https://docs.google.com/document/d/1S0ib_XFouz-HGwIMfo5uk7YVkuBLe1632WTDEriw404/edit?usp=drivesdk" target="_blank" class="submenu-item"><i class="ph-bold ph-file-text"></i> Terms of Use</a>
-
-      <div class="submenu-header">Official Sites</div>
-      <a href="https://www.mitec.com.my" target="_blank" class="submenu-item"><i class="ph-bold ph-globe-hemisphere-west"></i> MITEC</a>
-      <a href="https://www.qube.com.my" target="_blank" class="submenu-item"><i class="ph-bold ph-buildings"></i> Qube</a>
-      <a href="https://matrade.gov.my" target="_blank" class="submenu-item"><i class="ph-bold ph-briefcase"></i> MATRADE</a>
-    </div>
-
-    <!-- Fixed Bottom Logout Container -->
+    <!-- Pinned Bottom Logout Footer -->
     <div class="logout-footer-container">
       <a href="#" onclick="logout()" class="logout-footer-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
