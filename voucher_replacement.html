@@ -168,13 +168,6 @@
       box-shadow: 0 0 0 3px rgba(45, 104, 196, 0.15);
       background: #ffffff;
     }
-    input[readonly] { 
-      background: #e2e8f0; 
-      color: var(--md-on-surface-variant); 
-      font-weight: 700; 
-      cursor: not-allowed; 
-      border-color: #cbd5e1;
-    }
 
     .word-count-notice { font-size: 12px; color: #dc2626; margin-top: 6px; text-align: right; font-weight: 600; }
     .word-count-notice.valid { color: #16a34a; }
@@ -298,18 +291,6 @@
       </div>
 
       <form id="replacementForm">
-        <!-- USER PROFILE ACCOUNT VERIFICATION -->
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Worker Full Name</label>
-            <input type="text" id="workerName" readonly placeholder="Enter IC to load name..." />
-          </div>
-          <div class="form-group">
-            <label>IC / Passport Number</label>
-            <input type="text" id="docNo" placeholder="Enter IC / Passport" required />
-          </div>
-        </div>
-
         <div class="grid-2">
           <div class="form-group">
             <label>Voucher No.</label>
@@ -401,69 +382,21 @@
   </footer>
 
   <script>
+    // ⚡ Direct Session Protection Check (exact same logic as booking.html)
+    (function checkAuth() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const userDocNo = urlParams.get('id') || localStorage.getItem("mcl_doc_no");
+      if (!userDocNo) {
+        window.location.href = "index.html";
+      }
+    })();
+
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvmEGkXRk0AevOeEmwcxPKOsvJnot8StE9e6aBBvHvgF3bqgIzcQJyIHiQc7NhT72f/exec";
     let currentFileId = "";
 
-    function getActiveUserDocNo() {
+    function getUserDocNo() {
       const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('doc_no') || sessionStorage.getItem('active_doc_no') || localStorage.getItem('active_doc_no') || localStorage.getItem('mykad_passport_no') || "";
-    }
-
-    function getActiveUserName() {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('full_name') || sessionStorage.getItem('active_user_name') || localStorage.getItem('active_user_name') || localStorage.getItem('full_name') || "";
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const activeDocNo = getActiveUserDocNo();
-      const activeName = getActiveUserName();
-
-      const docInput = document.getElementById('docNo');
-      const nameInput = document.getElementById('workerName');
-
-      if (activeDocNo) {
-        docInput.value = activeDocNo;
-        docInput.readOnly = true;
-        if (activeName) {
-          nameInput.value = activeName;
-        } else {
-          fetchWorkerName(activeDocNo);
-        }
-      } else {
-        docInput.readOnly = false;
-        docInput.placeholder = "Enter IC / Passport";
-
-        docInput.addEventListener('blur', () => {
-          const val = docInput.value.trim();
-          if (val) fetchWorkerName(val);
-        });
-
-        docInput.addEventListener('keyup', (e) => {
-          if (e.key === 'Enter') {
-            const val = docInput.value.trim();
-            if (val) fetchWorkerName(val);
-          }
-        });
-      }
-    });
-
-    async function fetchWorkerName(docNo) {
-      const nameInput = document.getElementById('workerName');
-      nameInput.value = "Fetching name...";
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`);
-        const data = await res.json();
-        if (data.ok && data.exists && data.record) {
-          const full = data.record.full_name || data.record.name_mykad || "Verified Worker";
-          nameInput.value = full;
-          sessionStorage.setItem('active_doc_no', docNo);
-          sessionStorage.setItem('active_user_name', full);
-        } else {
-          nameInput.value = "Record Not Found";
-        }
-      } catch (err) {
-        nameInput.value = "Auto-retrieved on submission";
-      }
+      return urlParams.get('id') || localStorage.getItem("mcl_doc_no") || "";
     }
 
     const reasonInput = document.getElementById('reason');
@@ -490,12 +423,12 @@
     document.getElementById('replacementForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const docNoVal = document.getElementById('docNo').value.trim() || getActiveUserDocNo();
+      const docNoVal = getUserDocNo();
       const reasonText = reasonInput.value.trim();
       const wordCount = countWords(reasonText);
 
       if (!docNoVal) {
-        alert("Please enter a valid IC / Passport Number.");
+        window.location.href = "index.html";
         return;
       }
 
@@ -550,12 +483,13 @@
     });
 
     async function fetchHistory() {
-      const activeDocNo = document.getElementById('docNo').value.trim() || getActiveUserDocNo();
+      const activeDocNo = getUserDocNo();
       const voucherNo = document.getElementById('searchVoucherNo').value.trim();
       const tbody = document.getElementById('recordsBody');
 
       if (!activeDocNo) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #dc2626;">Please enter an IC number above first.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #dc2626;">Session invalid. Returning to login...</td></tr>`;
+        window.location.href = "index.html";
         return;
       }
 
