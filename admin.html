@@ -7,18 +7,18 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
     :root {
-      --admin: #4d7a29;
-      --admin-dark: #83a532;
-      --admin-gradient: linear-gradient(135deg, #a2c354 0%, #769628 100%);
+      --admin-dark: #8cc63f; /* Signature Qube Lime Green */
+      --admin-dark-text: #1e232a; /* Qube Dark Charcoal/Navy */
+      --admin-gradient: linear-gradient(135deg, #8cc63f 0%, #75ab31 100%);
       --bg-slate: #f8fafc;
       --card-bg: #ffffff;
-      --text-main: #242400;
-      --text-muted: #617A29;
+      --text-main: #1e232a;
+      --text-muted: #64748b;
       --border-thin: #e2e8f0;
 
-      --pill-teal-bg: #f1f1ef;
-      --pill-teal-text: #002412;
-      --pill-teal-border: #d2e49c;
+      --pill-teal-bg: #f3f9e9;
+      --pill-teal-text: #598522;
+      --pill-teal-border: #cbe69d;
 
       --pill-amber-bg: #fffbeb;
       --pill-amber-text: #b45309;
@@ -36,7 +36,7 @@
       --pill-orange-text: #c2410c;
       --pill-orange-border: #ffedd5;
 
-      --accent-emerald: #83a532;
+      --accent-emerald: #8cc63f;
       --accent-warn: #9b1c1c;
       --font-main: 'Trebuchet MS', sans-serif;
     }
@@ -57,7 +57,7 @@
       padding: 0 16px; 
     }
     .brand-img { height: 28px; width: auto; display: block; }
-    .user-profile-tag { font-size: 11px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; letter-spacing: 0.5px; background: #f4f8e8; border: 1px solid #d2e49c; padding: 5px 12px; border-radius: 6px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-profile-tag { font-size: 11px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; background: #f3f9e9; border: 1px solid #cbe69d; padding: 5px 12px; border-radius: 6px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .container { max-width: 500px; margin: 0 auto; padding: 15px; }
 
@@ -67,12 +67,12 @@
 
     .tab-bar { display: flex; background: #fff; border-bottom: 1px solid var(--border-thin); position: sticky; top: 60px; z-index: 900; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .tab-item { flex: 1; text-align: center; padding: 16px 0; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; border-bottom: 3px solid transparent; }
-    .tab-item.active { color: var(--pill-teal-text); border-color: var(--admin-dark); }
+    .tab-item.active { color: var(--text-main); border-color: var(--admin-dark); }
 
     .app-page { display: none; }
     .app-page.active { display: block; }
 
-    .section-label { font-size: 11px; font-weight: 800; color: var(--pill-teal-text); margin: 25px 0 12px 5px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
+    .section-label { font-size: 11px; font-weight: 800; color: var(--text-main); margin: 25px 0 12px 5px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
     .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border-thin); }
 
     /* 4 Scorecard Dashboard Layout */
@@ -82,20 +82,20 @@
     .dash-tile:active { transform: scale(0.96); }
     .dash-tile.selected { border-width: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
 
-    .dash-tile.tile-cap.selected { border-color: var(--admin-dark); color: var(--pill-teal-text); }
-    .dash-tile.tile-conf.selected { border-color: var(--admin); color: var(--pill-teal-text); background: var(--pill-teal-bg); }
+    .dash-tile.tile-cap.selected { border-color: var(--admin-dark); color: var(--text-main); }
+    .dash-tile.tile-conf.selected { border-color: var(--admin-dark); color: var(--text-main); background: var(--pill-teal-bg); }
     .dash-tile.tile-wait.selected { border-color: var(--pill-amber-text); color: var(--pill-amber-text); background: var(--pill-amber-bg); }
     .dash-tile.tile-pres.selected { border-color: var(--pill-emerald-text); color: var(--pill-emerald-text); background: var(--pill-emerald-bg); }
 
     .dash-tile span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
-    .dash-tile h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--pill-teal-text); transition: color 0.2s; }
-    .matrix-title-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #f4f8e8; border: 1px solid #d2e49c; color: var(--pill-teal-text); margin-left: 6px; vertical-align: middle; }
+    .dash-tile h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--text-main); transition: color 0.2s; }
+    .matrix-title-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #f3f9e9; border: 1px solid #cbe69d; color: var(--text-main); margin-left: 6px; vertical-align: middle; }
 
     /* Calendar UI Elements */
     .calendar-wrapper { background: #fff; border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 20px; box-shadow: 0 3px 8px rgba(0,0,0,0.03); }
     .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .cal-header h3 { margin: 0; font-size: 15px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; letter-spacing: 1px; }
-    .btn-cal-nav { background: #f4f8e8; border: 1px solid #d2e49c; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--pill-teal-text); font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
+    .cal-header h3 { margin: 0; font-size: 15px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
+    .btn-cal-nav { background: #f3f9e9; border: 1px solid #cbe69d; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--text-main); font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
     .btn-cal-nav:active { transform: scale(0.9); }
 
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
@@ -103,11 +103,11 @@
     .cal-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--text-main); cursor: pointer; border: 1px solid transparent; transition: 0.2s; position: relative; }
     .cal-cell:hover { background: #f8fafc; }
     .cal-cell.empty { background: transparent; cursor: default; }
-    .cal-cell.has-shifts { background: #f4f8e8; border-color: #d2e49c; color: var(--pill-teal-text); }
-    .cal-cell.selected { background: var(--admin-dark); color: #fff; border-color: var(--admin-dark); box-shadow: 0 4px 10px rgba(162, 195, 84, 0.3); transform: scale(1.05); z-index: 2; }
+    .cal-cell.has-shifts { background: #f3f9e9; border-color: #cbe69d; color: var(--text-main); }
+    .cal-cell.selected { background: var(--admin-dark); color: #fff; border-color: var(--admin-dark); box-shadow: 0 4px 10px rgba(140, 198, 63, 0.4); transform: scale(1.05); z-index: 2; }
 
     .cal-indicator { font-size: 9px; font-weight: 800; border-radius: 4px; padding: 1px 4px; margin-top: 2px; line-height: 1.2; }
-    .cal-cell.selected .cal-indicator { background: rgba(255,255,255,0.25) !important; color: #fff !important; }
+    .cal-cell.selected .cal-indicator { background: rgba(0,0,0,0.15) !important; color: #fff !important; }
 
     /* Pivot Interactive Accordion Styles */
     details.pivot-cat-card, details.pivot-date-block, details.pivot-dept-block, details.pivot-shift-item { display: block; width: 100%; }
@@ -118,7 +118,7 @@
     details[open] > summary.pivot-summary .pivot-chevron { transform: rotate(180deg); }
 
     .pivot-cat-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: 0 3px 8px rgba(0,0,0,0.02); border-left: 5px solid var(--admin-dark); }
-    .pivot-cat-title { font-size: 14px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); padding-bottom: 8px; margin-bottom: 12px; }
+    .pivot-cat-title { font-size: 14px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); padding-bottom: 8px; margin-bottom: 12px; }
 
     .pivot-date-block { margin-bottom: 10px; padding-left: 4px; border-bottom: 1px dashed var(--border-thin); padding-bottom: 10px; }
     .pivot-date-block:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -128,14 +128,14 @@
     .pivot-dept-title { font-size: 12px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; padding: 2px 0; }
 
     .pivot-shift-item { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0; margin-top: 8px; margin-bottom: 4px; }
-    .pivot-shift-header { font-size: 12px; font-weight: 700; color: var(--pill-teal-text); display: flex; width: 100%; justify-content: space-between; align-items: center; }
+    .pivot-shift-header { font-size: 12px; font-weight: 700; color: var(--text-main); display: flex; width: 100%; justify-content: space-between; align-items: center; }
 
     /* Cards & Roster Styling */
     .stat-row-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s ease; }
     .stat-row-card:active { transform: scale(0.98); }
-    .stat-row-card.selected-card { border: 2px solid var(--admin-dark); box-shadow: 0 4px 12px rgba(162, 195, 84, 0.2); transform: scale(1.02); }
+    .stat-row-card.selected-card { border: 2px solid var(--admin-dark); box-shadow: 0 4px 12px rgba(140, 198, 63, 0.25); transform: scale(1.02); }
 
-    .stat-info h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--pill-teal-text); display: flex; align-items: center; gap: 8px; }
+    .stat-info h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
     .stat-info p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; display: flex; flex-direction: column; gap: 3px; }
     .meta-data-line { display: flex; align-items: center; gap: 6px; }
 
@@ -165,8 +165,8 @@
     .status-waitlist + .wm-status-chevron { color: var(--pill-amber-text); }
     .status-cancelled + .wm-status-chevron { color: var(--pill-red-text); }
 
-    .view-drawable-name { color: var(--pill-teal-text); font-weight: 700; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
-    .view-drawable-name:hover { color: var(--admin-dark); text-decoration: underline; }
+    .view-drawable-name { color: var(--text-main); font-weight: 700; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
+    .view-drawable-name:hover { color: var(--pill-teal-text); text-decoration: underline; }
 
     /* Drawers Overlays Hierarchy */
     .drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 2000; display: none; align-items: flex-end; }
@@ -174,12 +174,12 @@
 
     .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 24px 20px; overflow-y: auto; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
     .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
-    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--pill-teal-text); font-weight: 800; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--text-main); font-weight: 800; display: flex; flex-direction: column; gap: 4px; }
     .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
     .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; }
 
     .roster-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; text-align: left; }
-    .roster-table th { background: #f8fafc; padding: 12px 10px; font-weight: 700; color: var(--pill-teal-text); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
+    .roster-table th { background: #f8fafc; padding: 12px 10px; font-weight: 700; color: var(--text-main); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
     .roster-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
     .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
 
@@ -187,19 +187,19 @@
     .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
     .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
 
-    .btn-approve { background: transparent; border: 1px solid var(--admin-dark); color: var(--pill-teal-text); font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; text-align: center; width: 100px; }
+    .btn-approve { background: transparent; border: 1px solid var(--admin-dark); color: var(--text-main); font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; text-align: center; width: 100px; }
 
     /* Export Config Options Panel */
     .export-options-group { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
-    .export-checkbox-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--pill-teal-text); cursor: pointer; }
+    .export-checkbox-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--text-main); cursor: pointer; }
     .export-checkbox-item:last-child { margin-bottom: 0; }
     .export-checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--admin-dark); cursor: pointer; }
 
     .form-group { margin-bottom: 16px; text-align: left; }
-    .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
 
-    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--pill-teal-text); background: #fff; appearance: auto; }
-    .form-control:focus { outline: none; border-color: var(--admin-dark); box-shadow: 0 0 0 3px rgba(162, 195, 84, 0.2); }
+    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--text-main); background: #fff; appearance: auto; }
+    .form-control:focus { outline: none; border-color: var(--admin-dark); box-shadow: 0 0 0 3px rgba(140, 198, 63, 0.25); }
     .form-control:disabled { background: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
     textarea.form-control { height: 80px; padding: 12px; resize: none; appearance: none; }
 
@@ -207,7 +207,7 @@
     .btn-submit-shift:active { transform: scale(0.98); }
     .btn-logout { background: none; border: 1px solid var(--pill-red-text); color: var(--pill-red-text); font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.15s; }
 
-    #sync-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: var(--pill-teal-text); letter-spacing: 1px; }
+    #sync-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: var(--text-main); letter-spacing: 1px; }
     .loader-text { margin-top: 12px; }
   </style>
 </head>
@@ -217,7 +217,7 @@
   <div id="login-overlay">
     <div class="login-card">
       <div class="login-logo"><i class="ph ph-shield-check"></i></div>
-      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--pill-teal-text);">Operations Console</h2>
+      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--text-main);">Operations Console</h2>
       <p style="margin: 0 0 24px 0; font-size: 13px; color: var(--text-muted);">Please provide credentials to scan matrix.</p>
       <form id="login-form" onsubmit="handleAdminLogin(event)">
         <div class="form-group">
@@ -326,7 +326,7 @@
           <div id="drawer-shift-meta" class="drawer-meta-subtitle"></div>
         </h2>
         <div style="display:flex; gap:12px; align-items:center;">
-          <button class="btn-close-drawer" style="color:var(--pill-teal-text); padding:4px;" onclick="openExportPanel()"><i class="ph ph-download-simple"></i></button>
+          <button class="btn-close-drawer" style="color:var(--text-main); padding:4px;" onclick="openExportPanel()"><i class="ph ph-download-simple"></i></button>
           <button class="btn-close-drawer" onclick="closeRosterDrawer()"><i class="ph ph-x"></i></button>
         </div>
       </div>
@@ -817,7 +817,7 @@
           if (visibleCards === 0) detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts match filters.</p>`;
       }
       if (isFutureOrToday(calSelectedDateStr)) {
-          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #f8fafc; color: var(--pill-teal-text); border: 2px dashed #d2e49c;" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px;"></i> DEPLOY NEW SHIFT HERE</button>`;
+          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #f8fafc; color: var(--text-main); border: 2px dashed #cbe69d;" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px;"></i> DEPLOY NEW SHIFT HERE</button>`;
       }
       listContainer.innerHTML = detailsHTML;
     }
@@ -1007,13 +1007,13 @@
                       attDisplay = `<span style="color:var(--accent-warn); font-weight:800;">No Show</span>`;
                     }
                   } else {
-                    attDisplay = `<span style="color:var(--pill-teal-text); font-weight:700; font-family:monospace;">${formatFullTimestamp(attStamp)}</span>`;
+                    attDisplay = `<span style="color:var(--text-main); font-weight:700; font-family:monospace;">${formatFullTimestamp(attStamp)}</span>`;
                   }
 
                   catMarkup += `
                     <tr>
                       <td style="padding:6px 8px;">
-                        <div style="font-weight:700; color:var(--pill-teal-text);">${w.worker_name}</div>
+                        <div style="font-weight:700; color:var(--text-main);">${w.worker_name}</div>
                         <div style="font-size:9px; color:var(--text-muted);">ID: ${w.user_id}</div>
                       </td>
                       <td style="text-align:center; padding:6px 8px;">${attDisplay}</td>
@@ -1069,8 +1069,8 @@
 
         htmlOutput += `
           <div class="roster-card" onclick="openRosterDrawer('${s.id}', '${s.dept}', '${s.date}', '${s.time}', '${capacity}', false)">
-            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--pill-teal-text); font-weight:700;">
-              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f4f8e8; border:1px solid #d2e49c; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
+            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--text-main); font-weight:700;">
+              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f3f9e9; border:1px solid #cbe69d; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
             </h3>
             <span style="font-size:12px; color:var(--text-muted); font-weight:600; display:inline-block;">
               <i class="ph ph-users"></i> Confirmed: <b>${confirmedCount} / ${capacity}</b> 
@@ -1098,11 +1098,11 @@
 
         htmlOutput += `
           <div class="roster-card" onclick="openRosterDrawer('${s.id}', '${s.dept}', '${s.date}', '${s.time}', '${capacity}', true)">
-            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--pill-teal-text); font-weight:700;">
-              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f4f8e8; border:1px solid #d2e49c; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
+            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--text-main); font-weight:700;">
+              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f3f9e9; border:1px solid #cbe69d; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
             </h3>
-            <span style="font-size:12px; color:var(--pill-teal-text); font-weight:700; display:inline-block;">
-              <i class="ph ph-check-circle" style="color:var(--admin-dark);"></i> Attendance: ${attendedCount} / ${capacity}
+            <span style="font-size:12px; color:var(--text-main); font-weight:700; display:inline-block;">
+              <i class="ph ph-check-circle" style="color:var(--pill-teal-text);"></i> Attendance: ${attendedCount} / ${capacity}
             </span>
             <div class="chevron-indicator"><i class="ph ph-caret-right"></i></div>
           </div>`;
@@ -1195,7 +1195,7 @@
             } else if (!formattedStamp || formattedStamp === "No Show") {
                 actionColumnMarkup = `<span style="font-size:11px; color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>`;
             } else {
-                actionColumnMarkup = `<span style="font-size:11px; color:var(--pill-teal-text); font-weight:800; font-family:monospace; white-space:nowrap;">${formattedStamp}</span>`;
+                actionColumnMarkup = `<span style="font-size:11px; color:var(--text-main); font-weight:800; font-family:monospace; white-space:nowrap;">${formattedStamp}</span>`;
             }
           } else { 
             if (isCancelled) {
@@ -1359,12 +1359,12 @@
         let statusPill = '<span class="status-pill pill-sub">Confirmed</span>';
         let attendanceDisplay = (attendanceStr === "no show" || attendanceStr === "" || attendanceStr === "0") 
           ? `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>` 
-          : `<span style="color:var(--pill-teal-text); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`;
+          : `<span style="color:var(--text-main); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`;
 
         profileRowsMarkup += `
           <tr>
             <td>
-              <div style="font-weight:700; color:var(--pill-teal-text);">${finalDisplayDate}</div>
+              <div style="font-weight:700; color:var(--text-main);">${finalDisplayDate}</div>
               <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-top:2px;">${finalDisplayDept}</div>
             </td>
             <td style="text-align:center;">${statusPill}</td>
