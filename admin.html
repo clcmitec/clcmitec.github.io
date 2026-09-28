@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MITEC — Booking Manager</title>
+  <title>QUBE — Booking Manager</title>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
     :root {
-      --admin-dark: #092253;
-      --admin-gradient: linear-gradient(135deg, #092253 0%, #153269 100%);
+      --admin-dark: #83a532;
+      --admin-gradient: linear-gradient(135deg, #a2c354 0%, #769628 100%);
       --bg-slate: #f8fafc;
       --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
+      --text-main: #242400;
+      --text-muted: #617A29;
       --border-thin: #e2e8f0;
-      
-      --pill-teal-bg: #f0f4f8;
-      --pill-teal-text: #092253;
-      --pill-teal-border: #d0dbe5;
-      
+
+      --pill-teal-bg: #f4f8e8;
+      --pill-teal-text: #002412;
+      --pill-teal-border: #d2e49c;
+
       --pill-amber-bg: #fffbeb;
       --pill-amber-text: #b45309;
       --pill-amber-border: #fef3c7;
@@ -35,14 +35,14 @@
       --pill-orange-text: #c2410c;
       --pill-orange-border: #ffedd5;
 
-      --accent-emerald: #092253;
+      --accent-emerald: #83a532;
       --accent-warn: #9b1c1c;
       --font-main: 'Trebuchet MS', sans-serif;
     }
 
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
     body { margin: 0; background-color: var(--bg-slate); font-family: var(--font-main); color: var(--text-main); padding-bottom: 90px; }
-    
+
     .header { 
       position: sticky; 
       top: 0; 
@@ -55,9 +55,9 @@
       justify-content: space-between; 
       padding: 0 16px; 
     }
-    .brand-img { height: 20px; width: auto; display: block; }
-    .user-profile-tag { font-size: 11px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; letter-spacing: 0.5px; background: #e2e8f0; padding: 5px 12px; border-radius: 6px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
+    .brand-img { height: 28px; width: auto; display: block; }
+    .user-profile-tag { font-size: 11px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; letter-spacing: 0.5px; background: #f4f8e8; border: 1px solid #d2e49c; padding: 5px 12px; border-radius: 6px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
     .container { max-width: 500px; margin: 0 auto; padding: 15px; }
 
     #login-overlay { position: fixed; inset: 0; background: var(--bg-slate); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -66,75 +66,75 @@
 
     .tab-bar { display: flex; background: #fff; border-bottom: 1px solid var(--border-thin); position: sticky; top: 60px; z-index: 900; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .tab-item { flex: 1; text-align: center; padding: 16px 0; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; border-bottom: 3px solid transparent; }
-    .tab-item.active { color: var(--admin-dark); border-color: var(--admin-dark); }
+    .tab-item.active { color: var(--pill-teal-text); border-color: var(--admin-dark); }
 
     .app-page { display: none; }
     .app-page.active { display: block; }
 
-    .section-label { font-size: 11px; font-weight: 800; color: var(--admin-dark); margin: 25px 0 12px 5px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
+    .section-label { font-size: 11px; font-weight: 800; color: var(--pill-teal-text); margin: 25px 0 12px 5px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
     .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border-thin); }
 
     /* 4 Scorecard Dashboard Layout */
     .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0 20px 0; }
-    
+
     .dash-tile { background: #fff; border: 1px solid var(--border-thin); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: all 0.15s ease; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .dash-tile:active { transform: scale(0.96); }
     .dash-tile.selected { border-width: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
-    
-    .dash-tile.tile-cap.selected { border-color: var(--admin-dark); color: var(--admin-dark); }
-    .dash-tile.tile-conf.selected { border-color: var(--admin-dark); color: var(--admin-dark); background: var(--pill-teal-bg); }
+
+    .dash-tile.tile-cap.selected { border-color: var(--admin-dark); color: var(--pill-teal-text); }
+    .dash-tile.tile-conf.selected { border-color: var(--admin-dark); color: var(--pill-teal-text); background: var(--pill-teal-bg); }
     .dash-tile.tile-wait.selected { border-color: var(--pill-amber-text); color: var(--pill-amber-text); background: var(--pill-amber-bg); }
     .dash-tile.tile-pres.selected { border-color: var(--pill-emerald-text); color: var(--pill-emerald-text); background: var(--pill-emerald-bg); }
 
     .dash-tile span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
-    .dash-tile h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--admin-dark); transition: color 0.2s; }
-    .matrix-title-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: var(--admin-dark); margin-left: 6px; vertical-align: middle; }
+    .dash-tile h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--pill-teal-text); transition: color 0.2s; }
+    .matrix-title-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #f4f8e8; border: 1px solid #d2e49c; color: var(--pill-teal-text); margin-left: 6px; vertical-align: middle; }
 
     /* Calendar UI Elements */
     .calendar-wrapper { background: #fff; border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 20px; box-shadow: 0 3px 8px rgba(0,0,0,0.03); }
     .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .cal-header h3 { margin: 0; font-size: 15px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; letter-spacing: 1px; }
-    .btn-cal-nav { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--admin-dark); font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
+    .cal-header h3 { margin: 0; font-size: 15px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; letter-spacing: 1px; }
+    .btn-cal-nav { background: #f4f8e8; border: 1px solid #d2e49c; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--pill-teal-text); font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
     .btn-cal-nav:active { transform: scale(0.9); }
-    
+
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
     .cal-day-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
     .cal-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--text-main); cursor: pointer; border: 1px solid transparent; transition: 0.2s; position: relative; }
     .cal-cell:hover { background: #f8fafc; }
     .cal-cell.empty { background: transparent; cursor: default; }
-    .cal-cell.has-shifts { background: #f0f4f8; border-color: #d0dbe5; color: var(--admin-dark); }
-    .cal-cell.selected { background: var(--admin-dark); color: #fff; border-color: var(--admin-dark); box-shadow: 0 4px 10px rgba(9, 34, 83, 0.2); transform: scale(1.05); z-index: 2; }
-    
+    .cal-cell.has-shifts { background: #f4f8e8; border-color: #d2e49c; color: var(--pill-teal-text); }
+    .cal-cell.selected { background: var(--admin-dark); color: #fff; border-color: var(--admin-dark); box-shadow: 0 4px 10px rgba(162, 195, 84, 0.3); transform: scale(1.05); z-index: 2; }
+
     .cal-indicator { font-size: 9px; font-weight: 800; border-radius: 4px; padding: 1px 4px; margin-top: 2px; line-height: 1.2; }
-    .cal-cell.selected .cal-indicator { background: rgba(255,255,255,0.2) !important; color: #fff !important; }
+    .cal-cell.selected .cal-indicator { background: rgba(255,255,255,0.25) !important; color: #fff !important; }
 
     /* Pivot Interactive Accordion Styles */
     details.pivot-cat-card, details.pivot-date-block, details.pivot-dept-block, details.pivot-shift-item { display: block; width: 100%; }
     summary.pivot-summary { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; outline: none; list-style: none; }
     summary.pivot-summary::-webkit-details-marker { display: none; }
-    
+
     .pivot-chevron { font-size: 13px; color: var(--text-muted); transition: transform 0.2s ease; display: inline-block; }
     details[open] > summary.pivot-summary .pivot-chevron { transform: rotate(180deg); }
 
     .pivot-cat-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: 0 3px 8px rgba(0,0,0,0.02); border-left: 5px solid var(--admin-dark); }
-    .pivot-cat-title { font-size: 14px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); padding-bottom: 8px; margin-bottom: 12px; }
-    
+    .pivot-cat-title { font-size: 14px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); padding-bottom: 8px; margin-bottom: 12px; }
+
     .pivot-date-block { margin-bottom: 10px; padding-left: 4px; border-bottom: 1px dashed var(--border-thin); padding-bottom: 10px; }
     .pivot-date-block:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     .pivot-date-title { font-size: 13px; font-weight: 800; color: #475569; padding: 4px 0; }
-    
+
     .pivot-dept-block { margin-left: 12px; border-left: 2px dashed #cbd5e1; padding-left: 12px; margin-top: 8px; margin-bottom: 8px; }
-    .pivot-dept-title { font-size: 12px; font-weight: 800; color: #0d9488; text-transform: uppercase; padding: 2px 0; }
-    
+    .pivot-dept-title { font-size: 12px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; padding: 2px 0; }
+
     .pivot-shift-item { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0; margin-top: 8px; margin-bottom: 4px; }
-    .pivot-shift-header { font-size: 12px; font-weight: 700; color: var(--admin-dark); display: flex; width: 100%; justify-content: space-between; align-items: center; }
+    .pivot-shift-header { font-size: 12px; font-weight: 700; color: var(--pill-teal-text); display: flex; width: 100%; justify-content: space-between; align-items: center; }
 
     /* Cards & Roster Styling */
     .stat-row-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s ease; }
     .stat-row-card:active { transform: scale(0.98); }
-    .stat-row-card.selected-card { border: 2px solid var(--admin-dark); box-shadow: 0 4px 12px rgba(9, 34, 83, 0.1); transform: scale(1.02); }
+    .stat-row-card.selected-card { border: 2px solid var(--admin-dark); box-shadow: 0 4px 12px rgba(162, 195, 84, 0.2); transform: scale(1.02); }
 
-    .stat-info h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--admin-dark); display: flex; align-items: center; gap: 8px; }
+    .stat-info h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--pill-teal-text); display: flex; align-items: center; gap: 8px; }
     .stat-info p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; display: flex; flex-direction: column; gap: 3px; }
     .meta-data-line { display: flex; align-items: center; gap: 6px; }
 
@@ -164,8 +164,8 @@
     .status-waitlist + .wm-status-chevron { color: var(--pill-amber-text); }
     .status-cancelled + .wm-status-chevron { color: var(--pill-red-text); }
 
-    .view-drawable-name { color: var(--admin-dark); font-weight: 700; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
-    .view-drawable-name:hover { color: #0d9488; text-decoration: underline; }
+    .view-drawable-name { color: var(--pill-teal-text); font-weight: 700; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
+    .view-drawable-name:hover { color: var(--admin-dark); text-decoration: underline; }
 
     /* Drawers Overlays Hierarchy */
     .drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 2000; display: none; align-items: flex-end; }
@@ -173,40 +173,40 @@
 
     .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 24px 20px; overflow-y: auto; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
     .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
-    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--admin-dark); font-weight: 800; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--pill-teal-text); font-weight: 800; display: flex; flex-direction: column; gap: 4px; }
     .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
     .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; }
-    
+
     .roster-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; text-align: left; }
-    .roster-table th { background: #f8fafc; padding: 12px 10px; font-weight: 700; color: var(--admin-dark); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
+    .roster-table th { background: #f8fafc; padding: 12px 10px; font-weight: 700; color: var(--pill-teal-text); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
     .roster-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
     .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
-    
+
     .pill-sub { background: var(--admin-dark); color: #ffffff; border: 1px solid var(--admin-dark); }
     .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
     .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
 
-    .btn-approve { background: transparent; border: 1px solid var(--admin-dark); color: var(--admin-dark); font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; text-align: center; width: 100px; }
+    .btn-approve { background: transparent; border: 1px solid var(--admin-dark); color: var(--pill-teal-text); font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; text-align: center; width: 100px; }
 
     /* Export Config Options Panel */
     .export-options-group { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
-    .export-checkbox-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--admin-dark); cursor: pointer; }
+    .export-checkbox-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--pill-teal-text); cursor: pointer; }
     .export-checkbox-item:last-child { margin-bottom: 0; }
     .export-checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--admin-dark); cursor: pointer; }
 
     .form-group { margin-bottom: 16px; text-align: left; }
-    .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-    
-    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--admin-dark); background: #fff; appearance: auto; }
-    .form-control:focus { outline: none; border-color: var(--admin-dark); box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.05); }
+    .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+
+    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--pill-teal-text); background: #fff; appearance: auto; }
+    .form-control:focus { outline: none; border-color: var(--admin-dark); box-shadow: 0 0 0 3px rgba(162, 195, 84, 0.2); }
     .form-control:disabled { background: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
     textarea.form-control { height: 80px; padding: 12px; resize: none; appearance: none; }
-    
+
     .btn-submit-shift { width: 100%; height: 50px; background: var(--admin-dark); color: #fff; font-size: 14px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; }
     .btn-submit-shift:active { transform: scale(0.98); }
     .btn-logout { background: none; border: 1px solid var(--pill-red-text); color: var(--pill-red-text); font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.15s; }
 
-    #sync-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: var(--admin-dark); letter-spacing: 1px; }
+    #sync-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: var(--pill-teal-text); letter-spacing: 1px; }
     .loader-text { margin-top: 12px; }
   </style>
 </head>
@@ -216,7 +216,7 @@
   <div id="login-overlay">
     <div class="login-card">
       <div class="login-logo"><i class="ph ph-shield-check"></i></div>
-      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--admin-dark);">Operations Console</h2>
+      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--pill-teal-text);">Operations Console</h2>
       <p style="margin: 0 0 24px 0; font-size: 13px; color: var(--text-muted);">Please provide credentials to scan matrix.</p>
       <form id="login-form" onsubmit="handleAdminLogin(event)">
         <div class="form-group">
@@ -236,7 +236,7 @@
 
   <!-- HEADER -->
   <header class="header">
-    <img class="brand-img" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
+    <img class="brand-img" src="https://qube.com.my/img/logos/qube.png" alt="QUBE">
     <div id="adminUserDisplayTag" class="user-profile-tag">SUPER ADMIN</div>
   </header>
 
@@ -248,11 +248,11 @@
   </nav>
 
   <div class="container">
-    
+
     <!-- PAGE 1: STATISTICS & DEPLOYMENT -->
     <div id="page-1" class="app-page active">
       <div id="matrixFilterActiveLabel" class="section-label">Global Matrix <span class="matrix-title-badge">All Data</span></div>
-      
+
       <!-- SHIFT MATRIX SECTION: 4 CUSTOMIZED CARDS -->
       <div class="dashboard-grid">
         <div id="tile-cap" class="dash-tile tile-cap selected" onclick="setDashboardFilter('ALL')">
@@ -272,7 +272,7 @@
           <h2 id="dash-txt-pres">0 / 0</h2>
         </div>
       </div>
-      
+
       <div id="stats-view-container"></div>
       <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border-thin);">
         <button class="btn-logout" onclick="handleAdminLogout()">Exit Session (Logout)</button>
@@ -325,7 +325,7 @@
           <div id="drawer-shift-meta" class="drawer-meta-subtitle"></div>
         </h2>
         <div style="display:flex; gap:12px; align-items:center;">
-          <button class="btn-close-drawer" style="color:var(--admin-dark); padding:4px;" onclick="openExportPanel()"><i class="ph ph-download-simple"></i></button>
+          <button class="btn-close-drawer" style="color:var(--pill-teal-text); padding:4px;" onclick="openExportPanel()"><i class="ph ph-download-simple"></i></button>
           <button class="btn-close-drawer" onclick="closeRosterDrawer()"><i class="ph ph-x"></i></button>
         </div>
       </div>
@@ -450,11 +450,11 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOQA9l1lpjs9eSOHwQmdZe4axc6OR6E9ohXmHQI3d9B-3apRtl6mFValUpepCorlqs/exec"; 
-    
+
     let activeAdminKey = null;
     let cachedShifts = [];
     let cachedBookings = [];
-    
+
     let currentActiveFilter = "ALL"; 
     let calSelectedDateStr = null;   
     let calSelectedShiftId = null;   
@@ -582,23 +582,23 @@
 
     function loadAdminDataSuite() {
       document.getElementById('sync-loader').style.display = 'flex';
-      
+
       fetch(`${SCRIPT_URL}?action=getAdminMasterData&userDocNo=${activeAdminKey}`)
         .then(r => r.json())
         .then(res => {
           if (res.ok && res.allShifts && res.allBookingsRaw) {
             try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
-            
+
             cachedShifts = (res.allShifts || []).map(s => ({ ...s, totalSlots: s.slots, Slots: s.slots }));
             cachedBookings = res.allBookingsRaw;
-            
+
             if (res.adminName) document.getElementById("adminUserDisplayTag").textContent = res.adminName.toUpperCase();
-            
+
             updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
             renderStatisticsPage(); 
             renderPivotRostersPage();
             renderRosterCardsPage();
-            
+
             document.getElementById('sync-loader').style.display = 'none';
           } else {
             alert("Handshake Refused!");
@@ -632,7 +632,7 @@
 
       let totalCap = 0;
       scopedShifts.forEach(s => { totalCap += Number(s.slots || s.totalSlots || s.Slots || 0); });
-      
+
       const confirmedBookings = scopedBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
       const totalConf = confirmedBookings.length;
       const totalWait = scopedBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
@@ -649,7 +649,7 @@
       document.getElementById('dash-txt-conf').textContent = totalConf;
       document.getElementById('dash-txt-wait').textContent = totalWait;
       document.getElementById('dash-txt-pres').textContent = `${totalPres} /${totalCap}`;
-      
+
       document.getElementById("matrixFilterActiveLabel").innerHTML = `${labelScope} <span class="matrix-title-badge">${badgeScope}</span>`;
     }
 
@@ -694,7 +694,7 @@
       renderCalendarGrid();
       renderSelectedDateDetails();
     }
-    
+
     function selectShiftCard(shiftId) {
       calSelectedShiftId = (calSelectedShiftId === shiftId) ? null : shiftId;
       if (calSelectedShiftId) openEditShift(shiftId);
@@ -731,7 +731,7 @@
                    if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:#e2e8f0; color:var(--text-main);">Req ${totalMetric}</div>`;
               } else if (currentActiveFilter === 'CONF') {
                    totalMetric = confirmedToday.length;
-                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-teal-bg); color:var(--admin-dark);">+${totalMetric}</div>`;
+                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-teal-bg); color:var(--pill-teal-text);">+${totalMetric}</div>`;
               } else if (currentActiveFilter === 'WAIT') {
                    totalMetric = todayBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
                    if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-amber-bg); color:var(--pill-amber-text);">+${totalMetric}</div>`;
@@ -757,7 +757,7 @@
 
       const shiftsToday = cachedShifts.filter(s => s.date === calSelectedDateStr);
       let detailsHTML = `<div class="section-label">Shift Details: ${calSelectedDateStr}</div>`;
-      
+
       if (shiftsToday.length === 0) {
           detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts scheduled for this date.</p>`;
       } else {
@@ -816,7 +816,7 @@
           if (visibleCards === 0) detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts match filters.</p>`;
       }
       if (isFutureOrToday(calSelectedDateStr)) {
-          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #f8fafc; color: var(--admin-dark); border: 2px dashed #cbd5e1;" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px;"></i> DEPLOY NEW SHIFT HERE</button>`;
+          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #f8fafc; color: var(--pill-teal-text); border: 2px dashed #d2e49c;" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px;"></i> DEPLOY NEW SHIFT HERE</button>`;
       }
       listContainer.innerHTML = detailsHTML;
     }
@@ -862,7 +862,7 @@
       let parts = shift.date.split('.');
       if (parts.length === 3) document.getElementById('form-date').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
       document.getElementById('form-dept').value = shift.dept;
-      
+
       let vTime = formatAttendanceTime(shift.time).replace(":", "");
       let timeSelect = document.getElementById('form-time');
       if (Array.from(timeSelect.options).some(opt => opt.value === vTime)) timeSelect.value = vTime;
@@ -902,7 +902,7 @@
     function renderPivotRostersPage() {
       const container = document.getElementById('pivot-roster-root-container');
       container.innerHTML = '';
-      
+
       if(!cachedShifts || cachedShifts.length === 0) {
         container.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">No pivot matrices discoverable.</p>';
         return;
@@ -919,12 +919,12 @@
 
         if (!pivotData[category][s.date]) pivotData[category][s.date] = {};
         if (!pivotData[category][s.date][s.dept]) pivotData[category][s.date][s.dept] = [];
-        
+
         pivotData[category][s.date][s.dept].push(s);
       });
 
       const catOrder = ["TODAY", "UPCOMING", "PAST"];
-      
+
       catOrder.forEach(cat => {
         let dateGroup = pivotData[cat];
         let dateKeys = Object.keys(dateGroup);
@@ -989,7 +989,7 @@
                 catMarkup += `
                   <table class="roster-table" style="font-size:11px; margin-top:4px; background:#fff; border:1px solid var(--border-thin); border-radius:6px;">
                     <thead>
-                      <tr style="background:#f1f5f9;">
+                      <tr style="background:#f8fafc;">
                         <th style="padding:6px 8px;">Casual Labourer</th>
                         <th style="width:110px; text-align:center; padding:6px 8px;">Attendance</th>
                       </tr>
@@ -1006,13 +1006,13 @@
                       attDisplay = `<span style="color:var(--accent-warn); font-weight:800;">No Show</span>`;
                     }
                   } else {
-                    attDisplay = `<span style="color:var(--admin-dark); font-weight:700; font-family:monospace;">${formatFullTimestamp(attStamp)}</span>`;
+                    attDisplay = `<span style="color:var(--pill-teal-text); font-weight:700; font-family:monospace;">${formatFullTimestamp(attStamp)}</span>`;
                   }
 
                   catMarkup += `
                     <tr>
                       <td style="padding:6px 8px;">
-                        <div style="font-weight:700; color:var(--admin-dark);">${w.worker_name}</div>
+                        <div style="font-weight:700; color:var(--pill-teal-text);">${w.worker_name}</div>
                         <div style="font-size:9px; color:var(--text-muted);">ID: ${w.user_id}</div>
                       </td>
                       <td style="text-align:center; padding:6px 8px;">${attDisplay}</td>
@@ -1068,8 +1068,8 @@
 
         htmlOutput += `
           <div class="roster-card" onclick="openRosterDrawer('${s.id}', '${s.dept}', '${s.date}', '${s.time}', '${capacity}', false)">
-            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--admin-dark); font-weight:700;">
-              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f1f5f9; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
+            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--pill-teal-text); font-weight:700;">
+              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f4f8e8; border:1px solid #d2e49c; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
             </h3>
             <span style="font-size:12px; color:var(--text-muted); font-weight:600; display:inline-block;">
               <i class="ph ph-users"></i> Confirmed: <b>${confirmedCount} / ${capacity}</b> 
@@ -1097,11 +1097,11 @@
 
         htmlOutput += `
           <div class="roster-card" onclick="openRosterDrawer('${s.id}', '${s.dept}', '${s.date}', '${s.time}', '${capacity}', true)">
-            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--admin-dark); font-weight:700;">
-              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f1f5f9; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
+            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--pill-teal-text); font-weight:700;">
+              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f4f8e8; border:1px solid #d2e49c; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
             </h3>
-            <span style="font-size:12px; color:var(--admin-dark); font-weight:700; display:inline-block;">
-              <i class="ph ph-check-circle" style="color:var(--pill-teal-text);"></i> Attendance: ${attendedCount} / ${capacity}
+            <span style="font-size:12px; color:var(--pill-teal-text); font-weight:700; display:inline-block;">
+              <i class="ph ph-check-circle" style="color:var(--admin-dark);"></i> Attendance: ${attendedCount} / ${capacity}
             </span>
             <div class="chevron-indicator"><i class="ph ph-caret-right"></i></div>
           </div>`;
@@ -1194,7 +1194,7 @@
             } else if (!formattedStamp || formattedStamp === "No Show") {
                 actionColumnMarkup = `<span style="font-size:11px; color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>`;
             } else {
-                actionColumnMarkup = `<span style="font-size:11px; color:var(--admin-dark); font-weight:800; font-family:monospace; white-space:nowrap;">${formattedStamp}</span>`;
+                actionColumnMarkup = `<span style="font-size:11px; color:var(--pill-teal-text); font-weight:800; font-family:monospace; white-space:nowrap;">${formattedStamp}</span>`;
             }
           } else { 
             if (isCancelled) {
@@ -1279,7 +1279,7 @@
         let nameClean = String(row.worker_name || "").replace(/"/g, '""');
         let bookingStamp = formatFullTimestamp(row.timestamp || "");
         let attClean = formatFullTimestamp(row.attendance || "");
-        
+
         let statusDisplay = String(row.status).toUpperCase();
         let cancelClean = "";
 
@@ -1303,7 +1303,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", `MITEC_Roster_${currentExportShiftId}.csv`);
+      link.setAttribute("download", `QUBE_Roster_${currentExportShiftId}.csv`);
 
       document.body.appendChild(link);
       link.click();
@@ -1337,7 +1337,7 @@
     function openWorkerProfileDrawer(workerId, workerName) {
       document.getElementById('wp-drawer-name').textContent = workerName;
       let totalConfirmed = 0, noShows = 0, profileRowsMarkup = "";
-      
+
       const historySubset = cachedBookings.filter(b => {
         const matchesUser = String(b.user_id).trim() === String(workerId).trim();
         const rawStatus = String(b.status).toUpperCase();
@@ -1358,12 +1358,12 @@
         let statusPill = '<span class="status-pill pill-sub">Confirmed</span>';
         let attendanceDisplay = (attendanceStr === "no show" || attendanceStr === "" || attendanceStr === "0") 
           ? `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>` 
-          : `<span style="color:var(--admin-dark); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`;
+          : `<span style="color:var(--pill-teal-text); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`;
 
         profileRowsMarkup += `
           <tr>
             <td>
-              <div style="font-weight:700; color:var(--admin-dark);">${finalDisplayDate}</div>
+              <div style="font-weight:700; color:var(--pill-teal-text);">${finalDisplayDate}</div>
               <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-top:2px;">${finalDisplayDept}</div>
             </td>
             <td style="text-align:center;">${statusPill}</td>
@@ -1375,7 +1375,7 @@
         <span><i class="ph ph-identification-card"></i> Document ID: <b>${workerId}</b></span>
         <span><i class="ph ph-shield-warning"></i> Matrix Analytics: <b>${noShows} No-Shows</b> out of <b>${totalConfirmed} Confirmed</b></span>`;
       document.getElementById('wp-drawer-table-body').innerHTML = profileRowsMarkup || `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">No confirmed attendance records found.</td></tr>`;
-      
+
       document.getElementById('worker-profile-drawer').style.display = 'flex';
     }
 
