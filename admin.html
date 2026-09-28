@@ -541,19 +541,20 @@
     }
 
     function formatFullTimestamp(timeVal) {
-      if (!timeVal) return "No Show";
-      let str = String(timeVal).trim();
-      if (str.toLowerCase() === "no show" || str === "0" || str === "-" || str === "") return "No Show";
-      if (str.includes("GMT")) {
-        try {
-          let d = new Date(str);
-          if (!isNaN(d.getTime())) {
-            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
-          }
-        } catch(e) {}
+  if (!timeVal) return "No Show";
+  let str = String(timeVal).trim();
+  if (str.toLowerCase() === "no show" || str === "0" || str === "-" || str === "") return "No Show";
+  if (str.includes("GMT")) {
+    try {
+      let d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
       }
-      return str; 
-    }
+    } catch(e) {}
+  }
+  return str; 
+}
+
 
     function getShiftDateObj(dateStr) {
       try {
