@@ -18,6 +18,9 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+  <!-- Load Supabase Library Synchronously -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Google Tag -->
   <script defer src="https://www.googletagmanager.com/gtag/js?id=G-S3RRBZB4NJ"></script>
   <script>
@@ -508,6 +511,10 @@
       border: 1px solid var(--md-outline); 
       padding: 10px 12px; 
       border-radius: 12px; 
+      min-height: 62px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .item-label { 
@@ -525,6 +532,8 @@
       font-weight: 800; 
       color: var(--mitec-blue); 
       display: block; 
+      line-height: 1.25;
+      margin-top: 2px;
     }
 
     /* SHINY GLOWING BUTTON STYLES */
@@ -934,6 +943,20 @@
 
   <script>
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyBP0-dwtWZV-bxbg12bYTIUvkoBtdwnzjKFIj8hSc1my2g0gUHQ-xD2vW_rb8KT4JJSw/exec";
+  const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+  let supabaseClient = null;
+
+  function getSupabase() {
+    if (!supabaseClient) {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+      } else {
+        throw new Error("Supabase SDK not loaded properly");
+      }
+    }
+    return supabaseClient;
+  }
 
   function toggleSideNav() {
     document.getElementById("sideNav").classList.toggle("active");
@@ -954,7 +977,7 @@
   function navigateToVoucherReplacement(event) {
     event.preventDefault();
     const worker = getStoredWorker();
-    const docNo = worker.mykad_passport_no || localStorage.getItem("mcl_doc_no") || "";
+    const docNo = worker.doc_no || worker.mykad_passport_no || localStorage.getItem("mcl_doc_no") || "";
     alert("Forwarding active session for Voucher Replacement (Doc No: " + docNo + ")");
   }
 
@@ -967,14 +990,10 @@
   function getStoredWorker() { return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}"); }
   function toProperCase(str) { if (!str) return ""; return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
 
+  // Return the link cleanly
   function convertToDirectLink(url) {
     if (!url) return "";
-    let stringUrl = String(url);
-    if (stringUrl.includes("drive.google.com")) {
-      const match = stringUrl.match(/\/file\/d\/([^/?]+)/) || stringUrl.match(/id=([^&]+)/);
-      if (match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=s160`;
-    }
-    return stringUrl;
+    return String(url).trim();
   }
 
   function setImageWithFallback(imgId, src, fallback) {
@@ -982,46 +1001,102 @@
     if (!imgEl) return;
     imgEl.onerror = function() { this.onerror = null; this.src = fallback; };
     const finalSrc = convertToDirectLink(src);
-    if (finalSrc && finalSrc.length > 10) imgEl.src = finalSrc;
+    if (finalSrc && finalSrc.length > 5) imgEl.src = finalSrc;
   }
 
   async function fillWorkerData() {
     const worker = getStoredWorker();
-    const docNo = worker.mykad_passport_no || localStorage.getItem("mcl_doc_no"); 
-    const nameStr = worker.name_mykad || worker.nama_mykad || worker.full_name || "Worker";
+    const docNo = worker.doc_no || worker.mykad_passport_no || localStorage.getItem("mcl_doc_no"); 
+    const nameStr = worker.name_mykad || worker.full_name || "Worker";
     document.getElementById("heroName").textContent = toProperCase(nameStr);
 
     const fallbackSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231B365D'/></svg>";
-    if (worker.photo_link) {
-      setImageWithFallback("headerPhoto", worker.photo_link, fallbackSvg);
+    
+    let photoUrl = worker.photo_link || worker.photo || "";
+    if (photoUrl) {
+      setImageWithFallback("headerPhoto", photoUrl, fallbackSvg);
     }
 
+    const loaderState = document.getElementById("loaderState");
+    const summaryGrid = document.getElementById("summaryGrid");
+    const inVal = document.getElementById("dashSignIn");
+    const outVal = document.getElementById("dashSignOut");
+    const vouchVal = document.getElementById("dashVoucher");
+    const hoursVal = document.getElementById("dashHours");
+
     if (docNo) {
-      const loaderState = document.getElementById("loaderState");
-      const summaryGrid = document.getElementById("summaryGrid");
-      const loaderText = document.getElementById("loaderText");
-
-      const inVal = document.getElementById("dashSignIn");
-      const outVal = document.getElementById("dashSignOut");
-      const vouchVal = document.getElementById("dashVoucher");
-      const hoursVal = document.getElementById("dashHours");
-
       try {
-        const res = await fetch(`${WEB_APP_URL}?action=get_today_summary&doc_no=${encodeURIComponent(docNo)}`, { cache: "no-cache" });
-        const data = await res.json();
+        const client = getSupabase();
+
+        // Fetch directly from casual_labour_profile to get photo_link & name_mykad
+        const { data: profile } = await client
+          .from('casual_labour_profile')
+          .select('photo_link, name_mykad')
+          .eq('doc_no', docNo)
+          .maybeSingle();
+
+        if (profile) {
+          if (profile.photo_link) {
+            setImageWithFallback("headerPhoto", profile.photo_link, fallbackSvg);
+            worker.photo_link = profile.photo_link;
+          }
+          if (profile.name_mykad) {
+            document.getElementById("heroName").textContent = toProperCase(profile.name_mykad);
+            worker.name_mykad = profile.name_mykad;
+          }
+          localStorage.setItem("mitecWorkerRecord", JSON.stringify(worker));
+        }
+
+        // Calculate today's date
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayDateString = `${year}-${month}-${day}`;
+        const todayFormattedDate = `${day}/${month}/${year}`;
+
+        // Fetch shift details recorded TODAY from Supabase
+        const { data: summary } = await client
+          .from('attendance_records')
+          .select('*')
+          .eq('doc_no', docNo)
+          .eq('working_date', todayDateString)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
         loaderState.style.display = "none";
         summaryGrid.style.display = "grid";
 
-        if (data.ok && data.summary) {
-          inVal.textContent = data.summary.sign_in_time || "--:--";
-          outVal.textContent = data.summary.sign_out_time || "--:--";
-          vouchVal.textContent = data.summary.voucher_no || "-";
-          hoursVal.textContent = data.summary.hours_worked || "0.0";
+        if (summary) {
+          let formattedClockIn = "--:--";
+          if (summary.clock_in) {
+            formattedClockIn = `${todayFormattedDate}<br>${summary.clock_in}`;
+          }
+
+          let formattedClockOut = "--:--";
+          if (summary.clock_out) {
+            formattedClockOut = `${todayFormattedDate}<br>${summary.clock_out}`;
+          }
+
+          inVal.innerHTML = formattedClockIn;
+          outVal.innerHTML = formattedClockOut;
+          vouchVal.textContent = summary.voucher ? summary.voucher : "-";
+          hoursVal.textContent = (summary.hours !== null && summary.hours !== undefined) ? summary.hours : "0.0";
+        } else {
+          inVal.innerHTML = "--:--";
+          outVal.innerHTML = "--:--";
+          vouchVal.textContent = "-";
+          hoursVal.textContent = "0.0";
         }
       } catch (e) { 
-        loaderText.textContent = "Connection Error";
-        const spinner = document.querySelector(".spinner-large");
-        if (spinner) spinner.style.display = "none";
+        console.error(e);
+        loaderState.style.display = "none";
+        summaryGrid.style.display = "grid";
+        inVal.innerHTML = "--:--";
+        outVal.innerHTML = "--:--";
+        vouchVal.textContent = "-";
+        hoursVal.textContent = "0.0";
       }
     }
   }
@@ -1114,7 +1189,7 @@
 
   function initDashboard() {
     if (!localStorage.getItem("mitecWorkerRecord")) {
-      window.location.href = "indexc.html";
+      window.location.href = "index.html";
     } else {
       fillWorkerData();
       loadHubSpreadsheetData();
