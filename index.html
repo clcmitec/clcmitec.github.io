@@ -5,25 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MITEC — Casual Labour Portal</title>
 
-  <!-- ⚡ Speed Optimizations -->
-  <link rel="preconnect" href="https://script.google.com" crossorigin>
-  <link rel="dns-prefetch" href="https://script.google.com">
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-
-  <link rel="icon" href="https://mitec.com.my/static/img/logos/logo-footer.png" type="image/png">
-
-  <!-- Non-blocking asynchronous font loading -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-
-  <!-- Deferred script loading to prevent render blocking -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <!-- Load Supabase Library Synchronously -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
       --mitec-blue: #092253;
-      --mitec-blue-dark: #07223f;
       --mitec-accent: #0f4a82;
       --bg-base: #f4f5f8;
       --card-bg: #ffffff;
@@ -33,7 +26,6 @@
       --success: #34c759;
       --radius: 28px;
       --shadow-vip: 0 20px 40px rgba(7, 34, 63, 0.1);
-      --marble-url: url('dark-blue-marble-plain-photo-wallpapers (1).jpg');
     }
 
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -61,10 +53,6 @@
     .brand { margin-bottom: 54px; }
     .brand img { width: 130px; height: auto; object-fit: contain; margin-bottom: 24px; }
 
-    .title { 
-      font-size: 24px; font-weight: 800; margin: 0 0 8px; 
-      letter-spacing: -0.03em; color: var(--mitec-blue); 
-    }
     .sub { font-size: 14px; color: var(--text-muted); margin: 0; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
 
     .input-group { position: relative; margin-bottom: 28px; text-align: left; margin-top: 32px;}
@@ -109,7 +97,6 @@
 
     .btn-primary {
       width: 100%; height: 60px; border: none; border-radius: 20px;
-      background: var(--marble-url) center/cover no-repeat;
       background-color: var(--mitec-blue);
       color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
       transition: all 0.2s; margin-top: 8px;
@@ -117,13 +104,7 @@
       box-shadow: 0 10px 25px rgba(9, 34, 83, 0.2);
     }
 
-    .btn-primary::before {
-      content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
-      background: rgba(0,0,0,0.25); transition: opacity 0.2s;
-    }
-
     .btn-primary:active { transform: scale(0.98); }
-    .btn-primary span { position: relative; z-index: 1; }
 
     .btn-link {
       display: inline-block; margin-top: 36px;
@@ -133,61 +114,27 @@
       transition: background 0.2s;
       line-height: 1.5;
     }
-    .btn-link:hover { background: rgba(15, 74, 130, 0.05); }
 
     .msg {
       margin-top: 24px; font-size: 13px; font-weight: 600;
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      min-height: 24px;
+      min-height: 24px; text-align: center;
     }
     .msg.error { color: var(--error); }
     .msg.success { color: var(--success); }
 
     .footer {
-      width: 100%;
-      max-width: 320px;
-      margin: 54px auto 32px;
-      text-align: center;
+      width: 100%; max-width: 320px; margin: 54px auto 32px; text-align: center;
     }
 
     .footer-brand {
-      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--mitec-blue);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      line-height: 1.4;
-      display: block;
-    }
-
-    .footer-divider {
-      width: 30px;
-      height: 1.5px;
-      background: var(--mitec-blue);
-      margin: 14px auto;
-      opacity: 0.15;
+      font-size: 12px; font-weight: 800; color: var(--mitec-blue);
+      letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
     }
 
     .footer-system {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      line-height: 1.8;
-    }
-
-    .version-tag {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 3px 10px;
-      background: #eef1f6;
-      border-radius: 6px;
-      font-size: 9px;
-      font-weight: 800;
-      color: var(--text-muted);
+      font-size: 10px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
     }
   </style>
 </head>
@@ -210,89 +157,85 @@
         <span>Access</span>
       </button>
 
-      <a href="129c.html" class="btn-link">First Time User?<br>Register / Update Account</a>
+      <a href="#" class="btn-link">First Time User?<br>Register / Update Account</a>
 
       <div id="loginMessage" class="msg"></div>
     </div>
 
     <footer class="footer">
       <div class="footer-brand">MALAYSIA INTERNATIONAL TRADE & EXHIBITION CENTRE</div>
-      <div class="footer-divider"></div>
-      <div class="footer-system">
-        Casual Labour Management <br> 
-        & Coordination System
-      </div>
-      <div class="version-tag">SYSTEM PROTOCOL V1.2.0</div>
+      <div class="footer-system">Casual Labour Management System</div>
     </footer>
   </div>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyBP0-dwtWZV-bxbg12bYTIUvkoBtdwnzjKFIj8hSc1my2g0gUHQ-xD2vW_rb8KT4JJSw/exec";
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+    let supabaseClient = null;
 
-    // Immediate session check before full DOM rendering
-    (function checkSession() {
-      const savedDoc = localStorage.getItem("mcl_doc_no");
-      const savedRecord = localStorage.getItem("mitecWorkerRecord");
-      if (savedDoc && savedRecord) {
-        window.location.href = "dashboard.html";
+    function getSupabase() {
+      if (!supabaseClient) {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        } else {
+          throw new Error("Supabase library not loaded. Ensure internet connection is active.");
+        }
       }
-    })();
-
-    const docInput = document.getElementById("docInput");
-    const loginBtn = document.getElementById("loginBtn");
-    const msg = document.getElementById("loginMessage");
-
-    window.addEventListener("DOMContentLoaded", () => {
-      if (docInput) docInput.focus();
-    });
+      return supabaseClient;
+    }
 
     function showStatus(text, isError = true) {
+      const msg = document.getElementById("loginMessage");
       msg.textContent = text;
       msg.className = isError ? "msg error" : "msg success";
-      if (isError && text) {
-        msg.innerHTML = `<i class="ph-bold ph-warning-circle"></i> ${text}`;
-      } else if (text) {
-        msg.innerHTML = `<i class="ph-bold ph-check-circle"></i> ${text}`;
-      }
     }
 
     async function handleLogin() {
+      const docInput = document.getElementById("docInput");
+      const loginBtn = document.getElementById("loginBtn");
       const docNo = docInput.value.trim();
+
       if (!docNo) {
         showStatus("Credentials required for entry.");
         return;
       }
 
       loginBtn.disabled = true;
-      loginBtn.querySelector('span').textContent = "Establishing Protocol...";
+      loginBtn.querySelector('span').textContent = "Login...";
       showStatus("");
 
       try {
-        const url = `${WEB_APP_URL}?action=check_existing&doc_no=${encodeURIComponent(docNo)}`;
-        const res = await fetch(url, { method: "GET", cache: "no-cache" });
-        const data = await res.json();
+        const client = getSupabase();
 
-        if (data.ok && data.exists) {
+        const { data: worker, error } = await client
+          .from('casual_labour_profile')
+          .select('*')
+          .eq('doc_no', docNo)
+          .maybeSingle();
+
+        if (error) {
+          showStatus("DB Error: " + error.message);
+          loginBtn.disabled = false;
+          loginBtn.querySelector('span').textContent = "Access";
+          return;
+        }
+
+        if (worker) {
           showStatus("Identity Verified. Entering...", false);
-          localStorage.setItem("mitecWorkerRecord", JSON.stringify(data.record));
+          localStorage.setItem("mitecWorkerRecord", JSON.stringify(worker));
           localStorage.setItem("mcl_doc_no", docNo);
           setTimeout(() => { window.location.href = "dashboard.html"; }, 150);
         } else {
-          showStatus(data.message || "Record not found. Access denied.");
+          showStatus("Record not found for doc_no: " + docNo);
           loginBtn.disabled = false;
           loginBtn.querySelector('span').textContent = "Access";
         }
       } catch (err) {
-        showStatus("Registry Timeout. Please retry.");
+        showStatus(err.message);
         loginBtn.disabled = false;
         loginBtn.querySelector('span').textContent = "Access";
       }
     }
-
-    if (docInput) {
-      docInput.addEventListener("keypress", (e) => { if(e.key === "Enter") handleLogin(); });
-    }
   </script>
-
 </body>
 </html>
