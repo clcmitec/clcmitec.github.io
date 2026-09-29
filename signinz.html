@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC — Staff Duty Entry</title>
+
+  <!-- Speed Optimizations -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <!-- Synchronous Supabase Library Load -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --mitec-blue: #092253;
+      --mitec-blue-dark: #071a3d;
+      --bg-base: #f8f9fa; 
+      --card-bg: #ffffff;
+      --text-main: #2c2c2e;
+      --text-muted: #6e6e73;
+      --border-color: #d1d1d6;
+      --shadow-standard: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    body { 
+      margin: 0; padding: 40px 20px; 
+      background-color: var(--bg-base);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
+    }
+
+    .container { max-width: 400px; margin: 0 auto; }
+
+    .header { text-align: center; margin-bottom: 32px; }
+    .brand-img { height: 24px; width: auto; }
+
+    .profile-card {
+      background: var(--mitec-blue);
+      border-radius: 16px;
+      padding: 20px;
+      color: #fff;
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .avatar { 
+      width: 56px; height: 56px; border-radius: 50%; 
+      border: 2px solid rgba(255,255,255,0.2); object-fit: cover; 
+      background: rgba(255,255,255,0.1); 
+    }
+
+    .profile-info { flex: 1; }
+    .profile-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; margin-bottom: 4px; display: block; }
+    .profile-name { font-size: 16px; font-weight: 600; margin: 0; }
+
+    .form-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow-standard);
+    }
+
+    .section-title { 
+      font-size: 13px; font-weight: 700; color: var(--mitec-blue); 
+      margin-bottom: 20px; display: block; border-bottom: 1px solid #eee; padding-bottom: 8px;
+    }
+
+    .field { margin-bottom: 16px; }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+
+    .input-icon {
+      position: absolute; left: 14px;
+      font-size: 18px; color: var(--text-muted);
+    }
+
+    .input-field, select {
+      width: 100%; height: 50px; border-radius: 8px;
+      border: 1px solid var(--border-color); background: #fff;
+      padding: 0 12px 0 44px; font-size: 15px;
+      outline: none; transition: border 0.2s;
+      appearance: none; color: var(--text-main);
+    }
+
+    .input-field:focus, select:focus { border-color: var(--mitec-blue); }
+
+    .btn-submit {
+      width: 100%; height: 52px; border-radius: 8px;
+      background: var(--mitec-blue); color: #fff;
+      font-size: 15px; font-weight: 600; border: none;
+      cursor: pointer; transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-submit:hover { background: var(--mitec-blue-dark); }
+
+    .overlay {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(255,255,255,0.98);
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 100; text-align: center; padding: 20px;
+    }
+    .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top: 3px solid var(--mitec-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <img class="brand-img" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
+    </div>
+
+    <div class="profile-card">
+      <img id="workerAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a2e66'/></svg>" alt="Profile">
+      <div class="profile-info">
+        <span class="profile-label">Current User</span>
+        <h2 class="profile-name" id="workerName">Staff Member</h2>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <span class="section-title">Portal Sign IN</span>
+
+      <div class="field">
+        <div class="input-wrapper">
+          <i class="ph ph-hash input-icon"></i>
+          <input type="text" id="voucherNo" class="input-field" placeholder="6-Digit Voucher No." maxlength="6" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="input-wrapper">
+          <i class="ph ph-briefcase input-icon"></i>
+          <select id="dept" required>
+            <option value="" disabled selected hidden>Department</option>
+            <option value="AV">AV</option>
+            <option value="CAT">CAT</option>
+            <option value="EXH">EXH</option>
+            <option value="FIN">FIN</option>
+            <option value="GCC">GCC</option>
+            <option value="GS">GS</option>
+            <option value="HK">HK</option>
+            <option value="HR">HR</option>
+            <option value="IT">IT</option>
+            <option value="KIT">KIT</option>
+            <option value="LINEN">LINEN</option>
+            <option value="OPERATION">OPERATION</option>
+            <option value="PUR">PUR</option>
+            <option value="QA">QA</option>
+            <option value="SC">SC</option>
+            <option value="SETUP">SETUP</option>
+            <option value="SH">SH</option>
+            <option value="STWD">STWD</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="input-wrapper">
+          <i class="ph ph-clock input-icon"></i>
+          <select id="shift" required>
+            <option value="" disabled selected hidden>Scheduled Shift</option>
+            <option value="0700">07:00</option>
+            <option value="0800">08:00</option>
+            <option value="0900">09:00</option>
+            <option value="1000">10:00</option>
+            <option value="1100">11:00</option>
+            <option value="1200">12:00</option>
+            <option value="1300">13:00</option>
+            <option value="1400">14:00</option>
+            <option value="1500">15:00</option>
+            <option value="1600">16:00</option>
+            <option value="1700">17:00</option>
+            <option value="1800">18:00</option>
+            <option value="1900">19:00</option>
+            <option value="2000">20:00</option>
+            <option value="2100">21:00</option>
+            <option value="2200">22:00</option>
+            <option value="2300">23:00</option>
+            <option value="0000">00:00</option>
+            <option value="0100">01:00</option>
+            <option value="0200">02:00</option>
+            <option value="0300">03:00</option>
+            <option value="0400">04:00</option>
+            <option value="0500">05:00</option>
+            <option value="0600">06:00</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="submitAttendance()">
+        <i class="ph ph-check-circle"></i>
+        Confirm Attendance
+      </button>
+    </div>
+  </div>
+
+  <div id="statusOverlay" class="overlay">
+    <div id="spinner" class="spinner"></div>
+    <h2 id="statusTitle" style="margin:0; font-size:20px; font-weight:600;">Processing...</h2>
+    <p id="statusMsg" style="color:var(--text-muted); font-size:14px; margin-top:8px;">Please wait while we record your entry.</p>
+    <button id="closeBtn" class="btn-submit" style="display:none; margin-top:24px; max-width:200px;" onclick="window.location.href='dashboard.html'">Return to Home</button>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+    let supabaseClient = null;
+
+    function getSupabase() {
+      if (!supabaseClient) {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        } else {
+          throw new Error("Supabase SDK not loaded properly");
+        }
+      }
+      return supabaseClient;
+    }
+
+    function convertToDirectLink(url) {
+      if (!url) return "";
+      let stringUrl = String(url);
+      if (stringUrl.includes("drive.google.com")) {
+        const match = stringUrl.match(/\/file\/d\/([^/?]+)/) || stringUrl.match(/id=([^&]+)/);
+        if (match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=s200`;
+      }
+      return stringUrl;
+    }
+
+    function initPage() {
+      const docNo = localStorage.getItem("mcl_doc_no");
+      if (!docNo) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+      const nameEl = document.getElementById("workerName");
+      const avatarEl = document.getElementById("workerAvatar");
+
+      if (record.nama_mykad || record.name_mykad || record.full_name) {
+        nameEl.textContent = record.nama_mykad || record.name_mykad || record.full_name;
+      }
+      if (record.photo_link) {
+        avatarEl.src = convertToDirectLink(record.photo_link);
+      }
+    }
+
+    async function submitAttendance() {
+      const voucherVal = document.getElementById("voucherNo").value.trim();
+      const deptVal = document.getElementById("dept").value;
+      const shiftVal = document.getElementById("shift").value;
+      const docNo = localStorage.getItem("mcl_doc_no");
+      const worker = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+
+      if (!voucherVal || !deptVal || !shiftVal) {
+        alert("Action Required: Please complete all fields.");
+        return;
+      }
+
+      if (voucherVal.length !== 6) {
+        alert("Action Required: Voucher Number must be exactly 6 digits.");
+        return;
+      }
+
+      const overlay = document.getElementById("statusOverlay");
+      const title = document.getElementById("statusTitle");
+      const msg = document.getElementById("statusMsg");
+      const spinner = document.getElementById("spinner");
+      const closeBtn = document.getElementById("closeBtn");
+
+      overlay.style.display = "flex";
+      spinner.style.display = "block";
+      closeBtn.style.display = "none";
+
+      try {
+        const client = getSupabase();
+        const now = new Date();
+
+        // Format "HH:MM:SS" strictly for Supabase 'time' data type
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const currentTimeString = `${hours}:${minutes}:${seconds}`;
+
+        // Format "YYYY-MM-DD" strictly for Supabase 'date' data type
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayDateString = `${year}-${month}-${day}`;
+
+        // Insert payload strictly matching your attendance_records table schema
+        const { error } = await client
+          .from('attendance_records')
+          .insert([{
+            doc_no: docNo,
+            name: worker.nama_mykad || worker.full_name || "",
+            voucher: voucherVal,
+            department: deptVal,
+            shift: shiftVal,
+            working_date: todayDateString,
+            clock_in: currentTimeString,
+            timestamp: now.toISOString()
+          }]);
+
+        spinner.style.display = "none";
+
+        if (!error) {
+          title.textContent = "Entry Confirmed";
+          title.style.color = "#28a745";
+          msg.innerHTML = `Signed in successfully at <strong>${hours}:${minutes}</strong>`;
+          closeBtn.style.display = "flex";
+          closeBtn.textContent = "Return to Home";
+          closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
+        } else {
+          title.textContent = "Submission Failed";
+          title.style.color = "#dc3545";
+          msg.textContent = error.message || "Registration Failed";
+          closeBtn.textContent = "Try Again";
+          closeBtn.onclick = () => { overlay.style.display = "none"; };
+          closeBtn.style.display = "flex";
+        }
+      } catch (err) {
+        spinner.style.display = "none";
+        title.textContent = "System Error";
+        title.style.color = "#dc3545";
+        msg.textContent = err.message || "Unable to process request.";
+        closeBtn.style.display = "flex";
+        closeBtn.textContent = "Try Again";
+        closeBtn.onclick = () => { overlay.style.display = "none"; };
+      }
+    }
+
+    initPage();
+  </script>
+</body>
+</html>
