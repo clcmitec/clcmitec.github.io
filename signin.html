@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MITEC — Staff Duty Entry</title>
 
-  <!-- ⚡ Speed Optimizations -->
-  <link rel="preconnect" href="https://script.google.com" crossorigin>
-  <link rel="dns-prefetch" href="https://script.google.com">
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-
-  <!-- Defer loading of icon library to prevent render blocking -->
+  <!-- Speed Optimizations -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <!-- Synchronous Supabase Library Load -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
@@ -116,7 +115,6 @@
     </div>
 
     <div class="profile-card">
-      <!-- Fast inline SVG placeholder -->
       <img id="workerAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a2e66'/></svg>" alt="Profile">
       <div class="profile-info">
         <span class="profile-label">Current User</span>
@@ -125,7 +123,7 @@
     </div>
 
     <div class="form-card">
-      <span class="section-title">Portal Sign IN  </span>
+      <span class="section-title">Portal Sign IN</span>
 
       <div class="field">
         <div class="input-wrapper">
@@ -209,19 +207,22 @@
   </div>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyBP0-dwtWZV-bxbg12bYTIUvkoBtdwnzjKFIj8hSc1my2g0gUHQ-xD2vW_rb8KT4JJSw/exec";
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+    let supabaseClient = null;
 
-    function convertToDirectLink(url) {
-      if (!url) return "";
-      let stringUrl = String(url);
-      if (stringUrl.includes("drive.google.com")) {
-        const match = stringUrl.match(/\/file\/d\/([^/?]+)/) || stringUrl.match(/id=([^&]+)/);
-        if (match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=s200`; // ⚡ Faster CDN direct link
+    function getSupabase() {
+      if (!supabaseClient) {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        } else {
+          throw new Error("Supabase SDK not loaded properly");
+        }
       }
-      return stringUrl;
+      return supabaseClient;
     }
 
-    function initPage() {
+    async function initPage() {
       const docNo = localStorage.getItem("mcl_doc_no");
       if (!docNo) {
         window.location.href = "index.html";
@@ -231,27 +232,45 @@
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       const nameEl = document.getElementById("workerName");
       const avatarEl = document.getElementById("workerAvatar");
-      
-      if (record.name_mykad || record.nama_mykad || record.full_name) {
-        nameEl.textContent = record.name_mykad || record.nama_mykad || record.full_name;
+
+      if (record.name_mykad || record.full_name) {
+        nameEl.textContent = record.name_mykad || record.full_name;
       }
       if (record.photo_link) {
-        avatarEl.src = convertToDirectLink(record.photo_link);
+        avatarEl.src = record.photo_link;
+      }
+
+      // Fetch live record from casual_labour_profile to keep photo and name up to date
+      try {
+        const client = getSupabase();
+        const { data: profile } = await client
+          .from('casual_labour_profile')
+          .select('photo_link, name_mykad')
+          .eq('doc_no', docNo)
+          .maybeSingle();
+
+        if (profile) {
+          if (profile.name_mykad) nameEl.textContent = profile.name_mykad;
+          if (profile.photo_link) avatarEl.src = profile.photo_link;
+        }
+      } catch(e) {
+        console.error(e);
       }
     }
 
     async function submitAttendance() {
-      const voucher = document.getElementById("voucherNo").value.trim();
-      const dept = document.getElementById("dept").value;
-      const shift = document.getElementById("shift").value;
+      const voucherVal = document.getElementById("voucherNo").value.trim();
+      const deptVal = document.getElementById("dept").value;
+      const shiftVal = document.getElementById("shift").value;
       const docNo = localStorage.getItem("mcl_doc_no");
+      const worker = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
 
-      if (!voucher || !dept || !shift) {
+      if (!voucherVal || !deptVal || !shiftVal) {
         alert("Action Required: Please complete all fields.");
         return;
       }
 
-      if (voucher.length !== 6) {
+      if (voucherVal.length !== 6) {
         alert("Action Required: Voucher Number must be exactly 6 digits.");
         return;
       }
@@ -267,54 +286,89 @@
       closeBtn.style.display = "none";
 
       try {
-        const url = `${WEB_APP_URL}?action=signin&doc_no=${encodeURIComponent(docNo)}&voucher=${encodeURIComponent(voucher)}&dept=${encodeURIComponent(dept)}&shift=${encodeURIComponent(shift)}`;
-        const res = await fetch(url, { method: "GET", cache: "no-cache" });
-        const data = await res.json();
+        const client = getSupabase();
+        const now = new Date();
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const currentTimeString = `${hours}:${minutes}:${seconds}`;
+
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayDateString = `${year}-${month}-${day}`;
+
+        // 1. Check if an entry already exists for today
+        const { data: existingRecord } = await client
+          .from('attendance_records')
+          .select('clock_in')
+          .eq('doc_no', docNo)
+          .eq('working_date', todayDateString)
+          .maybeSingle();
+
+        if (existingRecord && existingRecord.clock_in) {
+          spinner.style.display = "none";
+          title.textContent = "Already Signed In";
+          title.style.color = "#ff9500";
+          msg.innerHTML = `You have already clocked in today at <strong>${existingRecord.clock_in}</strong>.`;
+          closeBtn.style.display = "flex";
+          closeBtn.textContent = "Return to Dashboard";
+          closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
+          return;
+        }
+
+        // 2. Insert attendance record
+        const { error } = await client
+          .from('attendance_records')
+          .insert([{
+            doc_no: docNo,
+            name: worker.name_mykad || worker.full_name || "",
+            voucher: voucherVal,
+            department: deptVal,
+            shift: shiftVal,
+            working_date: todayDateString,
+            clock_in: currentTimeString,
+            timestamp: now.toISOString()
+          }]);
 
         spinner.style.display = "none";
 
-        if (data.ok) {
-          const now = new Date();
-          const timestamp = now.toLocaleTimeString('en-GB', { 
-            hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' 
-          });
-
+        if (!error) {
           title.textContent = "Entry Confirmed";
           title.style.color = "#28a745";
-          msg.innerHTML = `You have successfully signed in at <strong>${timestamp}</strong>`;
+          msg.innerHTML = `Signed in successfully at <strong>${hours}:${minutes}:${seconds}</strong>`;
           closeBtn.style.display = "flex";
           closeBtn.textContent = "Return to Home";
-          closeBtn.onclick = () => { window.location.href='dashboard.html' };
+          closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
+        } else if (error.code === '23505') {
+          // Catch SQL Unique Constraint Violation error directly
+          title.textContent = "Already Signed In";
+          title.style.color = "#ff9500";
+          msg.innerHTML = `This voucher has already been signed in. Contact HR department for assistance.`;
+          closeBtn.style.display = "flex";
+          closeBtn.textContent = "Return to Dashboard";
+          closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
         } else {
-          if (data.message && data.message.toLowerCase().includes("already signed in")) {
-            title.textContent = "Already Signed In";
-            title.style.color = "#dc3545";
-            msg.textContent = data.message;
-            closeBtn.textContent = "Go to Dashboard";
-            closeBtn.onclick = () => { window.location.href='dashboard.html' };
-          } else {
-            title.textContent = "Submission Failed";
-            title.style.color = "#dc3545";
-            msg.textContent = data.message || "Registration Failed";
-            closeBtn.textContent = "Try Again";
-            closeBtn.onclick = () => { overlay.style.display = "none"; };
-          }
+          title.textContent = "Submission Failed";
+          title.style.color = "#dc3545";
+          msg.textContent = error.message || "Registration Failed";
+          closeBtn.textContent = "Try Again";
+          closeBtn.onclick = () => { overlay.style.display = "none"; };
           closeBtn.style.display = "flex";
         }
       } catch (err) {
         spinner.style.display = "none";
         title.textContent = "System Error";
         title.style.color = "#dc3545";
-        msg.textContent = "Unable to process request. Please check your internet connection and try again.";
+        msg.textContent = err.message || "Unable to process request.";
         closeBtn.style.display = "flex";
         closeBtn.textContent = "Try Again";
         closeBtn.onclick = () => { overlay.style.display = "none"; };
       }
     }
 
-    // Run auth & identity immediately without waiting for DOM completion
     initPage();
   </script>
-
 </body>
 </html>
