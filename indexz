@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC — Casual Labour Portal</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <!-- Load Supabase Library Synchronously -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --mitec-blue: #092253;
+      --mitec-accent: #0f4a82;
+      --bg-base: #f4f5f8;
+      --card-bg: #ffffff;
+      --text-main: #1d1d1f;
+      --text-muted: #86868b;
+      --error: #ff3b30;
+      --success: #34c759;
+      --radius: 28px;
+      --shadow-vip: 0 20px 40px rgba(7, 34, 63, 0.1);
+    }
+
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    body {
+      margin: 0; padding: 0;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      font-family: 'Inter', -apple-system, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--text-main);
+    }
+
+    .shell { width: 100%; max-width: 440px; padding: 24px; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 54px 32px;
+      text-align: center;
+      box-shadow: var(--shadow-vip);
+      border: 1px solid rgba(9, 34, 83, 0.05);
+    }
+
+    .brand { margin-bottom: 54px; }
+    .brand img { width: 130px; height: auto; object-fit: contain; margin-bottom: 24px; }
+
+    .sub { font-size: 14px; color: var(--text-muted); margin: 0; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .input-group { position: relative; margin-bottom: 28px; text-align: left; margin-top: 32px;}
+
+    .input-icon {
+      position: absolute; left: 16px; top: 18px;
+      font-size: 20px; color: var(--mitec-blue); z-index: 2;
+    }
+
+    .input-control {
+      width: 100%; height: 58px; padding: 0 16px 0 48px;
+      font-size: 16px; font-weight: 600;
+      color: var(--text-main);
+      border: 1.5px solid #e5e7eb;
+      border-radius: 16px;
+      background: #f9fafb;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-control:focus {
+      border-color: var(--mitec-accent);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(15, 74, 130, 0.08);
+    }
+
+    .input-label {
+      position: absolute; left: 48px; top: 18px;
+      color: var(--text-muted);
+      font-size: 16px; font-weight: 500;
+      transition: 0.2s ease all;
+      pointer-events: none;
+    }
+
+    .input-control:focus ~ .input-label,
+    .input-control:not(:placeholder-shown) ~ .input-label {
+      top: -10px; left: 12px; font-size: 11px;
+      color: var(--mitec-accent);
+      background: #fff; padding: 0 6px;
+      font-weight: 800;
+    }
+
+    .btn-primary {
+      width: 100%; height: 60px; border: none; border-radius: 20px;
+      background-color: var(--mitec-blue);
+      color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; margin-top: 8px;
+      position: relative; overflow: hidden;
+      box-shadow: 0 10px 25px rgba(9, 34, 83, 0.2);
+    }
+
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-link {
+      display: inline-block; margin-top: 36px;
+      font-size: 13px; font-weight: 700;
+      color: var(--mitec-accent); text-decoration: none;
+      padding: 12px 20px; border-radius: 14px;
+      transition: background 0.2s;
+      line-height: 1.5;
+    }
+
+    .msg {
+      margin-top: 24px; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 24px; text-align: center;
+    }
+    .msg.error { color: var(--error); }
+    .msg.success { color: var(--success); }
+
+    .footer {
+      width: 100%; max-width: 320px; margin: 54px auto 32px; text-align: center;
+    }
+
+    .footer-brand {
+      font-size: 12px; font-weight: 800; color: var(--mitec-blue);
+      letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+    }
+
+    .footer-system {
+      font-size: 10px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="shell">
+    <div class="card">
+      <div class="brand">
+        <img src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC Logo">
+        <p class="sub">Casual Labour Portal</p>
+      </div>
+
+      <div class="input-group">
+        <i class="ph-fill ph-identification-card input-icon"></i>
+        <input id="docInput" class="input-control" type="text" placeholder=" " autocomplete="off" value="930129035193">
+        <label class="input-label">IC / Passport Number</label>
+      </div>
+
+      <button id="loginBtn" class="btn-primary" onclick="handleLogin()">
+        <span>Access</span>
+      </button>
+
+      <a href="#" class="btn-link">First Time User?<br>Register / Update Account</a>
+
+      <div id="loginMessage" class="msg"></div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-brand">MALAYSIA INTERNATIONAL TRADE & EXHIBITION CENTRE</div>
+      <div class="footer-system">Casual Labour Management System</div>
+    </footer>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+    let supabaseClient = null;
+
+    function getSupabase() {
+      if (!supabaseClient) {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        } else {
+          throw new Error("Supabase library not loaded. Ensure internet connection is active.");
+        }
+      }
+      return supabaseClient;
+    }
+
+    function showStatus(text, isError = true) {
+      const msg = document.getElementById("loginMessage");
+      msg.textContent = text;
+      msg.className = isError ? "msg error" : "msg success";
+    }
+
+    async function handleLogin() {
+      const docInput = document.getElementById("docInput");
+      const loginBtn = document.getElementById("loginBtn");
+      const docNo = docInput.value.trim();
+
+      if (!docNo) {
+        showStatus("Credentials required for entry.");
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.querySelector('span').textContent = "Establishing Protocol...";
+      showStatus("");
+
+      try {
+        const client = getSupabase();
+
+        const { data: worker, error } = await client
+          .from('casual_labour_profile')
+          .select('*')
+          .eq('doc_no', docNo)
+          .maybeSingle();
+
+        if (error) {
+          showStatus("DB Error: " + error.message);
+          loginBtn.disabled = false;
+          loginBtn.querySelector('span').textContent = "Access";
+          return;
+        }
+
+        if (worker) {
+          showStatus("Identity Verified. Entering...", false);
+          localStorage.setItem("mitecWorkerRecord", JSON.stringify(worker));
+          localStorage.setItem("mcl_doc_no", docNo);
+          setTimeout(() => { window.location.href = "dashboard.html"; }, 150);
+        } else {
+          showStatus("Record not found for doc_no: " + docNo);
+          loginBtn.disabled = false;
+          loginBtn.querySelector('span').textContent = "Access";
+        }
+      } catch (err) {
+        showStatus(err.message);
+        loginBtn.disabled = false;
+        loginBtn.querySelector('span').textContent = "Access";
+      }
+    }
+  </script>
+</body>
+</html>
