@@ -990,7 +990,6 @@
   function getStoredWorker() { return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}"); }
   function toProperCase(str) { if (!str) return ""; return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
 
-  // Return the link cleanly
   function convertToDirectLink(url) {
     if (!url) return "";
     return String(url).trim();
@@ -1028,7 +1027,6 @@
       try {
         const client = getSupabase();
 
-        // Fetch directly from casual_labour_profile to get photo_link & name_mykad
         const { data: profile } = await client
           .from('casual_labour_profile')
           .select('photo_link, name_mykad')
@@ -1047,7 +1045,6 @@
           localStorage.setItem("mitecWorkerRecord", JSON.stringify(worker));
         }
 
-        // Calculate today's date
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1055,13 +1052,12 @@
         const todayDateString = `${year}-${month}-${day}`;
         const todayFormattedDate = `${day}/${month}/${year}`;
 
-        // Fetch shift details recorded TODAY from Supabase
         const { data: summary } = await client
           .from('attendance_records')
           .select('*')
           .eq('doc_no', docNo)
           .eq('working_date', todayDateString)
-          .order('created_at', { ascending: false })
+          .order('timestamp', { ascending: false })
           .limit(1)
           .maybeSingle();
 
@@ -1072,6 +1068,16 @@
           let formattedClockIn = "--:--";
           if (summary.clock_in) {
             formattedClockIn = `${todayFormattedDate}<br>${summary.clock_in}`;
+          } else if (summary.timestamp) {
+            let timePart = "";
+            if (summary.timestamp.includes('T')) {
+              timePart = summary.timestamp.split('T')[1].substring(0, 8);
+            } else if (summary.timestamp.includes(' ')) {
+              timePart = summary.timestamp.split(' ')[1].substring(0, 8);
+            }
+            if (timePart) {
+              formattedClockIn = `${todayFormattedDate}<br>${timePart}`;
+            }
           }
 
           let formattedClockOut = "--:--";
@@ -1196,7 +1202,7 @@
     }
   }
 
-  initDashboard();
+    initDashboard();
   </script>
 </body>
 </html>

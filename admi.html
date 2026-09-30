@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC — Casual Labour Admin Portal</title>
+
+  <!-- Speed Optimizations & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+  <!-- Load Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --mitec-blue: #1B365D;
+      --mitec-blue-hover: #2D68C4;
+      --mitec-accent: #0f4a82;
+      --bg-surface: #f4f6f9;
+      --card-bg: #ffffff;
+      --border: #e1e4ea;
+      --text-main: #1d1d1f;
+      --text-muted: #6e6e73;
+      --success: #28a745;
+      --warning: #ff9500;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+
+    body {
+      background-color: var(--bg-surface);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(9, 34, 83, 0.04);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-brand img { height: 30px; width: auto; }
+    .header-title { font-size: 15px; font-weight: 800; color: var(--mitec-blue); letter-spacing: -0.01em; }
+    .badge-admin { background: rgba(27, 54, 93, 0.1); color: var(--mitec-blue); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+
+    .user-actions { display: flex; align-items: center; gap: 12px; }
+    .btn-secondary {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover { background: #f8f9fa; border-color: var(--mitec-accent); color: var(--mitec-accent); }
+
+    /* TAB CONTAINER */
+    .tabs-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      gap: 24px;
+    }
+
+    .tab-btn {
+      padding: 14px 4px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover { color: var(--mitec-blue); }
+    .tab-btn.active { color: var(--mitec-blue); border-bottom-color: var(--mitec-blue); }
+
+    /* CONTENT WRAPPER */
+    .main-container {
+      padding: 24px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* CONTROL PANEL & FILTERS */
+    .filter-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .filter-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+    .control-input, .control-select {
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      background: #ffffff;
+      color: var(--text-main);
+    }
+
+    .control-input:focus, .control-select:focus { border-color: var(--mitec-blue); box-shadow: 0 0 0 3px rgba(27, 54, 93, 0.08); }
+
+    .btn-primary {
+      height: 40px;
+      background: var(--mitec-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .btn-primary:hover { background: var(--mitec-blue-hover); }
+
+    /* DATA TABLE STYLES */
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    }
+
+    .table-wrapper { overflow-x: auto; max-height: 70vh; }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+
+    th {
+      background: #1B365D;
+      color: #ffffff;
+      font-weight: 800;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      user-select: none;
+    }
+
+    th .th-content { display: flex; align-items: center; justify-content: space-between; gap: 6px; cursor: pointer; color: #ffffff; }
+    th .sort-icon { font-size: 12px; color: rgba(255,255,255,0.7); }
+
+    /* COLUMN SEARCH FILTER IN TH */
+    .col-filter-input {
+      width: 100%;
+      height: 26px;
+      margin-top: 4px;
+      padding: 0 6px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 4px;
+      outline: none;
+      background: rgba(255,255,255,0.15);
+      color: #ffffff;
+    }
+
+    .col-filter-input::placeholder { color: rgba(255,255,255,0.6); }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    tr:hover td { background: rgba(27, 54, 93, 0.03); }
+
+    .tag-dept { background: rgba(15, 74, 130, 0.08); color: var(--mitec-accent); padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; }
+
+    /* KPI CARDS (REPORTING TAB) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .kpi-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; }
+    .kpi-value { font-size: 28px; font-weight: 900; color: var(--mitec-blue); line-height: 1; }
+    .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 20px;
+    }
+
+    .chart-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .chart-title { font-size: 15px; font-weight: 800; color: var(--mitec-blue); margin-bottom: 16px; }
+
+    /* SPINNER & EMPTY STATE */
+    .loading-state, .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(27, 54, 93, 0.15);
+      border-radius: 50%;
+      border-top-color: var(--mitec-blue);
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .main-container { padding: 12px; }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP APP HEADER -->
+  <header class="header">
+    <div class="header-brand">
+      <img src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC Logo">
+      <span class="header-title">Casual Labour Portal</span>
+      <span class="badge-admin">Admin Workspace</span>
+    </div>
+    <div class="user-actions">
+      <button class="btn-secondary" onclick="fetchLiveAttendance()"><i class="ph-bold ph-arrows-clockwise"></i> Refresh</button>
+      <button class="btn-secondary" onclick="window.location.href='dashboard.html'"><i class="ph-bold ph-house"></i> Portal Home</button>
+    </div>
+  </header>
+
+  <!-- TAB SELECTION NAVIGATION -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('dailyTab', this)">
+      <i class="ph-bold ph-calendar-check"></i> Attendance Master Log
+    </button>
+    <button class="tab-btn" onclick="switchTab('reportTab', this)">
+      <i class="ph-bold ph-chart-line-up"></i> Operational Reports
+    </button>
+  </div>
+
+  <div class="main-container">
+
+    <!-- ================= TAB 1: DAILY ATTENDANCE ================= -->
+    <div id="dailyTab" class="tab-content active">
+
+      <!-- TOOLBAR & GLOBAL FILTERS -->
+      <div class="filter-panel">
+        <div class="filter-group">
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Date From</label>
+            <input type="date" id="filterDateFrom" class="control-input" onchange="fetchLiveAttendance()">
+          </div>
+
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Date To</label>
+            <input type="date" id="filterDateTo" class="control-input" onchange="fetchLiveAttendance()">
+          </div>
+
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Department Filter</label>
+            <select id="filterDept" class="control-select" onchange="applyFiltersAndSort()">
+              <option value="ALL">All Departments</option>
+              <option value="AV">AV</option>
+              <option value="CAT">CAT</option>
+              <option value="EXH">EXH</option>
+              <option value="FIN">FIN</option>
+              <option value="GCC">GCC</option>
+              <option value="GS">GS</option>
+              <option value="HK">HK</option>
+              <option value="HR">HR</option>
+              <option value="IT">IT</option>
+              <option value="KIT">KIT</option>
+              <option value="LINEN">LINEN</option>
+              <option value="OPERATION">OPERATION</option>
+              <option value="PUR">PUR</option>
+              <option value="QA">QA</option>
+              <option value="SC">SC</option>
+              <option value="SETUP">SETUP</option>
+              <option value="SH">SH</option>
+              <option value="STWD">STWD</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Global Search</label>
+            <input type="text" id="globalSearch" class="control-input" placeholder="Search any keyword..." oninput="applyFiltersAndSort()">
+          </div>
+        </div>
+
+        <div class="filter-group" style="align-self: flex-end;">
+          <button class="btn-primary" onclick="exportToCSV()"><i class="ph-bold ph-download-simple"></i> Export Full CSV</button>
+        </div>
+      </div>
+
+      <!-- SORTABLE & FILTERABLE DATA TABLE -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table id="attendanceTable">
+            <thead>
+              <tr>
+                <th onclick="sortColumn('timestamp')">
+                  <div class="th-content">Timestamp <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('shift')">
+                  <div class="th-content">SHIFT <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('email')">
+                  <div class="th-content">Email address <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('column_6')">
+                  <div class="th-content">Column 6 <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('voucher')">
+                  <div class="th-content">VOUCHER <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('name')">
+                  <div class="th-content">NAMA ( MENGIKUT IC) <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('department')">
+                  <div class="th-content">DEPARTMENT <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('sign_out')">
+                  <div class="th-content">SIGN OUT <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('clock_in')">
+                  <div class="th-content">IN <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('clock_out')">
+                  <div class="th-content">OUT <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('hours')">
+                  <div class="th-content">HOURS <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('rate')">
+                  <div class="th-content">RATE <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('wages')">
+                  <div class="th-content">WAGES <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('process_date')">
+                  <div class="th-content">PROCESS DATE <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('payment_date')">
+                  <div class="th-content">PAYMENT DATE <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('remarks')">
+                  <div class="th-content">REMARKS <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+                <th onclick="sortColumn('notes')">
+                  <div class="th-content">NOTES <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                  <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
+                </th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTbody">
+              <tr>
+                <td colspan="17" class="loading-state">
+                  <div class="spinner"></div>
+                  <div>Loading attendance records...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= TAB 2: OPERATIONAL REPORTS ================= -->
+    <div id="reportTab" class="tab-content">
+
+      <!-- KPI METRICS SUMMARY -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Total Staff Logged</div>
+          <div class="kpi-value" id="kpiTotalStaff">0</div>
+          <div class="kpi-sub">Records in selected range</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">Total Logged Hours</div>
+          <div class="kpi-value" id="kpiTotalHours">0.0</div>
+          <div class="kpi-sub">Cumulative work hours</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">Total Calculated Wages</div>
+          <div class="kpi-value" id="kpiTotalWages">RM 0.00</div>
+          <div class="kpi-sub">Estimated wage payout</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">Active Departments</div>
+          <div class="kpi-value" id="kpiActiveDepts">0</div>
+          <div class="kpi-sub">Deploying casual workforce</div>
+        </div>
+      </div>
+
+      <!-- REPORT BREAKDOWN TABLES -->
+      <div class="charts-grid">
+
+        <!-- DEPARTMENT SUMMARY -->
+        <div class="chart-card">
+          <h3 class="chart-title">Department Deployment Summary</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Headcount</th>
+                  <th>Total Hours</th>
+                  <th>Total Wages (RM)</th>
+                </tr>
+              </thead>
+              <tbody id="deptSummaryTbody">
+                <tr><td colspan="4" class="empty-state">No report data generated yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SHIFT TIME DISTRIBUTION -->
+        <div class="chart-card">
+          <h3 class="chart-title">Shift Schedule Distribution</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Shift Time</th>
+                  <th>Staff Count</th>
+                  <th>% of Workforce</th>
+                </tr>
+              </thead>
+              <tbody id="shiftSummaryTbody">
+                <tr><td colspan="3" class="empty-state">No report data generated yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+    let supabaseClient = null;
+
+    let rawAttendanceData = [];
+    let processedData = [];
+    let sortState = { column: 'timestamp', ascending: false };
+
+    function getSupabase() {
+      if (!supabaseClient) {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+        } else {
+          throw new Error("Supabase SDK failed to load.");
+        }
+      }
+      return supabaseClient;
+    }
+
+    // TAB SWITCHING LOGIC
+    function switchTab(tabId, btnElement) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      btnElement.classList.add('active');
+
+      if (tabId === 'reportTab') {
+        renderReports();
+      }
+    }
+
+    // SET INITIAL DEFAULT DATES (TODAY)
+    function initDateFilters() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const formattedToday = `${yyyy}-${mm}-${dd}`;
+
+      document.getElementById("filterDateFrom").value = formattedToday;
+      document.getElementById("filterDateTo").value = formattedToday;
+    }
+
+    // FETCH LIVE ATTENDANCE FROM SUPABASE BASED ON DATE RANGE
+    async function fetchLiveAttendance() {
+      const tbody = document.getElementById("attendanceTbody");
+      tbody.innerHTML = `<tr><td colspan="17" class="loading-state"><div class="spinner"></div><div>Loading attendance records...</div></td></tr>`;
+
+      const dateFrom = document.getElementById("filterDateFrom").value;
+      const dateTo = document.getElementById("filterDateTo").value;
+
+      try {
+        const client = getSupabase();
+        let query = client
+          .from('attendance_records')
+          .select('*');
+
+        if (dateFrom) {
+          query = query.gte('working_date', dateFrom);
+        }
+        if (dateTo) {
+          query = query.lte('working_date', dateTo);
+        }
+
+        const { data, error } = await query.order('timestamp', { ascending: false });
+
+        if (error) throw error;
+
+        rawAttendanceData = data || [];
+        applyFiltersAndSort();
+      } catch (err) {
+        console.error("Error fetching attendance:", err);
+        tbody.innerHTML = `<tr><td colspan="17" class="empty-state" style="color:var(--error)">Failed to fetch records: ${err.message}</td></tr>`;
+      }
+    }
+
+    // COLUMN SORTING LOGIC
+    function sortColumn(columnName) {
+      if (sortState.column === columnName) {
+        sortState.ascending = !sortState.ascending;
+      } else {
+        sortState.column = columnName;
+        sortState.ascending = true;
+      }
+      applyFiltersAndSort();
+    }
+
+    // FILTERING AND SORTING DATA
+    function applyFiltersAndSort() {
+      const globalQuery = document.getElementById("globalSearch").value.toLowerCase().trim();
+      const deptFilter = document.getElementById("filterDept").value;
+
+      // Extract column-specific filter inputs in exact index order
+      const colInputs = document.querySelectorAll('.col-filter-input');
+      const colFilters = {
+        timestamp: colInputs[0]?.value.toLowerCase().trim() || '',
+        shift: colInputs[1]?.value.toLowerCase().trim() || '',
+        email: colInputs[2]?.value.toLowerCase().trim() || '',
+        column_6: colInputs[3]?.value.toLowerCase().trim() || '',
+        voucher: colInputs[4]?.value.toLowerCase().trim() || '',
+        name: colInputs[5]?.value.toLowerCase().trim() || '',
+        department: colInputs[6]?.value.toLowerCase().trim() || '',
+        sign_out: colInputs[7]?.value.toLowerCase().trim() || '',
+        clock_in: colInputs[8]?.value.toLowerCase().trim() || '',
+        clock_out: colInputs[9]?.value.toLowerCase().trim() || '',
+        hours: colInputs[10]?.value.toLowerCase().trim() || '',
+        rate: colInputs[11]?.value.toLowerCase().trim() || '',
+        wages: colInputs[12]?.value.toLowerCase().trim() || '',
+        process_date: colInputs[13]?.value.toLowerCase().trim() || '',
+        payment_date: colInputs[14]?.value.toLowerCase().trim() || '',
+        remarks: colInputs[15]?.value.toLowerCase().trim() || '',
+        notes: colInputs[16]?.value.toLowerCase().trim() || ''
+      };
+
+      // Apply Filters
+      processedData = rawAttendanceData.filter(row => {
+        // Department Dropdown Filter
+        if (deptFilter !== 'ALL' && (row.department || '').toUpperCase() !== deptFilter) return false;
+
+        // Global Search Filter
+        if (globalQuery) {
+          const matchGlobal = Object.values(row).some(val => 
+            String(val || '').toLowerCase().includes(globalQuery)
+          );
+          if (!matchGlobal) return false;
+        }
+
+        // Individual Column Filters
+        for (const [key, filterVal] of Object.entries(colFilters)) {
+          if (filterVal) {
+            const cellVal = String(row[key] || '').toLowerCase();
+            if (!cellVal.includes(filterVal)) return false;
+          }
+        }
+
+        return true;
+      });
+
+      // Apply Sorting
+      processedData.sort((a, b) => {
+        let valA = a[sortState.column] ?? '';
+        let valB = b[sortState.column] ?? '';
+
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+
+        if (valA < valB) return sortState.ascending ? -1 : 1;
+        if (valA > valB) return sortState.ascending ? 1 : -1;
+        return 0;
+      });
+
+      renderTable();
+      renderReports();
+    }
+
+    // RENDER MAIN ATTENDANCE TABLE
+    function renderTable() {
+      const tbody = document.getElementById("attendanceTbody");
+
+      if (processedData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="17" class="empty-state">No matching attendance records found for this date range.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = processedData.map(row => {
+        return `
+          <tr>
+            <td>${row.timestamp ? new Date(row.timestamp).toLocaleString() : '-'}</td>
+            <td><strong>${row.shift || '-'}</strong></td>
+            <td>${row.email || '-'}</td>
+            <td>${row.column_6 || '-'}</td>
+            <td><strong>${row.voucher || '-'}</strong></td>
+            <td>${row.name || '-'}</td>
+            <td><span class="tag-dept">${row.department || '-'}</span></td>
+            <td>${row.sign_out || '-'}</td>
+            <td><strong>${row.clock_in || '-'}</strong></td>
+            <td><strong>${row.clock_out || '-'}</strong></td>
+            <td><strong>${row.hours !== null && row.hours !== undefined ? row.hours : '0.0'}</strong></td>
+            <td>${row.rate !== null && row.rate !== undefined ? row.rate : '12'}</td>
+            <td><strong>${row.wages !== null && row.wages !== undefined ? row.wages : '0.00'}</strong></td>
+            <td>${row.process_date || '-'}</td>
+            <td>${row.payment_date || '-'}</td>
+            <td>${row.remarks || '-'}</td>
+            <td>${row.notes || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // GENERATE OPERATIONAL REPORTS & KPI METRICS
+    function renderReports() {
+      const totalStaff = processedData.length;
+      let totalHours = 0;
+      let totalWages = 0;
+      const activeDepts = new Set();
+      const deptCounts = {};
+      const deptHours = {};
+      const deptWages = {};
+      const shiftCounts = {};
+
+      processedData.forEach(row => {
+        const hrs = parseFloat(row.hours) || 0;
+        const wage = parseFloat(row.wages) || (hrs * (parseFloat(row.rate) || 12));
+        totalHours += hrs;
+        totalWages += wage;
+
+        if (row.department) {
+          activeDepts.add(row.department);
+          deptCounts[row.department] = (deptCounts[row.department] || 0) + 1;
+          deptHours[row.department] = (deptHours[row.department] || 0) + hrs;
+          deptWages[row.department] = (deptWages[row.department] || 0) + wage;
+        }
+
+        if (row.shift) {
+          shiftCounts[row.shift] = (shiftCounts[row.shift] || 0) + 1;
+        }
+      });
+
+      // Render KPI Cards
+      document.getElementById("kpiTotalStaff").textContent = totalStaff;
+      document.getElementById("kpiTotalHours").textContent = totalHours.toFixed(1);
+      document.getElementById("kpiTotalWages").textContent = `RM ${totalWages.toFixed(2)}`;
+      document.getElementById("kpiActiveDepts").textContent = activeDepts.size;
+
+      // Render Department Summary
+      const deptTbody = document.getElementById("deptSummaryTbody");
+      const deptKeys = Object.keys(deptCounts);
+
+      if (deptKeys.length === 0) {
+        deptTbody.innerHTML = `<tr><td colspan="4" class="empty-state">No department data recorded for selected date range.</td></tr>`;
+      } else {
+        deptTbody.innerHTML = deptKeys.map(dept => `
+          <tr>
+            <td><span class="tag-dept">${dept}</span></td>
+            <td><strong>${deptCounts[dept]}</strong></td>
+            <td>${(deptHours[dept] || 0).toFixed(1)} hrs</td>
+            <td><strong>RM ${(deptWages[dept] || 0).toFixed(2)}</strong></td>
+          </tr>
+        `).join('');
+      }
+
+      // Render Shift Summary
+      const shiftTbody = document.getElementById("shiftSummaryTbody");
+      const shiftKeys = Object.keys(shiftCounts);
+
+      if (shiftKeys.length === 0) {
+        shiftTbody.innerHTML = `<tr><td colspan="3" class="empty-state">No shift data recorded for selected date range.</td></tr>`;
+      } else {
+        shiftTbody.innerHTML = shiftKeys.map(shift => {
+          const count = shiftCounts[shift];
+          const pct = totalStaff > 0 ? ((count / totalStaff) * 100).toFixed(1) : "0.0";
+          return `
+            <tr>
+              <td><strong>${shift}</strong></td>
+              <td>${count} staff</td>
+              <td>${pct}%</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // EXPORT FILTERED DATA TO CSV
+    function exportToCSV() {
+      if (processedData.length === 0) {
+        alert("No data available to export.");
+        return;
+      }
+
+      const dateFrom = document.getElementById("filterDateFrom").value || 'start';
+      const dateTo = document.getElementById("filterDateTo").value || 'end';
+      const headers = [
+        "Timestamp", "SHIFT", "Email address", "Column 6", "VOUCHER", 
+        "NAMA ( MENGIKUT IC)", "DEPARTMENT", "SIGN OUT", "IN", "OUT", 
+        "HOURS", "RATE", "WAGES", "PROCESS DATE", "PAYMENT DATE", "REMARKS", "NOTES"
+      ];
+
+      const rows = processedData.map(row => [
+        `"${row.timestamp || ''}"`,
+        `"${row.shift || ''}"`,
+        `"${row.email || ''}"`,
+        `"${row.column_6 || ''}"`,
+        `"${row.voucher || ''}"`,
+        `"${row.name || ''}"`,
+        `"${row.department || ''}"`,
+        `"${row.sign_out || ''}"`,
+        `"${row.clock_in || ''}"`,
+        `"${row.clock_out || ''}"`,
+        `"${row.hours !== null && row.hours !== undefined ? row.hours : '0.0'}"`,
+        `"${row.rate !== null && row.rate !== undefined ? row.rate : '12'}"`,
+        `"${row.wages !== null && row.wages !== undefined ? row.wages : '0.00'}"`,
+        `"${row.process_date || ''}"`,
+        `"${row.payment_date || ''}"`,
+        `"${row.remarks || ''}"`,
+        `"${row.notes || ''}"`
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `MITEC_Attendance_${dateFrom}_to_${dateTo}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // INITIALIZATION
+    window.onload = function() {
+      initDateFilters();
+      fetchLiveAttendance();
+    };
+  </script>
+</body>
+</html>
