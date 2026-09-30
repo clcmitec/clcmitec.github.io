@@ -12,15 +12,6 @@
   <!-- Synchronous Supabase Library Load -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Google Tag -->
-  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-S3RRBZB4NJ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-S3RRBZB4NJ');
-  </script>
-
   <style>
     :root {
       --mitec-blue: #092253;
@@ -306,10 +297,10 @@
         const day = String(now.getDate()).padStart(2, '0');
         const todayDateString = `${year}-${month}-${day}`;
 
-        // FIX: Build local Malaysia ISO string (+08:00) so it matches your local clock precisely
+        // Clean Local Malaysia ISO string without milliseconds (+08:00)
         const offsetMs = now.getTimezoneOffset() * 60 * 1000;
         const localTime = new Date(now.getTime() - offsetMs);
-        const localISOString = localTime.toISOString().slice(0, -1) + '+08:00';
+        const localISOString = localTime.toISOString().split('.')[0] + '+08:00';
 
         // 1. Check if an entry already exists for today
         const { data: existingRecord } = await client
@@ -330,7 +321,7 @@
           return;
         }
 
-        // 2. Insert attendance record with correct local Malaysia timestamp
+        // 2. Insert attendance record with source_sheet tagged as SHEET_A
         const { error } = await client
           .from('attendance_records')
           .insert([{
@@ -341,7 +332,8 @@
             department: deptVal,
             shift: shiftVal,
             working_date: todayDateString,
-            timestamp: localISOString
+            timestamp: localISOString,
+            source_sheet: 'SHEET_A'
           }]);
 
         spinner.style.display = "none";
