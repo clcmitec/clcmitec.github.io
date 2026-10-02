@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MITEC — Shift Manager</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    :root {
+      --admin-dark: #092253;
+      --admin-gradient: linear-gradient(135deg, #092253 0%, #153269 100%);
+      --bg-slate: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-thin: #e2e8f0;
+      
+      --pill-teal-bg: #f0f4f8;
+      --pill-teal-text: #092253;
+      --pill-teal-border: #d0dbe5;
+      
+      --pill-amber-bg: #fffbeb;
+      --pill-amber-text: #b45309;
+      --pill-amber-border: #fef3c7;
+
+      --pill-red-bg: #fdf2f2;
+      --pill-red-text: #9b1c1c;
+      --pill-red-border: #fbd5d5;
+
+      --accent-emerald: #092253;
+      --accent-warn: #9b1c1c;
+      --font-main: 'Trebuchet MS', sans-serif;
+    }
+
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+    body { margin: 0; background-color: var(--bg-slate); font-family: var(--font-main); color: var(--text-main); padding-bottom: 90px; }
+    
+    .header { 
+      position: sticky; 
+      top: 0; 
+      z-index: 1100; 
+      background: #fff; 
+      border-bottom: 1px solid var(--border-thin); 
+      height: 60px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 0 16px; 
+    }
+    .brand-img { height: 20px; width: auto; display: block; }
+    .user-profile-tag { font-size: 11px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; letter-spacing: 0.5px; background: #e2e8f0; padding: 5px 12px; border-radius: 6px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+
+    #login-overlay { position: fixed; inset: 0; background: var(--bg-slate); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .login-card { background: #fff; width: 100%; max-width: 400px; border-radius: 16px; padding: 32px 24px; border: 1px solid var(--border-thin); box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
+    .login-logo { font-size: 44px; color: var(--admin-dark); margin-bottom: 12px; }
+
+    .section-label { font-size: 11px; font-weight: 800; color: var(--admin-dark); margin: 20px 0 12px 5px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
+    .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border-thin); }
+
+    .filter-panel-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+
+    .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .doc-type-filter-group {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-thin);
+    }
+
+    .doc-type-options {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    .checkbox-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--admin-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--admin-dark);
+      cursor: pointer;
+    }
+
+    .wm-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .wm-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .wm-header-title { font-size: 24px; font-weight: 800; color: var(--admin-dark); margin: 0 0 10px 0; text-transform: uppercase; }
+    .wm-meta-line { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+
+    .btn-download-roster { background: #f1f5f9; color: var(--admin-dark); border: 1px solid var(--border-thin); border-radius: 8px; padding: 8px 12px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700; transition: 0.15s; }
+    .btn-download-roster:active { transform: scale(0.95); background: #e2e8f0; }
+
+    .wm-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; text-align: left; }
+    .wm-table th { background: #f8fafc; padding: 12px 8px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
+    .wm-table td { padding: 14px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
+
+    .worker-profile-cell { display: flex; align-items: center; gap: 10px; }
+    .worker-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background-color: #e2e8f0; flex-shrink: 0; border: 1px solid var(--border-thin); }
+
+    .wm-status-select-wrapper { position: relative; display: inline-block; width: 100%; max-width: 135px; }
+    .wm-status-select { width: 100%; padding: 8px 24px 8px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
+    .wm-status-select.status-confirmed { background-color: var(--admin-dark); color: #ffffff; border: 1px solid var(--admin-dark); }
+    .wm-status-select.status-waitlist { background-color: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
+    .wm-status-chevron { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 12px; }
+    .status-confirmed + .wm-status-chevron { color: #ffffff; }
+    .status-waitlist + .wm-status-chevron { color: var(--pill-amber-text); }
+
+    .btn-call-action { background: #fff; color: var(--admin-dark); border: 1.5px solid var(--admin-dark); font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.15s; width: 100%; max-width: 100px; }
+    .btn-call-action:active { background: #f1f5f9; transform: scale(0.96); }
+
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 2000; display: none; align-items: flex-end; }
+    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 24px 20px; overflow-y: auto; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
+    .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
+    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--admin-dark); font-weight: 800; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
+    .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; }
+    
+    .roster-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; text-align: left; }
+    .roster-table th { background: #f8fafc; padding: 12px 10px; font-weight: 700; color: var(--admin-dark); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
+    .roster-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
+    .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
+    
+    .pill-sub { background: var(--admin-dark); color: #ffffff; border: 1px solid var(--admin-dark); }
+    .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
+    .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
+
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    
+    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--admin-dark); background: #fff; appearance: auto; }
+    .form-control:focus { outline: none; border-color: var(--admin-dark); box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.05); }
+    .btn-submit-shift { width: 100%; height: 50px; background: var(--admin-dark); color: #fff; font-size: 14px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; }
+    .btn-submit-shift:active { transform: scale(0.98); }
+    .btn-logout { background: none; border: 1px solid var(--pill-red-text); color: var(--pill-red-text); font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.15s; }
+    
+    /* Scorecard Layout - Single Row & Positioned Below Header */
+    .wm-scorecard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0 16px 0;
+    }
+
+    .wm-stat-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-thin);
+      border-radius: 10px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 2px;
+    }
+
+    .wm-stat-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.3px;
+      line-height: 1.1;
+    }
+
+    .wm-stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #103e98;
+    }
+
+    #sync-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: var(--admin-dark); letter-spacing: 1px; }
+    .loader-text { margin-top: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN OVERLAY -->
+  <div id="login-overlay">
+    <div class="login-card">
+      <div class="login-logo"><i class="ph ph-shield-check"></i></div>
+      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--admin-dark);">Shift Manager</h2>
+      <p style="margin: 0 0 24px 0; font-size: 13px; color: var(--text-muted);">Please provide administrative key.</p>
+      <form id="login-form" onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label>MyKad / Passport ID</label>
+          <input type="text" id="login-id-input" class="form-control" placeholder="Enter administrative ID Key" required />
+        </div>
+        <button type="submit" class="btn-submit-shift" style="margin-top: 5px;">Verify Handshake</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SYNC LOADER -->
+  <div id="sync-loader">
+    <i class="ph ph-gear-six ph-spin" style="font-size: 40px; color: var(--admin-dark);"></i>
+    <div class="loader-text">LOADING SHIFT MANAGER...</div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <img class="brand-img" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
+    <div id="adminUserDisplayTag" class="user-profile-tag">SUPER ADMIN</div>
+  </header>
+
+  <div class="container">
+    <!-- Top Scorecard Container (Below Header) -->
+    <div id="top-scorecard-root"></div>
+
+    <div class="section-label">Worker Manager</div>
+
+    <!-- Filter Panel: Shift, Status & Doc Type Checkboxes -->
+    <div class="filter-panel-card">
+      <div class="filter-grid">
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:10px;">Select Shift</label>
+          <select id="wm-shift-select" class="form-control" style="height:42px; font-weight:700;" onchange="renderWorkerManagerTable()">
+            <option value="">-- Loading Shifts --</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:10px;">Filter Status</label>
+          <select id="wm-status-filter" class="form-control" style="height:42px; font-weight:700;" onchange="renderWorkerManagerTable()">
+            <option value="ALL">ALL STATUSES</option>
+            <option value="CONFIRMED">CONFIRMED ONLY</option>
+            <option value="WAITLIST">WAITLIST ONLY</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Checkboxes for Doc Type -->
+      <div class="doc-type-filter-group">
+        <label style="font-size:10px; font-weight:800; color:var(--admin-dark); text-transform:uppercase; letter-spacing:0.5px;">Document Type</label>
+        <div class="doc-type-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="wm-doc-ic" checked onchange="renderWorkerManagerTable()">
+            MyKad (IC)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="wm-doc-passport" checked onchange="renderWorkerManagerTable()">
+            Passport
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Shift Card & Worker Roster Table -->
+    <div id="worker-manager-root"></div>
+
+    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border-thin);">
+      <button class="btn-logout" onclick="handleAdminLogout()">Exit Session (Logout)</button>
+    </div>
+  </div>
+
+  <!-- WORKER PROFILE DRAWER OVERLAY -->
+  <div id="worker-profile-drawer" class="drawer-overlay" onclick="closeWorkerProfileDrawer()">
+    <div class="drawer-content" onclick="event.stopPropagation()">
+      <div class="drawer-header">
+        <h2>
+          <span id="wp-drawer-name">Casual Labour Account</span>
+          <div id="wp-drawer-meta" class="drawer-meta-subtitle"></div>
+        </h2>
+        <button class="btn-close-drawer" onclick="closeWorkerProfileDrawer()"><i class="ph ph-x"></i></button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="roster-table">
+          <thead>
+            <tr>
+              <th>Date / Department</th>
+              <th style="width: 110px; text-align: center;">Status</th>
+              <th style="width: 120px; text-align: center;">Attendance</th>
+            </tr>
+          </thead>
+          <tbody id="wp-drawer-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOQA9l1lpjs9eSOHwQmdZe4axc6OR6E9ohXmHQI3d9B-3apRtl6mFValUpepCorlqs/exec"; 
+    
+    let activeAdminKey = null;
+    let cachedShifts = [];
+    let cachedBookings = [];
+
+    window.onload = () => {
+      let sessionKey = null;
+      try {
+        sessionKey = localStorage.getItem("mitec_admin_key") || localStorage.getItem("mcl_doc_no");
+      } catch (err) { console.warn("Storage restricted."); }
+
+      if (sessionKey) {
+        activeAdminKey = sessionKey;
+        document.getElementById('login-overlay').style.display = 'none';
+        loadAdminDataSuite();
+      } else {
+        document.getElementById('login-overlay').style.display = 'flex';
+      }
+    };
+
+    function isPassportHolder(userId) {
+      if (!userId) return false;
+      const cleanId = String(userId).trim();
+      return /^[a-zA-Z]/.test(cleanId);
+    }
+
+    function handleAdminLogin(event) {
+      event.preventDefault();
+      const enteredId = document.getElementById('login-id-input').value.trim();
+      if(!enteredId) return;
+      activeAdminKey = enteredId;
+      document.getElementById('login-overlay').style.display = 'none';
+      loadAdminDataSuite();
+    }
+
+    function handleAdminLogout() {
+      try {
+        localStorage.removeItem("mitec_admin_key");
+        localStorage.removeItem("mcl_doc_no");
+      } catch(e) {}
+      window.location.reload();
+    }
+
+    function formatPhoneForDialing(phone) {
+      if (!phone) return '';
+      let cleaned = String(phone).replace(/[^0-9+]/g, '');
+      if (!cleaned) return '';
+      
+      if (cleaned.startsWith('60')) {
+        return '+' + cleaned;
+      }
+      if (!cleaned.startsWith('+') && !cleaned.startsWith('0')) {
+        return '+' + cleaned;
+      }
+      return cleaned;
+    }
+
+    function formatAttendanceTime(timeVal) {
+      if (!timeVal) return "";
+      const str = String(timeVal).trim();
+      if (str.includes("1899")) {
+        try {
+          const d = new Date(str);
+          return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        } catch(e) { return str; }
+      }
+      if (str.includes("GMT")) {
+        try {
+          const d = new Date(str);
+          return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        } catch(e) { return str; }
+      }
+      let cleanDigits = str.replace(/[^0-9]/g, "");
+      if (cleanDigits.length === 4 && !str.includes(":")) {
+        return cleanDigits.substring(0, 2) + ":" + cleanDigits.substring(2, 4);
+      }
+      return str;
+    }
+
+    function formatFullTimestamp(timeVal) {
+      if (!timeVal) return "No Show";
+      let str = String(timeVal).trim();
+      if (str.toLowerCase() === "no show" || str === "0" || str === "-" || str === "") return "No Show";
+      if (str.includes("GMT")) {
+        try {
+          let d = new Date(str);
+          if (!isNaN(d.getTime())) {
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+          }
+        } catch(e) {}
+      }
+      return str; 
+    }
+
+    function getShiftDateObj(dateStr) {
+      try {
+        let parts = dateStr.includes('.') ? dateStr.split('.') : dateStr.split('/');
+        if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+      } catch(e) {}
+      return new Date(0);
+    }
+
+    function loadAdminDataSuite() {
+      document.getElementById('sync-loader').style.display = 'flex';
+      
+      fetch(`${SCRIPT_URL}?action=getAdminMasterData&userDocNo=${activeAdminKey}`)
+        .then(r => r.json())
+        .then(res => {
+          if (res.ok && res.allShifts && res.allBookingsRaw) {
+            try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
+            
+            cachedShifts = (res.allShifts || []).map(s => ({ ...s, totalSlots: s.slots, Slots: s.slots }));
+            cachedBookings = res.allBookingsRaw;
+            
+            if (res.adminName) document.getElementById("adminUserDisplayTag").textContent = res.adminName.toUpperCase();
+            
+            populateWorkerManagerShifts();
+            
+            document.getElementById('sync-loader').style.display = 'none';
+          } else {
+            alert("Handshake Refused!");
+            document.getElementById('sync-loader').style.display = 'none';
+            document.getElementById('login-overlay').style.display = 'flex';
+          }
+        }).catch(() => {
+          document.getElementById('sync-loader').style.display = 'none';
+          document.getElementById('login-overlay').style.display = 'flex';
+        });
+    }
+
+    function populateWorkerManagerShifts() {
+      const selectEl = document.getElementById('wm-shift-select');
+      if (!selectEl) return;
+
+      let today = new Date(); today.setHours(0,0,0,0);
+      const upcomingShifts = cachedShifts.filter(s => getShiftDateObj(s.date) >= today);
+      
+      if (upcomingShifts.length === 0) {
+        selectEl.innerHTML = '<option value="">No upcoming shifts found</option>';
+        document.getElementById('worker-manager-root').innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No upcoming shift parameters registered.</p>';
+        return;
+      }
+
+      upcomingShifts.sort((a, b) => getShiftDateObj(a.date) - getShiftDateObj(b.date));
+
+      let currentSelection = selectEl.value;
+      selectEl.innerHTML = upcomingShifts.map(s => `
+        <option value="${s.id}">[${s.dept}] ${s.date} (${formatAttendanceTime(s.time)}) — ID: ${s.id}</option>
+      `).join('');
+
+      if (currentSelection && upcomingShifts.some(s => s.id === currentSelection)) {
+        selectEl.value = currentSelection;
+      } else {
+        selectEl.value = upcomingShifts[0].id;
+      }
+
+      renderWorkerManagerTable();
+    }
+
+    function renderWorkerManagerTable() {
+      const selectEl = document.getElementById('wm-shift-select');
+      const filterEl = document.getElementById('wm-status-filter');
+      const rootEl = document.getElementById('worker-manager-root');
+      const topScorecardEl = document.getElementById('top-scorecard-root');
+      if (!selectEl || !rootEl) return;
+
+      const shiftId = selectEl.value;
+      const statusFilter = filterEl ? filterEl.value : 'ALL';
+      
+      const showIC = document.getElementById('wm-doc-ic') ? document.getElementById('wm-doc-ic').checked : true;
+      const showPassport = document.getElementById('wm-doc-passport') ? document.getElementById('wm-doc-passport').checked : true;
+
+      const shift = cachedShifts.find(s => s.id === shiftId);
+
+      if (!shift) {
+        rootEl.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">Please select a shift above.</p>';
+        if (topScorecardEl) topScorecardEl.innerHTML = '';
+        return;
+      }
+
+      // Filter: All active non-cancelled bookings for this shift
+      const shiftBookings = cachedBookings.filter(b => 
+        b.shift_id === shift.id && 
+        String(b.status).toUpperCase() !== 'CANCELLED'
+      );
+
+      // Scorecard Calculations (Totals for whole shift regardless of view filters)
+      const totalApproved = shiftBookings.filter(b => {
+        const status = String(b.status).toUpperCase();
+        return status === 'SUBMITTED' || status === 'CONFIRMED';
+      }).length;
+
+      const totalWaitlist = shiftBookings.filter(b => {
+        const status = String(b.status).toUpperCase();
+        return status === 'WAITLIST' || status === 'WAITING LIST';
+      }).length;
+
+      const totalCL = totalApproved + totalWaitlist;
+      const totalSlots = shift.slots || shift.totalSlots || shift.Slots || 0;
+
+      // Render Scorecard
+      if (topScorecardEl) {
+        topScorecardEl.innerHTML = `
+          <div class="wm-scorecard-grid">
+            <div class="wm-stat-card">
+              <span class="wm-stat-label">Total CL Approved</span>
+              <span class="wm-stat-value">${totalApproved}</span>
+            </div>
+            <div class="wm-stat-card">
+              <span class="wm-stat-label">Total Waiting List</span>
+              <span class="wm-stat-value">${totalWaitlist}</span>
+            </div>
+            <div class="wm-stat-card">
+              <span class="wm-stat-label">Total CL</span>
+              <span class="wm-stat-value">${totalCL}</span>
+            </div>
+          </div>`;
+      }
+
+      // Filter rows based on Status + Document Type Checkboxes
+      let displayedBookings = shiftBookings.filter(b => {
+        // Status filter
+        const isConfirmed = (String(b.status).toUpperCase() === 'SUBMITTED' || String(b.status).toUpperCase() === 'CONFIRMED');
+        if (statusFilter === 'CONFIRMED' && !isConfirmed) return false;
+        if (statusFilter === 'WAITLIST' && isConfirmed) return false;
+
+        // Doc Type filter
+        const isPassport = isPassportHolder(b.user_id);
+        if (isPassport && !showPassport) return false;
+        if (!isPassport && !showIC) return false;
+
+        return true;
+      });
+
+      let html = `
+        <div class="wm-card">
+          <div class="wm-card-header">
+            <div>
+              <h2 class="wm-header-title" style="margin: 0 0 6px 0;">${shift.dept}</h2>
+              <div class="wm-meta-line"><i class="ph ph-fingerprint"></i> Shift ID: <b>${shift.id}</b></div>
+              <div class="wm-meta-line"><i class="ph ph-calendar"></i> Date: <b>${shift.date} (${formatAttendanceTime(shift.time)})</b></div>
+              <div class="wm-meta-line"><i class="ph ph-users-three"></i> Capacity: <b>${totalSlots} Slots</b></div>
+            </div>
+            <button class="btn-download-roster" onclick="downloadRosterCSV('${shift.id}')" title="Download Roster">
+              <i class="ph ph-download-simple"></i>
+            </button>
+          </div>
+
+          <div style="overflow-x:auto; margin-top:15px;">
+            <table class="wm-table">
+              <thead>
+                <tr>
+                  <th>Casual Labour Name</th>
+                  <th style="text-align:center; width:135px;">Status</th>
+                  <th style="text-align:center; width:100px;">Action</th>
+                </tr>
+              </thead>
+              <tbody>`;
+
+      if (displayedBookings.length === 0) {
+        html += `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No casual workers found matching current filters.</td></tr>`;
+      } else {
+        displayedBookings.forEach(w => {
+          const isConfirmed = (String(w.status).toUpperCase() === 'SUBMITTED' || String(w.status).toUpperCase() === 'CONFIRMED');
+          const selectClass = isConfirmed ? "status-confirmed" : "status-waitlist";
+
+          const defaultAvatar = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>`;
+          const photoUrl = w.photo_url || w.photo || defaultAvatar;
+
+          const dialablePhone = formatPhoneForDialing(w.phone);
+          const callLink = dialablePhone ? `tel:${dialablePhone}` : `javascript:alert('No phone number on record');`;
+
+          const docTypeLabel = isPassportHolder(w.user_id) ? "Passport" : "MyKad";
+
+          html += `
+            <tr>
+              <td>
+                <div class="worker-profile-cell">
+                  <img src="${photoUrl}" class="worker-avatar" alt="Photo" onerror="this.onerror=null; this.src='${defaultAvatar}';" />
+                  <div>
+                    <div style="font-weight:800; color:var(--admin-dark); text-transform:uppercase; line-height:1.2; cursor:pointer;" onclick="openWorkerProfileDrawer('${w.user_id}', '${w.worker_name.replace(/'/g, "\\'")}')">${w.worker_name}</div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-top:3px; font-weight:600;">${docTypeLabel}: ${w.user_id}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="text-align:center;">
+                <div class="wm-status-select-wrapper">
+                  <select class="wm-status-select ${selectClass}" onchange="toggleWorkerStatus('${shift.id}', '${w.user_id}', this.value === 'WAITLIST' ? 'true' : 'false')">
+                    <option value="CONFIRMED" ${isConfirmed ? 'selected' : ''}>CONFIRMED</option>
+                    <option value="WAITLIST" ${!isConfirmed ? 'selected' : ''}>WAITLIST</option>
+                  </select>
+                  <i class="ph ph-caret-down wm-status-chevron"></i>
+                </div>
+              </td>
+              <td style="text-align:center;">
+                <a href="${callLink}" class="btn-call-action">
+                  <i class="ph ph-phone"></i> CALL
+                </a>
+              </td>
+            </tr>`;
+        });
+      }
+
+      html += `</tbody></table></div></div>`;
+      rootEl.innerHTML = html;
+    }
+
+    function downloadRosterCSV(shiftId) {
+      const shift = cachedShifts.find(s => s.id === shiftId);
+      const bookings = cachedBookings.filter(b => 
+        b.shift_id === shiftId && 
+        String(b.status).toUpperCase() !== 'CANCELLED'
+      );
+      
+      if (!bookings || bookings.length === 0) {
+        alert("No casual workers available to download.");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,Worker Name,MyKad/Passport ID,Doc Type,Status,Phone\n";
+      bookings.forEach(b => {
+        const docType = isPassportHolder(b.user_id) ? "Passport" : "MyKad";
+        csvContent += `"${b.worker_name}","${b.user_id}","${docType}","${b.status}","${b.phone || ''}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Roster_${shiftId}_${shift ? shift.dept : ''}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function toggleWorkerStatus(shiftId, workerId, targetToWaitlist) {
+      const promptMsg = targetToWaitlist === 'true' 
+        ? `Demote Worker ID: ${workerId} back to Standby Waitlist?` 
+        : `Promote & Confirm registration for Worker ID: ${workerId}?`;
+
+      if (!confirm(promptMsg)) return;
+      
+      document.getElementById('sync-loader').querySelector('.loader-text').textContent = "SYNCHRONIZING STATUS TRANSACTION...";
+      document.getElementById('sync-loader').style.display = 'flex';
+      
+      fetch(`${SCRIPT_URL}?action=updateStatus&shiftId=${encodeURIComponent(shiftId)}&userDocNo=${encodeURIComponent(workerId)}&isWaitlist=${targetToWaitlist}&adminDocNo=${encodeURIComponent(activeAdminKey)}`)
+        .then(r => r.json())
+        .then(res => {
+          document.getElementById('sync-loader').style.display = 'none';
+          if (res.ok) {
+            alert("Database matrix successfully updated!");
+          } else {
+            alert("Update Failed: " + (res.error || "Matching record not found."));
+          }
+          loadAdminDataSuite();
+        })
+        .catch(err => {
+          document.getElementById('sync-loader').style.display = 'none';
+          alert("An error occurred while transmitting transaction variables.");
+          console.error(err);
+          loadAdminDataSuite();
+        });
+    }
+
+    function openWorkerProfileDrawer(workerId, workerName) {
+      document.getElementById('wp-drawer-name').textContent = workerName;
+      let totalConfirmed = 0, noShows = 0, profileRowsMarkup = "";
+      const historySubset = cachedBookings.filter(b => String(b.user_id).trim() === String(workerId).trim());
+      historySubset.sort((a, b) => getShiftDateObj(b.date) - getShiftDateObj(a.date));
+
+      historySubset.forEach(b => {
+        const rawStatus = String(b.status).toUpperCase();
+        const attendanceStr = String(b.attendance || "").trim().toLowerCase();
+        if (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED') totalConfirmed++;
+        if (attendanceStr === 'no show') noShows++;
+
+        let matchingShift = cachedShifts.find(s => String(s.id).toUpperCase() === String(b.shift_id).toUpperCase());
+        let finalDisplayDate = b.date || (matchingShift ? matchingShift.date : "N/A");
+        let finalDisplayDept = b.dept || (matchingShift ? matchingShift.dept : "N/A");
+
+        let statusPill = (rawStatus === 'CANCELLED') ? '<span class="status-pill pill-cancelled">Cancelled</span>' : ((rawStatus === 'WAITLIST' || rawStatus === 'WAITING LIST') ? '<span class="status-pill pill-wait">Waitlist</span>' : '<span class="status-pill pill-sub">Confirmed</span>');
+        let attendanceDisplay = (rawStatus === 'CANCELLED' || rawStatus === 'WAITLIST' || rawStatus === 'WAITING LIST') ? `<span style="color:var(--text-muted); font-weight:700;">-</span>` : ((attendanceStr === "no show" || attendanceStr === "" || attendanceStr === "0") ? `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>` : `<span style="color:var(--admin-dark); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`);
+
+        profileRowsMarkup += `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--admin-dark);">${finalDisplayDate}</div>
+              <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-top:2px;">${finalDisplayDept}</div>
+            </td>
+            <td style="text-align:center;">${statusPill}</td>
+            <td style="text-align:center;">${attendanceDisplay}</td>
+          </tr>`;
+      });
+
+      const docTypeStr = isPassportHolder(workerId) ? "Passport" : "MyKad";
+
+      document.getElementById('wp-drawer-meta').innerHTML = `
+        <span><i class="ph ph-identification-card"></i> ${docTypeStr} ID: <b>${workerId}</b></span>
+        <span><i class="ph ph-shield-warning"></i> Matrix Analytics: <b>${noShows} No-Shows</b> out of <b>${totalConfirmed} Confirmed</b></span>`;
+      document.getElementById('wp-drawer-table-body').innerHTML = profileRowsMarkup || `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">No logged history discovered.</td></tr>`;
+      document.getElementById('worker-profile-drawer').style.display = 'flex';
+    }
+
+    function closeWorkerProfileDrawer() { document.getElementById('worker-profile-drawer').style.display = 'none'; }
+  </script>
+
+</body>
+</html>
