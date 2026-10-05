@@ -14,6 +14,9 @@
   <!-- Load Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- Load SheetJS library for native XLSX file generation -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
     :root {
       --mitec-blue: #1B365D;
@@ -166,6 +169,24 @@
 
     .btn-primary:hover { background: var(--mitec-blue-hover); }
 
+    .btn-success {
+      height: 40px;
+      background: var(--success);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn-success:hover { opacity: 0.9; }
+
     /* DATA TABLE STYLES */
     .table-card {
       background: var(--card-bg);
@@ -310,6 +331,9 @@
     <button class="tab-btn" onclick="switchTab('reportTab', this)">
       <i class="ph-bold ph-chart-line-up"></i> Operational Reports
     </button>
+    <button class="tab-btn" onclick="switchTab('bankTab', this)">
+      <i class="ph-bold ph-bank"></i> Bank Bulk Payroll
+    </button>
   </div>
 
   <div class="main-container">
@@ -322,12 +346,12 @@
         <div class="filter-group">
           <div>
             <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Date From</label>
-            <input type="date" id="filterDateFrom" class="control-input" onchange="fetchLiveAttendance()">
+            <input type="date" id="filterDateFrom" class="control-input" onchange="applyFiltersAndSort()">
           </div>
 
           <div>
             <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Date To</label>
-            <input type="date" id="filterDateTo" class="control-input" onchange="fetchLiveAttendance()">
+            <input type="date" id="filterDateTo" class="control-input" onchange="applyFiltersAndSort()">
           </div>
 
           <div>
@@ -384,8 +408,8 @@
                   <div class="th-content">Email address <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
                   <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
                 </th>
-                <th onclick="sortColumn('column_6')">
-                  <div class="th-content">Column 6 <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
+                <th onclick="sortColumn('doc_no')">
+                  <div class="th-content">DOC NO <i class="ph-bold ph-arrows-down-up sort-icon"></i></div>
                   <input type="text" class="col-filter-input" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFiltersAndSort()">
                 </th>
                 <th onclick="sortColumn('voucher')">
@@ -532,6 +556,80 @@
 
     </div>
 
+    <!-- ================= TAB 3: BANK BULK PAYROLL ================= -->
+    <div id="bankTab" class="tab-content">
+      
+      <!-- BANK EXPORT CONTROLS -->
+      <div class="filter-panel">
+        <div class="filter-group">
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Debiting Acc. No</label>
+            <input type="text" id="bankDebitingAcc" class="control-input" value="100380031466">
+          </div>
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Payment Date Lookup</label>
+            <!-- DYNAMIC DROPDOWN FOR UNFILTERED PAYMENT_DATE -->
+            <select id="bankPaymentDate" class="control-select" onchange="renderBankPayroll()">
+              <option value="ALL">All Payment Dates</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Recipient Reference</label>
+            <input type="text" id="bankRecipientRef" class="control-input" value="QUBE MITEC">
+          </div>
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Credit Description</label>
+            <input type="text" id="bankCreditDesc" class="control-input" value="CASUAL LABOUR WORKERS">
+          </div>
+        </div>
+
+        <div class="filter-group" style="align-self: flex-end;">
+          <button class="btn-success" onclick="exportBankFile()"><i class="ph-bold ph-file-arrow-down"></i> Download Bulk DuitNow (.xlsx)</button>
+        </div>
+      </div>
+
+      <!-- PAYROLL SUMMARY CARDS -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Unique Payees</div>
+          <div class="kpi-value" id="bankPayeeCount">0</div>
+          <div class="kpi-sub">Consolidated workers</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Total Batch Payout</div>
+          <div class="kpi-value" id="bankTotalPayout" style="color:var(--success)">RM 0.00</div>
+          <div class="kpi-sub">Sum of aggregated wages</div>
+        </div>
+      </div>
+
+      <!-- CONSOLIDATED PAYROLL PREVIEW TABLE -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Beneficiary Name (IC)</th>
+                <th>Bank Code</th>
+                <th>Beneficiary Acc No</th>
+                <th>ID Type</th>
+                <th>ID Number</th>
+                <th>Total Shifts</th>
+                <th>Total Hours</th>
+                <th>Net Wages (RM)</th>
+              </tr>
+            </thead>
+            <tbody id="bankPayrollTbody">
+              <tr>
+                <td colspan="9" class="empty-state">No payroll records aggregated. Select a Payment Date.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
   <script>
@@ -540,8 +638,37 @@
     let supabaseClient = null;
 
     let rawAttendanceData = [];
+    let labourProfilesMap = new Map(); // Maps profile info by doc, ic, email, name
     let processedData = [];
+    let aggregatedBankData = [];
     let sortState = { column: 'timestamp', ascending: false };
+
+    // Bank BIC Mapping
+    const BANK_BIC_MAP = {
+      'maybank': 'MBBEMYKL',
+      'cimb': 'CIBBMYKL',
+      'public bank': 'PBBEMYKL',
+      'rhb': 'RHBBMYKL',
+      'hong leong': 'HLBBMYKL',
+      'ambank': 'ARBKMYKL',
+      'bank islam': 'BIMBMYKL',
+      'bank rakyat': 'BKRMMYKL',
+      'bsn': 'BSNAMYK1',
+      'bank simpanan nasional': 'BSNAMYK1',
+      'uob': 'UOVBMYKL',
+      'ocbc': 'OCBCMYKL',
+      'hsbc': 'HBMBMYKL',
+      'touch n go': 'TNGDMYNB',
+      'tng': 'TNGDMYNB',
+      'touch \'n go': 'TNGDMYNB',
+      'gxbank': 'GXSPMYKL',
+      'affin': 'PHBMMYKL',
+      'agrobank': 'AGOBMYKL',
+      'alliance': 'MFBBMYKL',
+      'muamalat': 'BMMBMYKL',
+      'mbsb': 'AFBQMYKL',
+      'grabpay': 'GRABMYNB'
+    };
 
     function getSupabase() {
       if (!supabaseClient) {
@@ -564,10 +691,13 @@
 
       if (tabId === 'reportTab') {
         renderReports();
+      } else if (tabId === 'bankTab') {
+        populatePaymentDateDropdown();
+        renderBankPayroll();
       }
     }
 
-    // SET INITIAL DEFAULT DATES (TODAY)
+    // SET INITIAL DEFAULT DATES FOR TAB 1 (TODAY)
     function initDateFilters() {
       const today = new Date();
       const yyyy = today.getFullYear();
@@ -579,40 +709,52 @@
       document.getElementById("filterDateTo").value = formattedToday;
     }
 
-    // FETCH LIVE ATTENDANCE FROM SUPABASE BASED ON DATE RANGE
+    // HELPER: Extract raw numbers/letters for key matching
+    function cleanKey(val) {
+      return String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase().trim();
+    }
+
+    // FETCH ALL RAW ATTENDANCE RECORDS & CASUAL LABOUR PROFILES
     async function fetchLiveAttendance() {
       const tbody = document.getElementById("attendanceTbody");
       tbody.innerHTML = `<tr><td colspan="17" class="loading-state"><div class="spinner"></div><div>Loading attendance records...</div></td></tr>`;
 
-      const dateFrom = document.getElementById("filterDateFrom").value;
-      const dateTo = document.getElementById("filterDateTo").value;
-
       try {
         const client = getSupabase();
-        let query = client
-          .from('attendance_records')
-          .select('*');
+        
+        // Concurrent fetch of attendance records and profile table
+        const [attendanceRes, profileRes] = await Promise.all([
+          client.from('attendance_records').select('*').order('timestamp', { ascending: false }),
+          client.from('casual_labour_profile').select('*')
+        ]);
 
-        if (dateFrom) {
-          query = query.gte('working_date', dateFrom);
+        if (attendanceRes.error) throw attendanceRes.error;
+        rawAttendanceData = attendanceRes.data || [];
+
+        // Build comprehensive profile map with multiple keys
+        labourProfilesMap.clear();
+        if (profileRes.data && !profileRes.error) {
+          profileRes.data.forEach(p => {
+            const kDoc = cleanKey(p.doc_no || p.doc_number);
+            const kIc = cleanKey(p.ic_number || p.ic_no || p.ic);
+            const kEmail = String(p.email || '').trim().toLowerCase();
+            const kName = cleanKey(p.full_name || p.name);
+
+            if (kDoc) labourProfilesMap.set(`doc:${kDoc}`, p);
+            if (kIc) labourProfilesMap.set(`ic:${kIc}`, p);
+            if (kEmail) labourProfilesMap.set(`email:${kEmail}`, p);
+            if (kName) labourProfilesMap.set(`name:${kName}`, p);
+          });
         }
-        if (dateTo) {
-          query = query.lte('working_date', dateTo);
-        }
 
-        const { data, error } = await query.order('timestamp', { ascending: false });
-
-        if (error) throw error;
-
-        rawAttendanceData = data || [];
         applyFiltersAndSort();
       } catch (err) {
-        console.error("Error fetching attendance:", err);
+        console.error("Error fetching data:", err);
         tbody.innerHTML = `<tr><td colspan="17" class="empty-state" style="color:var(--error)">Failed to fetch records: ${err.message}</td></tr>`;
       }
     }
 
-    // COLUMN SORTING LOGIC
+    // COLUMN SORTING LOGIC FOR TAB 1
     function sortColumn(columnName) {
       if (sortState.column === columnName) {
         sortState.ascending = !sortState.ascending;
@@ -623,18 +765,19 @@
       applyFiltersAndSort();
     }
 
-    // FILTERING AND SORTING DATA
+    // LOCAL FILTERING AND SORTING FOR TAB 1 ONLY
     function applyFiltersAndSort() {
       const globalQuery = document.getElementById("globalSearch").value.toLowerCase().trim();
       const deptFilter = document.getElementById("filterDept").value;
+      const dateFrom = document.getElementById("filterDateFrom").value;
+      const dateTo = document.getElementById("filterDateTo").value;
 
-      // Extract column-specific filter inputs in exact index order
       const colInputs = document.querySelectorAll('.col-filter-input');
       const colFilters = {
         timestamp: colInputs[0]?.value.toLowerCase().trim() || '',
         shift: colInputs[1]?.value.toLowerCase().trim() || '',
         email: colInputs[2]?.value.toLowerCase().trim() || '',
-        column_6: colInputs[3]?.value.toLowerCase().trim() || '',
+        doc_no: colInputs[3]?.value.toLowerCase().trim() || '',
         voucher: colInputs[4]?.value.toLowerCase().trim() || '',
         name: colInputs[5]?.value.toLowerCase().trim() || '',
         department: colInputs[6]?.value.toLowerCase().trim() || '',
@@ -650,9 +793,13 @@
         notes: colInputs[16]?.value.toLowerCase().trim() || ''
       };
 
-      // Apply Filters
       processedData = rawAttendanceData.filter(row => {
-        // Department Dropdown Filter
+        // Tab 1 Date Filters
+        const rowWorkDate = row.working_date || (row.timestamp ? row.timestamp.split('T')[0] : '');
+        if (dateFrom && rowWorkDate && rowWorkDate < dateFrom) return false;
+        if (dateTo && rowWorkDate && rowWorkDate > dateTo) return false;
+
+        // Department Filter
         if (deptFilter !== 'ALL' && (row.department || '').toUpperCase() !== deptFilter) return false;
 
         // Global Search Filter
@@ -666,7 +813,10 @@
         // Individual Column Filters
         for (const [key, filterVal] of Object.entries(colFilters)) {
           if (filterVal) {
-            const cellVal = String(row[key] || '').toLowerCase();
+            let cellVal = String(row[key] || '').toLowerCase();
+            if (key === 'doc_no' && !cellVal) {
+              cellVal = String(row['column_6'] || '').toLowerCase();
+            }
             if (!cellVal.includes(filterVal)) return false;
           }
         }
@@ -674,10 +824,9 @@
         return true;
       });
 
-      // Apply Sorting
       processedData.sort((a, b) => {
-        let valA = a[sortState.column] ?? '';
-        let valB = b[sortState.column] ?? '';
+        let valA = a[sortState.column] ?? (sortState.column === 'doc_no' ? a['column_6'] : '') ?? '';
+        let valB = b[sortState.column] ?? (sortState.column === 'doc_no' ? b['column_6'] : '') ?? '';
 
         if (typeof valA === 'string') valA = valA.toLowerCase();
         if (typeof valB === 'string') valB = valB.toLowerCase();
@@ -689,9 +838,11 @@
 
       renderTable();
       renderReports();
+      populatePaymentDateDropdown();
+      renderBankPayroll();
     }
 
-    // RENDER MAIN ATTENDANCE TABLE
+    // RENDER MAIN ATTENDANCE TABLE (TAB 1)
     function renderTable() {
       const tbody = document.getElementById("attendanceTbody");
 
@@ -706,7 +857,7 @@
             <td>${row.timestamp ? new Date(row.timestamp).toLocaleString() : '-'}</td>
             <td><strong>${row.shift || '-'}</strong></td>
             <td>${row.email || '-'}</td>
-            <td>${row.column_6 || '-'}</td>
+            <td>${row.doc_no || row.column_6 || '-'}</td>
             <td><strong>${row.voucher || '-'}</strong></td>
             <td>${row.name || '-'}</td>
             <td><span class="tag-dept">${row.department || '-'}</span></td>
@@ -725,7 +876,7 @@
       }).join('');
     }
 
-    // GENERATE OPERATIONAL REPORTS & KPI METRICS
+    // GENERATE OPERATIONAL REPORTS & KPI METRICS (TAB 2)
     function renderReports() {
       const totalStaff = processedData.length;
       let totalHours = 0;
@@ -754,13 +905,11 @@
         }
       });
 
-      // Render KPI Cards
       document.getElementById("kpiTotalStaff").textContent = totalStaff;
       document.getElementById("kpiTotalHours").textContent = totalHours.toFixed(1);
       document.getElementById("kpiTotalWages").textContent = `RM ${totalWages.toFixed(2)}`;
       document.getElementById("kpiActiveDepts").textContent = activeDepts.size;
 
-      // Render Department Summary
       const deptTbody = document.getElementById("deptSummaryTbody");
       const deptKeys = Object.keys(deptCounts);
 
@@ -777,7 +926,6 @@
         `).join('');
       }
 
-      // Render Shift Summary
       const shiftTbody = document.getElementById("shiftSummaryTbody");
       const shiftKeys = Object.keys(shiftCounts);
 
@@ -798,7 +946,253 @@
       }
     }
 
-    // EXPORT FILTERED DATA TO CSV
+    // HELPER: DERIVE BIC FROM BANK NAME
+    function getBankBic(bankRaw) {
+      if (!bankRaw) return 'MBBEMYKL';
+      const clean = String(bankRaw).toLowerCase().trim();
+      for (const [key, bic] of Object.entries(BANK_BIC_MAP)) {
+        if (clean.includes(key)) return bic;
+      }
+      return 'MBBEMYKL';
+    }
+
+    // FORMAT DATE TO DDMMYYYY FOR DUITNOW / MAYBANK SPEC
+    function formatToDDMMYYYY(dateStr) {
+      if (!dateStr) return '';
+      const clean = String(dateStr).trim();
+      if (/^\d{8}$/.test(clean)) return clean;
+
+      const dateObj = new Date(clean);
+      if (!isNaN(dateObj.getTime())) {
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const yyyy = dateObj.getFullYear();
+        return `${dd}${mm}${yyyy}`;
+      }
+      return clean.replace(/\D/g, '');
+    }
+
+    // POPULATE TAB 3 DROPDOWN DIRECTLY FROM RAW UNFILTERED DATA
+    function populatePaymentDateDropdown() {
+      const dropdown = document.getElementById("bankPaymentDate");
+      if (!dropdown) return;
+
+      const currentSelected = dropdown.value;
+      const dateSet = new Set();
+
+      rawAttendanceData.forEach(row => {
+        const pDate = row.payment_date;
+        if (pDate && String(pDate).trim() !== '' && String(pDate).trim() !== '-') {
+          dateSet.add(String(pDate).trim());
+        }
+      });
+
+      const dates = Array.from(dateSet).sort();
+
+      let optionsHTML = `<option value="ALL">All Payment Dates</option>`;
+      dates.forEach(d => {
+        optionsHTML += `<option value="${d}">${d}</option>`;
+      });
+
+      dropdown.innerHTML = optionsHTML;
+
+      if (currentSelected && (dates.includes(currentSelected) || currentSelected === 'ALL')) {
+        dropdown.value = currentSelected;
+      }
+    }
+
+    // TAB 3 PAYROLL AGGREGATION
+    function renderBankPayroll() {
+      const selectedPaymentDate = document.getElementById("bankPaymentDate")?.value || 'ALL';
+      const payeesMap = new Map();
+
+      const filteredRows = rawAttendanceData.filter(row => {
+        if (!row.payment_date || String(row.payment_date).trim() === '' || String(row.payment_date).trim() === '-') {
+          return false;
+        }
+        if (selectedPaymentDate === 'ALL') return true;
+        return String(row.payment_date).trim() === selectedPaymentDate;
+      });
+
+      filteredRows.forEach(row => {
+        const rowEmail = (row.email || '').trim().toLowerCase();
+        const rowDoc = cleanKey(row.doc_no || row.column_6);
+        const rowIc = cleanKey(row.ic_number || row.ic_no || row.ic);
+        const rowName = cleanKey(row.name);
+        
+        // Multi-level lookup against profile map
+        const profile = labourProfilesMap.get(`doc:${rowDoc}`) || 
+                        labourProfilesMap.get(`ic:${rowIc}`) || 
+                        labourProfilesMap.get(`email:${rowEmail}`) || 
+                        labourProfilesMap.get(`name:${rowName}`) || {};
+
+        // Name lookup
+        const finalName = (profile.full_name || profile.name || row.name || 'UNKNOWN').trim().toUpperCase();
+        
+        // Bank name lookup
+        const finalBank = profile.bank_name || profile.bank || row.bank_name || row.bank || '';
+        
+        // EXACT BRACKET NOTATION FOR Column 19
+        const rawAccNo = profile["Column 19"] ?? 
+                         profile["column_19"] ?? 
+                         profile["Column_19"] ?? 
+                         profile["column19"] ?? 
+                         profile.account_number ?? 
+                         profile.bank_account ?? 
+                         profile.account_no ?? 
+                         row["Column 19"] ?? 
+                         row.column_19 ?? 
+                         row.bank_account ?? 
+                         row.account_no ?? 
+                         row.acc_no ?? '';
+                         
+        const finalAccNo = String(rawAccNo).replace(/\D/g, '');
+
+        // ID TYPE & DOC NO LOOKUP
+        const finalDocType = String(profile.doc_type || profile.id_type || row.id_type || '');
+        const rawDocNo = String(profile.doc_no || profile.ic_number || profile.ic_no || row.doc_no || row.column_6 || '900101015000');
+        const finalDocNo = rawDocNo.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+        const hrs = parseFloat(row.hours) || 0;
+        const wage = parseFloat(row.wages) || (hrs * (parseFloat(row.rate) || 12));
+        
+        const isPassport = finalDocType.toLowerCase().includes('passport') || (finalDocNo.length < 12 && /[a-zA-Z]/.test(finalDocNo));
+
+        const key = (rowEmail || finalName || 'UNKNOWN').toLowerCase();
+
+        if (!payeesMap.has(key)) {
+          payeesMap.set(key, {
+            name: finalName,
+            email: rowEmail,
+            ic: finalDocNo,
+            idTypeDuitNow: isPassport ? 'Passport Number' : 'NRIC (New)',
+            idTypeBeneficiary: isPassport ? 'Police/Army/Others' : 'New IC Number',
+            bankCode: getBankBic(finalBank),
+            accNo: finalAccNo,
+            paymentDate: row.payment_date || '',
+            totalShifts: 0,
+            totalHours: 0,
+            totalWages: 0
+          });
+        }
+
+        const payee = payeesMap.get(key);
+        payee.totalShifts += 1;
+        payee.totalHours += hrs;
+        payee.totalWages += wage;
+      });
+
+      // Convert map to array and SORT ALPHABETICALLY BY BENEFICIARY NAME (A-Z)
+      aggregatedBankData = Array.from(payeesMap.values()).sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      });
+
+      const tbody = document.getElementById("bankPayrollTbody");
+      let grandTotalPayout = 0;
+
+      if (aggregatedBankData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty-state">No payroll records found for selected Payment Date.</td></tr>`;
+      } else {
+        tbody.innerHTML = aggregatedBankData.map((item, idx) => {
+          grandTotalPayout += item.totalWages;
+          return `
+            <tr>
+              <td>${idx + 1}</td>
+              <td><strong>${item.name}</strong></td>
+              <td><code>${item.bankCode}</code></td>
+              <td><strong>${item.accNo || '-'}</strong></td>
+              <td>${item.idTypeDuitNow}</td>
+              <td>${item.ic}</td>
+              <td>${item.totalShifts} shift(s)</td>
+              <td>${item.totalHours.toFixed(1)} hrs</td>
+              <td><strong style="color:var(--success)">RM ${item.totalWages.toFixed(2)}</strong></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById("bankPayeeCount").textContent = aggregatedBankData.length;
+      document.getElementById("bankTotalPayout").textContent = `RM ${grandTotalPayout.toFixed(2)}`;
+    }
+
+    // EXPORT TRUE BINARY XLSX FILE (COMPATIBLE WITH EXCEL MOBILE & DESKTOP)
+    function exportBankFile() {
+      if (aggregatedBankData.length === 0) {
+        alert("No aggregated payroll records to export.");
+        return;
+      }
+
+      if (typeof XLSX === 'undefined') {
+        alert("XLSX generator library is loading. Please try again in 5 seconds.");
+        return;
+      }
+
+      const debitingAcc = document.getElementById("bankDebitingAcc").value || "100380031466";
+      const selectedDropdownDate = document.getElementById("bankPaymentDate").value;
+
+      let rawPaymentDate = selectedDropdownDate !== 'ALL' ? selectedDropdownDate : (aggregatedBankData[0]?.paymentDate || new Date());
+      const formattedPaymentDate = formatToDDMMYYYY(rawPaymentDate);
+
+      const recipientRef = document.getElementById("bankRecipientRef").value || "QUBE MITEC";
+      const creditDesc = document.getElementById("bankCreditDesc").value || "CASUAL LABOUR WORKERS";
+
+      const headers = [
+        "Record Type\n*01-Payment\n*02-Payment Advice",
+        "01 - Payment Mode\n02 - Payment Advice Amount",
+        "01 - Payment Date\n02 - Advice Detail",
+        "01 - Customer Reference No.\n02 - Email Address 1",
+        "01 - Payment Amount\n02 - Email Address 2",
+        "01 - Debiting Acc. No.\n02 - Email Address 3",
+        "01 - DuitNow ID Type\n02 - Email Address 4",
+        "01 - DuitNow ID\n02 - Email Address 5",
+        "01 - Issuing Country",
+        "01 - Transfer Type",
+        "01 - Beneficiary Bank Code",
+        "01 - Beneficiary Acc. No",
+        "01 - Beneficiary Name",
+        "01 - Resident Indicator",
+        "01 - Resident Country",
+        "01 - Recipient Reference",
+        "01 - Credit Description",
+        "01 - ID Checking Required",
+        "01 - Beneficiary ID Type",
+        "01 - Beneficiary ID No",
+        "01 - Relationship"
+      ];
+
+      const sheetData = [headers];
+
+      aggregatedBankData.forEach(item => {
+        const custRefName = item.name.substring(0, 16).toUpperCase();
+        const amt = Math.round(item.totalWages);
+        const itemDateFormatted = item.paymentDate ? formatToDDMMYYYY(item.paymentDate) : formattedPaymentDate;
+
+        // Row 01 - Payment Line
+        sheetData.push([
+          "01", "CN", itemDateFormatted, custRefName, amt, debitingAcc,
+          item.idTypeDuitNow, item.ic, "MY", "To Saving Account",
+          item.bankCode, item.accNo, item.name, "Y", "", recipientRef,
+          creditDesc, "Y", item.idTypeBeneficiary, item.ic, "02"
+        ]);
+
+        // Row 02 - Payment Advice Line
+        sheetData.push([
+          "02", amt, custRefName, "kahyeel@mitec.com.my", "ulfaamran@mitec.com.my",
+          "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
+        ]);
+      });
+
+      // Build SheetJS Workbook
+      const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Payment");
+
+      // Trigger native .xlsx download
+      const filename = `MITEC_Bulk_DuitNow_Payment_${formattedPaymentDate || 'Batch'}.xlsx`;
+      XLSX.writeFile(workbook, filename);
+    }
+
+    // EXPORT FILTERED ATTENDANCE DATA TO CSV (TAB 1)
     function exportToCSV() {
       if (processedData.length === 0) {
         alert("No data available to export.");
@@ -808,7 +1202,7 @@
       const dateFrom = document.getElementById("filterDateFrom").value || 'start';
       const dateTo = document.getElementById("filterDateTo").value || 'end';
       const headers = [
-        "Timestamp", "SHIFT", "Email address", "Column 6", "VOUCHER", 
+        "Timestamp", "SHIFT", "Email address", "DOC NO", "VOUCHER", 
         "NAMA ( MENGIKUT IC)", "DEPARTMENT", "SIGN OUT", "IN", "OUT", 
         "HOURS", "RATE", "WAGES", "PROCESS DATE", "PAYMENT DATE", "REMARKS", "NOTES"
       ];
@@ -817,7 +1211,7 @@
         `"${row.timestamp || ''}"`,
         `"${row.shift || ''}"`,
         `"${row.email || ''}"`,
-        `"${row.column_6 || ''}"`,
+        `"${row.doc_no || row.column_6 || ''}"`,
         `"${row.voucher || ''}"`,
         `"${row.name || ''}"`,
         `"${row.department || ''}"`,
@@ -833,11 +1227,11 @@
         `"${row.notes || ''}"`
       ]);
 
-      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-      const encodedUri = encodeURI(csvContent);
+      const csvContent = "\uFEFF" + [headers.map(h => `"${h}"`).join(","), ...rows.map(e => e.join(","))].join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `MITEC_Attendance_${dateFrom}_to_${dateTo}.csv`);
+      link.href = URL.createObjectURL(blob);
+      link.download = `MITEC_Attendance_${dateFrom}_to_${dateTo}.csv`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
