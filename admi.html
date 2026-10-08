@@ -29,6 +29,7 @@
       --text-muted: #6e6e73;
       --success: #28a745;
       --warning: #ff9500;
+      --error: #dc3545;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -194,6 +195,31 @@
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      margin-bottom: 24px;
+    }
+
+    .table-card.risk-card {
+      border: 1px solid rgba(220, 53, 69, 0.4);
+    }
+
+    .table-header-title {
+      padding: 16px 20px;
+      font-size: 14px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-header-title.risk-header {
+      background: rgba(220, 53, 69, 0.05);
+      color: var(--error);
+    }
+
+    .table-header-title.success-header {
+      background: rgba(40, 167, 69, 0.05);
+      color: var(--success);
     }
 
     .table-wrapper { overflow-x: auto; max-height: 70vh; }
@@ -244,11 +270,18 @@
     tr:hover td { background: rgba(27, 54, 93, 0.03); }
 
     .tag-dept { background: rgba(15, 74, 130, 0.08); color: var(--mitec-accent); padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; }
+    .tag-rate { background: rgba(40, 167, 69, 0.08); color: var(--success); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; }
+    .tag-risk { background: rgba(220, 53, 69, 0.1); color: var(--error); padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; }
+
+    /* PIVOT TABLE STYLES */
+    tr.pivot-header-row td { background: rgba(27, 54, 93, 0.05); font-weight: 800; border-top: 2px solid var(--border); }
+    tr.pivot-subtotal-row td { background: #f8f9fa; font-weight: 800; border-top: 1px solid var(--border); border-bottom: 2px solid var(--border); }
+    tr.pivot-grandtotal-row td { background: var(--mitec-blue); color: #ffffff; font-weight: 900; font-size: 13px; }
 
     /* KPI CARDS (REPORTING TAB) */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
       margin-bottom: 24px;
     }
@@ -262,13 +295,14 @@
     }
 
     .kpi-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; }
-    .kpi-value { font-size: 28px; font-weight: 900; color: var(--mitec-blue); line-height: 1; }
+    .kpi-value { font-size: 26px; font-weight: 900; color: var(--mitec-blue); line-height: 1; }
     .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
 
     .charts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
       gap: 20px;
+      margin-bottom: 20px;
     }
 
     .chart-card {
@@ -279,7 +313,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
 
-    .chart-title { font-size: 15px; font-weight: 800; color: var(--mitec-blue); margin-bottom: 16px; }
+    .chart-title { font-size: 15px; font-weight: 800; color: var(--mitec-blue); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
 
     /* SPINNER & EMPTY STATE */
     .loading-state, .empty-state {
@@ -358,24 +392,13 @@
             <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Department Filter</label>
             <select id="filterDept" class="control-select" onchange="applyFiltersAndSort()">
               <option value="ALL">All Departments</option>
-              <option value="AV">AV</option>
-              <option value="CAT">CAT</option>
-              <option value="EXH">EXH</option>
-              <option value="FIN">FIN</option>
-              <option value="GCC">GCC</option>
-              <option value="GS">GS</option>
-              <option value="HK">HK</option>
-              <option value="HR">HR</option>
-              <option value="IT">IT</option>
-              <option value="KIT">KIT</option>
-              <option value="LINEN">LINEN</option>
-              <option value="OPERATION">OPERATION</option>
-              <option value="PUR">PUR</option>
-              <option value="QA">QA</option>
-              <option value="SC">SC</option>
-              <option value="SETUP">SETUP</option>
-              <option value="SH">SH</option>
-              <option value="STWD">STWD</option>
+            </select>
+          </div>
+          
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Shift Filter</label>
+            <select id="filterShift" class="control-select" onchange="applyFiltersAndSort()">
+              <option value="ALL">All Shifts</option>
             </select>
           </div>
 
@@ -385,8 +408,13 @@
           </div>
         </div>
 
-        <div class="filter-group" style="align-self: flex-end;">
-          <button class="btn-primary" onclick="exportToCSV()"><i class="ph-bold ph-download-simple"></i> Export Full CSV</button>
+        <div class="filter-group" style="align-self: flex-end; display: flex; gap: 8px;">
+          <button class="btn-secondary" style="height: 40px;" onclick="resetAllFilters()">
+            <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset Filters
+          </button>
+          <button class="btn-primary" onclick="exportToCSV()">
+            <i class="ph-bold ph-download-simple"></i> Export Full CSV
+          </button>
         </div>
       </div>
 
@@ -508,9 +536,46 @@
           <div class="kpi-value" id="kpiActiveDepts">0</div>
           <div class="kpi-sub">Deploying casual workforce</div>
         </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">Avg Shift Duration</div>
+          <div class="kpi-value" id="kpiAvgHours">0.0</div>
+          <div class="kpi-sub">Hours per shift</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">Avg Wage / Staff</div>
+          <div class="kpi-value" id="kpiAvgWage">RM 0.00</div>
+          <div class="kpi-sub">Payout per shift</div>
+        </div>
       </div>
 
-      <!-- REPORT BREAKDOWN TABLES -->
+      <!-- PIVOT TABLE SECTION: DEPARTMENT - RATE -->
+      <div class="charts-grid" style="grid-template-columns: 1fr;">
+        <div class="chart-card">
+          <div class="chart-title">
+            <span><i class="ph-bold ph-table"></i> Department & Pay Rate Breakdown (Pivot)</span>
+            <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Rows: Department — Hourly Rate | Values: Workers & Total Wages</span>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 40%;">Department / Hourly Rate</th>
+                  <th style="width: 20%;">Pay Rate</th>
+                  <th style="width: 20%;">Total Workers (Shifts)</th>
+                  <th style="width: 20%;">Total Wages (RM)</th>
+                </tr>
+              </thead>
+              <tbody id="pivotDeptRateTbody">
+                <tr><td colspan="4" class="empty-state">No pivot data generated yet. Select a valid date range.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORT BREAKDOWN TABLES (GRID 1: DEPT & SHIFT) -->
       <div class="charts-grid">
 
         <!-- DEPARTMENT SUMMARY -->
@@ -554,6 +619,53 @@
 
       </div>
 
+      <!-- REPORT BREAKDOWN TABLES (GRID 2: TOP EARNERS & LONGEST HOURS) -->
+      <div class="charts-grid">
+
+        <!-- TOP 5 EARNERS -->
+        <div class="chart-card">
+          <h3 class="chart-title">Top 5 Highest Paid Staff</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Shifts</th>
+                  <th>Total Wages (RM)</th>
+                </tr>
+              </thead>
+              <tbody id="topEarnersTbody">
+                <tr><td colspan="5" class="empty-state">No data available.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TOP 5 HOURS WORKED -->
+        <div class="chart-card">
+          <h3 class="chart-title">Top 5 Highest Hours Logged</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Shifts</th>
+                  <th>Total Hours</th>
+                </tr>
+              </thead>
+              <tbody id="topHoursTbody">
+                <tr><td colspan="5" class="empty-state">No data available.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
     </div>
 
     <!-- ================= TAB 3: BANK BULK PAYROLL ================= -->
@@ -568,7 +680,6 @@
           </div>
           <div>
             <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Payment Date Lookup</label>
-            <!-- DYNAMIC DROPDOWN FOR UNFILTERED PAYMENT_DATE -->
             <select id="bankPaymentDate" class="control-select" onchange="renderBankPayroll()">
               <option value="ALL">All Payment Dates</option>
             </select>
@@ -584,26 +695,64 @@
         </div>
 
         <div class="filter-group" style="align-self: flex-end;">
-          <button class="btn-success" onclick="exportBankFile()"><i class="ph-bold ph-file-arrow-down"></i> Download Bulk DuitNow (.xlsx)</button>
+          <button class="btn-success" onclick="exportBankFile()"><i class="ph-bold ph-file-arrow-down"></i> Download Verified DuitNow Batch (.xlsx)</button>
         </div>
       </div>
 
       <!-- PAYROLL SUMMARY CARDS -->
       <div class="kpi-grid">
         <div class="kpi-card">
-          <div class="kpi-title">Unique Payees</div>
-          <div class="kpi-value" id="bankPayeeCount">0</div>
-          <div class="kpi-sub">Consolidated workers</div>
+          <div class="kpi-title">Verified Payees</div>
+          <div class="kpi-value" id="bankPayeeCount" style="color:var(--success)">0</div>
+          <div class="kpi-sub">Ready for payment</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-title">Total Batch Payout</div>
+          <div class="kpi-title">High Risk / Incomplete Payees</div>
+          <div class="kpi-value" id="bankRiskCount" style="color:var(--error)">0</div>
+          <div class="kpi-sub">Action required</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Verified Batch Payout</div>
           <div class="kpi-value" id="bankTotalPayout" style="color:var(--success)">RM 0.00</div>
-          <div class="kpi-sub">Sum of aggregated wages</div>
+          <div class="kpi-sub">Sum of verified wages</div>
         </div>
       </div>
 
-      <!-- CONSOLIDATED PAYROLL PREVIEW TABLE -->
+      <!-- TABLE 1: INCOMPLETE / HIGH RISK FOR REJECTION -->
+      <div class="table-card risk-card">
+        <div class="table-header-title risk-header">
+          <span><i class="ph-bold ph-warning-octagon"></i> Table 1: Incomplete / High Risk for Rejection</span>
+          <span style="font-size: 11px; font-weight: 600;">Excluded from automated bulk payout file</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Beneficiary Name</th>
+                <th>Rejection Risk / Missing Info</th>
+                <th>Bank Provided</th>
+                <th>Beneficiary Acc No</th>
+                <th>ID Number</th>
+                <th>Total Shifts</th>
+                <th>Pending Wages (RM)</th>
+              </tr>
+            </thead>
+            <tbody id="bankPayrollRiskTbody">
+              <tr>
+                <td colspan="8" class="empty-state">No high-risk records found. All payees are verified.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TABLE 2: COMPLETE / NO RISK FOR PAYMENT EXECUTION -->
       <div class="table-card">
+        <div class="table-header-title success-header">
+          <span><i class="ph-bold ph-check-circle"></i> Table 2: Verified Payees (Ready for DuitNow Batch)</span>
+          <span style="font-size: 11px; font-weight: 600;">Included in downloadable .xlsx file</span>
+        </div>
         <div class="table-wrapper">
           <table>
             <thead>
@@ -638,36 +787,102 @@
     let supabaseClient = null;
 
     let rawAttendanceData = [];
-    let labourProfilesMap = new Map(); // Maps profile info by doc, ic, email, name
+    let labourProfilesMap = new Map();
     let processedData = [];
     let aggregatedBankData = [];
+    let highRiskBankData = [];
     let sortState = { column: 'timestamp', ascending: false };
 
-    // Bank BIC Mapping
+    // COMPREHENSIVE MALAYSIAN BANK & E-WALLET BIC / DUITNOW MAPPING
     const BANK_BIC_MAP = {
+      // --- Retail & Commercial Banks ---
       'maybank': 'MBBEMYKL',
+      'malayan banking': 'MBBEMYKL',
       'cimb': 'CIBBMYKL',
       'public bank': 'PBBEMYKL',
       'rhb': 'RHBBMYKL',
+      'rhb银行': 'RHBBMYKL',
       'hong leong': 'HLBBMYKL',
       'ambank': 'ARBKMYKL',
       'bank islam': 'BIMBMYKL',
       'bank rakyat': 'BKRMMYKL',
+      'kerjasama rakyat': 'BKRMMYKL',
       'bsn': 'BSNAMYK1',
       'bank simpanan nasional': 'BSNAMYK1',
       'uob': 'UOVBMYKL',
+      'united overseas bank': 'UOVBMYKL',
       'ocbc': 'OCBCMYKL',
       'hsbc': 'HBMBMYKL',
-      'touch n go': 'TNGDMYNB',
-      'tng': 'TNGDMYNB',
-      'touch \'n go': 'TNGDMYNB',
-      'gxbank': 'GXSPMYKL',
       'affin': 'PHBMMYKL',
       'agrobank': 'AGOBMYKL',
       'alliance': 'MFBBMYKL',
       'muamalat': 'BMMBMYKL',
       'mbsb': 'AFBQMYKL',
-      'grabpay': 'GRABMYNB'
+      'standard chartered': 'SCBLMYKX',
+      'al-rajhi': 'RJHIMYKL',
+      'al rajhi': 'RJHIMYKL',
+      'citibank': 'CITIMYKL',
+      'kuwait finance': 'KFHOMYKL',
+      'bank of china': 'BKCHMYKL',
+      'bank of tokyo': 'BOTKMYKX',
+      'mizuho': 'MHCBMYKA',
+      'icbc': 'ICBKMYKL',
+      'ccb': 'PCBCMYKL',
+      'china construction': 'PCBCMYKL',
+      'deutsche bank': 'DEUTMYKL',
+      'bnp paribas': 'BNPAMYKL',
+      'bank of america': 'BOFAMY2X',
+      'jp morgan': 'CHASMYKX',
+      'kaf investment': 'KAFBMYK2',
+
+      // --- Licensed Digital Banks ---
+      'gxbank': 'GXSPMYKL',
+      'gx bank': 'GXSPMYKL',
+      'aeon bank': 'ACDBMYK2',
+      'aeon': 'ACDBMYK2',
+      'boost bank': 'BOBEMYK2',
+
+      // --- E-Wallets & E-Money Providers ---
+      'touch n go': 'TNGDMYNB',
+      'touch \'n go': 'TNGDMYNB',
+      'touch n go ewallet': 'TNGDMYNB',
+      'tng': 'TNGDMYNB',
+      'tngo': 'TNGDMYNB',
+      'dompet elektronik touch n go': 'TNGDMYNB',
+      'edompet touch n go': 'TNGDMYNB',
+      
+      'shopee': 'ARPYMYNB',
+      'shopeepay': 'ARPYMYNB',
+      'seamoney': 'SCCHMYKL',
+
+      'grabpay': 'GRABMYNB',
+      'grab': 'GRABMYNB',
+
+      'boost': 'BOSTMYNB',
+      'boostconnect': 'BCNTMYNB',
+
+      'bigpay': 'BGPYMYNB',
+      'instapay': 'INSTMYNB',
+      'merchantrade': 'MASBMYNB',
+      'merchanttrade': 'MASBMYNB',
+      
+      'payex': 'PAYXMYNBP',
+      'setel': 'SVSBMYNB',
+      'razer': 'RZMSMYNB',
+      'ipay88': 'IPAYMYNB',
+      'fave': 'FAVEMYNB',
+      'kiplepay': 'KPLPMYNB',
+      'curlec': 'CRLCMYNB',
+      'stripe': 'STRPMYNB',
+      'beezfintech': 'BEEZMYNB',
+      'fasspay': 'FSPYMYNB',
+      'finexus': 'FNXSMYNB',
+      'ghl': 'GHLCMYNB',
+      'global payments': 'GLPYMYNB',
+      'mobilityone': 'MBLOMYNB',
+      'pidm': 'PIDMMYNB',
+      'revenue': 'RSSBMYNB',
+      'siliconnet': 'SPAYMYNB'
     };
 
     function getSupabase() {
@@ -679,6 +894,22 @@
         }
       }
       return supabaseClient;
+    }
+
+    // FORMAT TIMESTAMP TO dd/mm/yyyy HH:mm:ss
+    function formatTimestamp(tsStr) {
+      if (!tsStr) return '-';
+      const d = new Date(tsStr);
+      if (isNaN(d.getTime())) return tsStr;
+
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+
+      return `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
     }
 
     // TAB SWITCHING LOGIC
@@ -714,6 +945,71 @@
       return String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase().trim();
     }
 
+    // DYNAMICALLY POPULATE SHIFT DROPDOWN
+    function populateShiftDropdown() {
+      const dropdown = document.getElementById("filterShift");
+      if (!dropdown) return;
+
+      const currentSelected = dropdown.value;
+      const shiftSet = new Set();
+
+      rawAttendanceData.forEach(row => {
+        const shiftVal = String(row.shift || '').trim();
+        if (shiftVal && shiftVal !== '-') {
+          const parts = shiftVal.split(':');
+          if (parts.length >= 2) {
+            const hh = parts[0].padStart(2, '0');
+            const mm = parts[1].padStart(2, '0');
+            shiftSet.add(`${hh}:${mm}`);
+          } else {
+            shiftSet.add(shiftVal);
+          }
+        }
+      });
+
+      const sortedShifts = Array.from(shiftSet).sort((a, b) => a.localeCompare(b));
+
+      let optionsHTML = `<option value="ALL">All Shifts</option>`;
+      sortedShifts.forEach(shift => {
+        optionsHTML += `<option value="${shift}">${shift}</option>`;
+      });
+
+      dropdown.innerHTML = optionsHTML;
+
+      if (currentSelected && (sortedShifts.includes(currentSelected) || currentSelected === 'ALL')) {
+        dropdown.value = currentSelected;
+      }
+    }
+
+    // DYNAMICALLY POPULATE DEPARTMENT DROPDOWN
+    function populateDeptDropdown() {
+      const dropdown = document.getElementById("filterDept");
+      if (!dropdown) return;
+
+      const currentSelected = dropdown.value;
+      const deptSet = new Set();
+
+      rawAttendanceData.forEach(row => {
+        const deptVal = String(row.department || '').trim().toUpperCase();
+        if (deptVal && deptVal !== '-' && deptVal !== 'NULL' && deptVal !== 'UNDEFINED') {
+          deptSet.add(deptVal);
+        }
+      });
+
+      const sortedDepts = Array.from(deptSet).sort((a, b) => a.localeCompare(b));
+
+      let optionsHTML = `<option value="ALL">All Departments</option>`;
+      sortedDepts.forEach(dept => {
+        optionsHTML += `<option value="${dept}">${dept}</option>`;
+      });
+
+      dropdown.innerHTML = optionsHTML;
+
+      if (currentSelected && (sortedDepts.includes(currentSelected) || currentSelected === 'ALL')) {
+        dropdown.value = currentSelected;
+      }
+    }
+
     // FETCH ALL RAW ATTENDANCE RECORDS & CASUAL LABOUR PROFILES
     async function fetchLiveAttendance() {
       const tbody = document.getElementById("attendanceTbody");
@@ -722,7 +1018,6 @@
       try {
         const client = getSupabase();
         
-        // Concurrent fetch of attendance records and profile table
         const [attendanceRes, profileRes] = await Promise.all([
           client.from('attendance_records').select('*').order('timestamp', { ascending: false }),
           client.from('casual_labour_profile').select('*')
@@ -731,7 +1026,6 @@
         if (attendanceRes.error) throw attendanceRes.error;
         rawAttendanceData = attendanceRes.data || [];
 
-        // Build comprehensive profile map with multiple keys
         labourProfilesMap.clear();
         if (profileRes.data && !profileRes.error) {
           profileRes.data.forEach(p => {
@@ -747,11 +1041,33 @@
           });
         }
 
+        populateShiftDropdown();
+        populateDeptDropdown();
+
         applyFiltersAndSort();
       } catch (err) {
         console.error("Error fetching data:", err);
         tbody.innerHTML = `<tr><td colspan="17" class="empty-state" style="color:var(--error)">Failed to fetch records: ${err.message}</td></tr>`;
       }
+    }
+
+    // RESET ALL FILTERS
+    function resetAllFilters() {
+      initDateFilters();
+
+      const filterDept = document.getElementById("filterDept");
+      if (filterDept) filterDept.value = "ALL";
+
+      const filterShift = document.getElementById("filterShift");
+      if (filterShift) filterShift.value = "ALL";
+
+      const globalSearch = document.getElementById("globalSearch");
+      if (globalSearch) globalSearch.value = "";
+
+      const colInputs = document.querySelectorAll('.col-filter-input');
+      colInputs.forEach(input => { input.value = ""; });
+
+      applyFiltersAndSort();
     }
 
     // COLUMN SORTING LOGIC FOR TAB 1
@@ -769,6 +1085,7 @@
     function applyFiltersAndSort() {
       const globalQuery = document.getElementById("globalSearch").value.toLowerCase().trim();
       const deptFilter = document.getElementById("filterDept").value;
+      const shiftFilter = document.getElementById("filterShift").value;
       const dateFrom = document.getElementById("filterDateFrom").value;
       const dateTo = document.getElementById("filterDateTo").value;
 
@@ -801,6 +1118,15 @@
 
         // Department Filter
         if (deptFilter !== 'ALL' && (row.department || '').toUpperCase() !== deptFilter) return false;
+
+        // Shift Filter
+        if (shiftFilter !== 'ALL') {
+          const rowShift = String(row.shift || '').trim();
+          const normRow = rowShift.split(':').slice(0, 2).join(':');
+          const normFilter = shiftFilter.split(':').slice(0, 2).join(':');
+
+          if (normRow !== normFilter) return false;
+        }
 
         // Global Search Filter
         if (globalQuery) {
@@ -854,7 +1180,7 @@
       tbody.innerHTML = processedData.map(row => {
         return `
           <tr>
-            <td>${row.timestamp ? new Date(row.timestamp).toLocaleString() : '-'}</td>
+            <td>${formatTimestamp(row.timestamp)}</td>
             <td><strong>${row.shift || '-'}</strong></td>
             <td>${row.email || '-'}</td>
             <td>${row.doc_no || row.column_6 || '-'}</td>
@@ -886,10 +1212,17 @@
       const deptHours = {};
       const deptWages = {};
       const shiftCounts = {};
+      const staffAggMap = new Map();
+
+      // PIVOT TABLE DATA MAP: Dept -> Rate -> { workers, wages }
+      const pivotMap = new Map();
 
       processedData.forEach(row => {
         const hrs = parseFloat(row.hours) || 0;
-        const wage = parseFloat(row.wages) || (hrs * (parseFloat(row.rate) || 12));
+        const rate = parseFloat(row.rate) || 12;
+        const wage = parseFloat(row.wages) || (hrs * rate);
+        const dept = (row.department || 'UNASSIGNED').toUpperCase().trim();
+
         totalHours += hrs;
         totalWages += wage;
 
@@ -903,13 +1236,115 @@
         if (row.shift) {
           shiftCounts[row.shift] = (shiftCounts[row.shift] || 0) + 1;
         }
+
+        // Aggregate individual worker metrics
+        const sName = (row.name || 'UNKNOWN').trim().toUpperCase();
+        const sKey = sName.toLowerCase();
+        if (!staffAggMap.has(sKey)) {
+          staffAggMap.set(sKey, {
+            name: sName,
+            dept: row.department || '-',
+            shifts: 0,
+            hours: 0,
+            wages: 0
+          });
+        }
+        const sData = staffAggMap.get(sKey);
+        sData.shifts += 1;
+        sData.hours += hrs;
+        sData.wages += wage;
+
+        // Populate Pivot Map: Dept -> Rate
+        if (!pivotMap.has(dept)) {
+          pivotMap.set(dept, new Map());
+        }
+        const rateMap = pivotMap.get(dept);
+        const rateKey = rate.toFixed(2);
+        if (!rateMap.has(rateKey)) {
+          rateMap.set(rateKey, { workers: 0, wages: 0 });
+        }
+        const pCell = rateMap.get(rateKey);
+        pCell.workers += 1;
+        pCell.wages += wage;
       });
+
+      // KPI CARDS
+      const avgHours = totalStaff > 0 ? (totalHours / totalStaff).toFixed(1) : "0.0";
+      const avgWage = totalStaff > 0 ? (totalWages / totalStaff).toFixed(2) : "0.00";
 
       document.getElementById("kpiTotalStaff").textContent = totalStaff;
       document.getElementById("kpiTotalHours").textContent = totalHours.toFixed(1);
       document.getElementById("kpiTotalWages").textContent = `RM ${totalWages.toFixed(2)}`;
       document.getElementById("kpiActiveDepts").textContent = activeDepts.size;
+      document.getElementById("kpiAvgHours").textContent = `${avgHours} hrs`;
+      document.getElementById("kpiAvgWage").textContent = `RM ${avgWage}`;
 
+      // RENDER PIVOT TABLE (DEPARTMENT - RATE)
+      const pivotTbody = document.getElementById("pivotDeptRateTbody");
+      if (pivotMap.size === 0) {
+        pivotTbody.innerHTML = `<tr><td colspan="4" class="empty-state">No matching data to build pivot table.</td></tr>`;
+      } else {
+        let pivotHTML = '';
+        let grandWorkers = 0;
+        let grandWages = 0;
+
+        const sortedDepts = Array.from(pivotMap.keys()).sort();
+
+        sortedDepts.forEach(dept => {
+          const rateMap = pivotMap.get(dept);
+          const sortedRates = Array.from(rateMap.keys()).sort((a, b) => parseFloat(a) - parseFloat(b));
+
+          let deptWorkersSubtotal = 0;
+          let deptWagesSubtotal = 0;
+
+          // Department Group Header Row
+          pivotHTML += `
+            <tr class="pivot-header-row">
+              <td colspan="4"><span class="tag-dept">${dept}</span></td>
+            </tr>
+          `;
+
+          // Rate Sub-Rows
+          sortedRates.forEach(rateKey => {
+            const data = rateMap.get(rateKey);
+            deptWorkersSubtotal += data.workers;
+            deptWagesSubtotal += data.wages;
+            grandWorkers += data.workers;
+            grandWages += data.wages;
+
+            pivotHTML += `
+              <tr>
+                <td style="padding-left: 28px;">↳ ${dept} (RM ${rateKey}/hr)</td>
+                <td><span class="tag-rate">RM ${rateKey}/hr</span></td>
+                <td><strong>${data.workers}</strong> worker(s)</td>
+                <td><strong>RM ${data.wages.toFixed(2)}</strong></td>
+              </tr>
+            `;
+          });
+
+          // Department Subtotal Row
+          pivotHTML += `
+            <tr class="pivot-subtotal-row">
+              <td colspan="2" style="text-align: right;">${dept} Subtotal:</td>
+              <td>${deptWorkersSubtotal} worker(s)</td>
+              <td>RM ${deptWagesSubtotal.toFixed(2)}</td>
+            </tr>
+          `;
+        });
+
+        // Grand Total Row
+        pivotHTML += `
+          <tr class="pivot-grandtotal-row">
+            <td colspan="2" style="text-align: right;">GRAND TOTAL:</td>
+            <td>${grandWorkers} worker(s)</td>
+            <td>RM ${grandWages.toFixed(2)}</td>
+          </tr>
+        `;
+
+        pivotTbody.innerHTML = pivotHTML;
+      }
+
+      // DEPARTMENT SUMMARY TABLE
       const deptTbody = document.getElementById("deptSummaryTbody");
       const deptKeys = Object.keys(deptCounts);
 
@@ -926,6 +1361,7 @@
         `).join('');
       }
 
+      // SHIFT SUMMARY TABLE
       const shiftTbody = document.getElementById("shiftSummaryTbody");
       const shiftKeys = Object.keys(shiftCounts);
 
@@ -944,16 +1380,53 @@
           `;
         }).join('');
       }
+
+      // TOP 5 EARNERS TABLE
+      const staffList = Array.from(staffAggMap.values());
+      const topEarners = [...staffList].sort((a, b) => b.wages - a.wages).slice(0, 5);
+      const topEarnersTbody = document.getElementById("topEarnersTbody");
+
+      if (topEarners.length === 0) {
+        topEarnersTbody.innerHTML = `<tr><td colspan="5" class="empty-state">No earner records available.</td></tr>`;
+      } else {
+        topEarnersTbody.innerHTML = topEarners.map((item, idx) => `
+          <tr>
+            <td><strong>${idx + 1}</strong></td>
+            <td><strong>${item.name}</strong></td>
+            <td><span class="tag-dept">${item.dept}</span></td>
+            <td>${item.shifts} shift(s)</td>
+            <td><strong style="color:var(--success)">RM ${item.wages.toFixed(2)}</strong></td>
+          </tr>
+        `).join('');
+      }
+
+      // TOP 5 HOURS WORKED TABLE
+      const topHours = [...staffList].sort((a, b) => b.hours - a.hours).slice(0, 5);
+      const topHoursTbody = document.getElementById("topHoursTbody");
+
+      if (topHours.length === 0) {
+        topHoursTbody.innerHTML = `<tr><td colspan="5" class="empty-state">No hours records available.</td></tr>`;
+      } else {
+        topHoursTbody.innerHTML = topHours.map((item, idx) => `
+          <tr>
+            <td><strong>${idx + 1}</strong></td>
+            <td><strong>${item.name}</strong></td>
+            <td><span class="tag-dept">${item.dept}</span></td>
+            <td>${item.shifts} shift(s)</td>
+            <td><strong>${item.hours.toFixed(1)} hrs</strong></td>
+          </tr>
+        `).join('');
+      }
     }
 
     // HELPER: DERIVE BIC FROM BANK NAME
     function getBankBic(bankRaw) {
-      if (!bankRaw) return 'MBBEMYKL';
+      if (!bankRaw) return '';
       const clean = String(bankRaw).toLowerCase().trim();
       for (const [key, bic] of Object.entries(BANK_BIC_MAP)) {
         if (clean.includes(key)) return bic;
       }
-      return 'MBBEMYKL';
+      return '';
     }
 
     // FORMAT DATE TO DDMMYYYY FOR DUITNOW / MAYBANK SPEC
@@ -1001,7 +1474,7 @@
       }
     }
 
-    // TAB 3 PAYROLL AGGREGATION
+    // TAB 3 PAYROLL AGGREGATION & DUAL-TABLE RISK AUDIT
     function renderBankPayroll() {
       const selectedPaymentDate = document.getElementById("bankPaymentDate")?.value || 'ALL';
       const payeesMap = new Map();
@@ -1020,19 +1493,14 @@
         const rowIc = cleanKey(row.ic_number || row.ic_no || row.ic);
         const rowName = cleanKey(row.name);
         
-        // Multi-level lookup against profile map
         const profile = labourProfilesMap.get(`doc:${rowDoc}`) || 
                         labourProfilesMap.get(`ic:${rowIc}`) || 
                         labourProfilesMap.get(`email:${rowEmail}`) || 
                         labourProfilesMap.get(`name:${rowName}`) || {};
 
-        // Name lookup
         const finalName = (profile.full_name || profile.name || row.name || 'UNKNOWN').trim().toUpperCase();
-        
-        // Bank name lookup
         const finalBank = profile.bank_name || profile.bank || row.bank_name || row.bank || '';
         
-        // EXACT BRACKET NOTATION FOR Column 19
         const rawAccNo = profile["Column 19"] ?? 
                          profile["column_19"] ?? 
                          profile["Column_19"] ?? 
@@ -1048,9 +1516,8 @@
                          
         const finalAccNo = String(rawAccNo).replace(/\D/g, '');
 
-        // ID TYPE & DOC NO LOOKUP
         const finalDocType = String(profile.doc_type || profile.id_type || row.id_type || '');
-        const rawDocNo = String(profile.doc_no || profile.ic_number || profile.ic_no || row.doc_no || row.column_6 || '900101015000');
+        const rawDocNo = String(profile.doc_no || profile.ic_number || profile.ic_no || row.doc_no || row.column_6 || '');
         const finalDocNo = rawDocNo.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
         const hrs = parseFloat(row.hours) || 0;
@@ -1058,21 +1525,32 @@
         
         const isPassport = finalDocType.toLowerCase().includes('passport') || (finalDocNo.length < 12 && /[a-zA-Z]/.test(finalDocNo));
 
+        const derivedBic = getBankBic(finalBank);
+
+        // RISK AUDIT: Identify Missing / Invalid Data
+        const riskReasons = [];
+        if (!finalAccNo || finalAccNo.length < 5) riskReasons.push("Missing Bank Account No");
+        if (!finalDocNo || finalDocNo.length < 5) riskReasons.push("Missing IC / Document No");
+        if (!derivedBic) riskReasons.push(`Unrecognized Bank (${finalBank || 'None'})`);
+
         const key = (rowEmail || finalName || 'UNKNOWN').toLowerCase();
 
         if (!payeesMap.has(key)) {
           payeesMap.set(key, {
             name: finalName,
             email: rowEmail,
-            ic: finalDocNo,
+            ic: finalDocNo || 'MISSING IC',
             idTypeDuitNow: isPassport ? 'Passport Number' : 'NRIC (New)',
             idTypeBeneficiary: isPassport ? 'Police/Army/Others' : 'New IC Number',
-            bankCode: getBankBic(finalBank),
+            rawBank: finalBank || 'NOT PROVIDED',
+            bankCode: derivedBic || 'UNKNOWN_BIC',
             accNo: finalAccNo,
             paymentDate: row.payment_date || '',
             totalShifts: 0,
             totalHours: 0,
-            totalWages: 0
+            totalWages: 0,
+            riskReasons: riskReasons,
+            isHighRisk: riskReasons.length > 0
           });
         }
 
@@ -1082,16 +1560,36 @@
         payee.totalWages += wage;
       });
 
-      // Convert map to array and SORT ALPHABETICALLY BY BENEFICIARY NAME (A-Z)
-      aggregatedBankData = Array.from(payeesMap.values()).sort((a, b) => {
-        return a.name.localeCompare(b.name);
-      });
+      // SPLIT INTO HIGH RISK VS VERIFIED DATA ARRAYS
+      const allPayees = Array.from(payeesMap.values());
+      highRiskBankData = allPayees.filter(p => p.isHighRisk).sort((a, b) => a.name.localeCompare(b.name));
+      aggregatedBankData = allPayees.filter(p => !p.isHighRisk).sort((a, b) => a.name.localeCompare(b.name));
 
+      // RENDER TABLE 1: HIGH RISK / INCOMPLETE
+      const riskTbody = document.getElementById("bankPayrollRiskTbody");
+      if (highRiskBankData.length === 0) {
+        riskTbody.innerHTML = `<tr><td colspan="8" class="empty-state" style="color:var(--success)"><i class="ph-bold ph-check-circle"></i> Zero high-risk payees! All accounts are verified and ready for payment.</td></tr>`;
+      } else {
+        riskTbody.innerHTML = highRiskBankData.map((item, idx) => `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><strong>${item.name}</strong></td>
+            <td>${item.riskReasons.map(r => `<span class="tag-risk"><i class="ph-bold ph-warning"></i> ${r}</span>`).join(' ')}</td>
+            <td>${item.rawBank}</td>
+            <td><strong style="color:${item.accNo ? 'inherit' : 'var(--error)'}">${item.accNo || 'MISSING'}</strong></td>
+            <td>${item.ic}</td>
+            <td>${item.totalShifts} shift(s)</td>
+            <td><strong style="color:var(--error)">RM ${item.totalWages.toFixed(2)}</strong></td>
+          </tr>
+        `).join('');
+      }
+
+      // RENDER TABLE 2: VERIFIED / READY
       const tbody = document.getElementById("bankPayrollTbody");
       let grandTotalPayout = 0;
 
       if (aggregatedBankData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="empty-state">No payroll records found for selected Payment Date.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="empty-state">No verified payroll records found for selected Payment Date.</td></tr>`;
       } else {
         tbody.innerHTML = aggregatedBankData.map((item, idx) => {
           grandTotalPayout += item.totalWages;
@@ -1100,7 +1598,7 @@
               <td>${idx + 1}</td>
               <td><strong>${item.name}</strong></td>
               <td><code>${item.bankCode}</code></td>
-              <td><strong>${item.accNo || '-'}</strong></td>
+              <td><strong>${item.accNo}</strong></td>
               <td>${item.idTypeDuitNow}</td>
               <td>${item.ic}</td>
               <td>${item.totalShifts} shift(s)</td>
@@ -1112,13 +1610,14 @@
       }
 
       document.getElementById("bankPayeeCount").textContent = aggregatedBankData.length;
+      document.getElementById("bankRiskCount").textContent = highRiskBankData.length;
       document.getElementById("bankTotalPayout").textContent = `RM ${grandTotalPayout.toFixed(2)}`;
     }
 
-    // EXPORT TRUE BINARY XLSX FILE (COMPATIBLE WITH EXCEL MOBILE & DESKTOP)
+    // EXPORT VERIFIED BINARY XLSX FILE (EXCLUDES HIGH RISK RECORDS)
     function exportBankFile() {
       if (aggregatedBankData.length === 0) {
-        alert("No aggregated payroll records to export.");
+        alert("No verified payroll records available to export. Please resolve high-risk payees or select a valid payment date.");
         return;
       }
 
@@ -1164,7 +1663,7 @@
 
       aggregatedBankData.forEach(item => {
         const custRefName = item.name.substring(0, 16).toUpperCase();
-        const amt = Math.round(item.totalWages);
+        const amt = item.totalWages.toFixed(2);
         const itemDateFormatted = item.paymentDate ? formatToDDMMYYYY(item.paymentDate) : formattedPaymentDate;
 
         // Row 01 - Payment Line
@@ -1182,13 +1681,11 @@
         ]);
       });
 
-      // Build SheetJS Workbook
       const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Payment");
 
-      // Trigger native .xlsx download
-      const filename = `MITEC_Bulk_DuitNow_Payment_${formattedPaymentDate || 'Batch'}.xlsx`;
+      const filename = `MITEC_Bulk_DuitNow_Verified_${formattedPaymentDate || 'Batch'}.xlsx`;
       XLSX.writeFile(workbook, filename);
     }
 
@@ -1208,7 +1705,7 @@
       ];
 
       const rows = processedData.map(row => [
-        `"${row.timestamp || ''}"`,
+        `"${formatTimestamp(row.timestamp)}"`,
         `"${row.shift || ''}"`,
         `"${row.email || ''}"`,
         `"${row.doc_no || row.column_6 || ''}"`,
