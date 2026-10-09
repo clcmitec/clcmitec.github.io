@@ -821,8 +821,10 @@
   </div>
 
   <script>
-  // 🔗 Updated Live Web App Deployment URL
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyBP0-dwtWZV-bxbg12bYTIUvkoBtdwnzjKFIj8hSc1my2g0gUHQ-xD2vW_rb8KT4JJSw/exec";
+  // 🔗 DIRECT SUPABASE CONFIGURATION
+  const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+  const SUPABASE_TABLE = "casual_labour_profile";
 
   const form = document.getElementById("appForm");
   const steps = Array.from(document.querySelectorAll(".step"));
@@ -979,9 +981,9 @@
     if (mode === "update") {
       docNumber.readOnly = true;
       if (docLockedHint) docLockedHint.classList.add("show");
-      icCopy.setAttribute("required", "required");
-      document.getElementById("icCopyHint").textContent = "Document upload required for profile update.";
-      cameraMetaText.textContent = "Live capture required for profile update.";
+      icCopy.removeAttribute("required");
+      document.getElementById("icCopyHint").textContent = "Optional for profile update.";
+      cameraMetaText.textContent = "Live capture optional for profile update.";
     } else {
       docNumber.readOnly = false;
       if (docLockedHint) docLockedHint.classList.remove("show");
@@ -1006,24 +1008,24 @@
 
   function fillRecord(record) {
     if (!record) return;
-    if (record.nama_mykad || record.name_mykad) {
-      document.getElementById("nameMykad").value = String(record.nama_mykad || record.name_mykad).toUpperCase();
+    if (record.name_mykad) {
+      document.getElementById("nameMykad").value = String(record.name_mykad).toUpperCase();
     }
     if (record.phone) document.getElementById("phoneNumber").value = normalizeDigitsOnly(record.phone);
     if (record.email) document.getElementById("email").value = record.email;
-    if (record.mykad_passport_no) document.getElementById("docNumber").value = record.mykad_passport_no;
+    if (record.doc_no) document.getElementById("docNumber").value = record.doc_no;
     if (record.alamat) document.getElementById("alamat").value = record.alamat;
     if (record.gender) fillRadio("gender", record.gender);
     if (record.status_perkahwinan) fillRadio("status_perkahwinan", record.status_perkahwinan);
     if (record.nama_waris) document.getElementById("namaWaris").value = String(record.nama_waris).toUpperCase();
     if (record.hubungan) document.getElementById("hubungan").value = String(record.hubungan).toUpperCase();
     if (record.emergency_no) document.getElementById("emergencyNumber").value = normalizeDigitsOnly(record.emergency_no);
-    if (record.kemahiran || record.kebolehan) {
-      document.getElementById("kebolehan").value = record.kemahiran || record.kebolehan;
+    if (record.kebolehan) {
+      document.getElementById("kebolehan").value = record.kebolehan;
     }
     if (record.bank) document.getElementById("bank").value = record.bank;
-    if (record.account_no) document.getElementById("accountNo").value = record.account_no;
-    if (record.account_name) document.getElementById("accountName").value = String(record.account_name).toUpperCase();
+    if (record["Column 19"]) document.getElementById("accountNo").value = record["Column 19"];
+    if (record["Column 20"]) document.getElementById("accountName").value = String(record["Column 20"]).toUpperCase();
 
     if (record.doc_type) {
       fillRadio("doc_type", record.doc_type);
@@ -1053,8 +1055,8 @@
     const photo = document.getElementById("lookupPreviewPhoto");
     if (!card) return;
 
-    document.getElementById("previewName").textContent = record?.nama_mykad || record?.name_mykad || record?.full_name || "-";
-    document.getElementById("previewDocNo").textContent = record?.mykad_passport_no || "-";
+    document.getElementById("previewName").textContent = record?.name_mykad || "-";
+    document.getElementById("previewDocNo").textContent = record?.doc_no || "-";
 
     if (record?.photo_link) {
       photo.src = record.photo_link;
@@ -1080,24 +1082,28 @@
     hideLookupPreview();
 
     try {
-      const url = `${WEB_APP_URL}?action=get_full_profile&doc_no=${encodeURIComponent(docNo)}`;
-      const res = await fetch(url);
-      const result = await res.json();
+      const fetchUrl = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?doc_no=eq.${encodeURIComponent(docNo)}&select=*`;
+      const res = await fetch(fetchUrl, {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      });
+      const data = await res.json();
 
       document.getElementById("docNumber").value = docNo;
 
-      if (result.ok && result.record) {
-        globalCachedRecord = result.record;
-        fillRecord(result.record);
+      if (data && data.length > 0) {
+        globalCachedRecord = data[0];
+        fillRecord(globalCachedRecord);
         applyEntryMode("update");
-        existingRow.value = "";
-        showLookupPreview(result.record);
+        showLookupPreview(globalCachedRecord);
         setLookupStatus("Profile verified. Initializing update protocol.", true);
       } else {
         globalCachedRecord = null;
         clearFormFieldsForCreate();
         applyEntryMode("create");
-        existingRow.value = "";
         hideLookupPreview();
         setLookupStatus("No profile detected. Initializing new registry protocol.");
       }
@@ -1134,8 +1140,10 @@
       const hint = field.parentElement?.querySelector(".hint") || field.nextElementSibling;
       if (field.type === "file") {
         if (!field.files || !field.files.length) {
-          ok = false;
-          showHint(hint, true);
+          if (formMode.value === "create") {
+            ok = false;
+            showHint(hint, true);
+          }
         }
         return;
       }
@@ -1183,7 +1191,7 @@
         showHint(document.getElementById("docHint"), true);
       }
 
-      if (!capturedPhotoData.value) {
+      if (formMode.value === "create" && !capturedPhotoData.value) {
         ok = false;
         showHint(gambarHint, true);
       }
@@ -1294,7 +1302,7 @@
   }
 
   function checkedText(name) {
-    return document.querySelector(`input[name="${name}"]:checked`)?.value || "-";
+    return document.querySelector(`input[name="${name}"]:checked`)?.value || null;
   }
 
   function buildSummary() {
@@ -1383,42 +1391,39 @@
     if (icFile && icFile.size > MAX_SIZE) throw new Error("Document scan exceeds 5MB limit.");
 
     const payload = {
-      mode: formMode.value, // Added for dual-compatibility
-      form_mode: formMode.value,
-      existing_row: existingRow.value,
+      doc_no: safeVal("docNumber"),
+      timestamp: new Date().toISOString(),
       name_mykad: safeVal("nameMykad"),
       phone: safeVal("phoneNumber"),
       email: safeVal("email"),
       doc_type: checkedText("doc_type"),
-      mykad_passport_no: safeVal("docNumber"),
       alamat: safeVal("alamat"),
       gender: checkedText("gender"),
       status_perkahwinan: checkedText("status_perkahwinan"),
       nama_waris: safeVal("namaWaris"),
       hubungan: safeVal("hubungan"),
       emergency_no: safeVal("emergencyNumber"),
-      kemahiran: safeVal("kebolehan"), // Mapped directly to Google Sheet column 'kemahiran'
       kebolehan: safeVal("kebolehan"),
       typhoid: checkedText("typhoid"),
       transportation: checkedText("transportation"),
       sejarah: checkedText("sejarah"),
-      sejarah_other: safeVal("sejarahOther"),
+      sejarah_other: safeVal("sejarahOther") || null,
       bank: safeVal("bank"),
-      account_no: safeVal("accountNo"),
-      account_name: safeVal("accountName")
+      "Column 19": safeVal("accountNo"),
+      "Column 20": safeVal("accountName"),
+      source_sheet: "FRONTEND_DIRECT",
+      updated_at: new Date().toISOString()
     };
 
     if (icFile) {
-      payload.ic_copy_base64 = await compressImageFile(icFile, "Document");
-      payload.ic_copy_filename = icFile.name;
+      payload.ic_filename = icFile.name;
     }
 
     if (capturedPhotoData.value) {
-      payload.gambar_base64 = capturedPhotoData.value;
-      payload.gambar_filename = "live_capture.jpg";
+      payload.photo_filename = "live_capture.jpg";
     }
 
-    return payload;
+    return [payload];
   }
 
   form.addEventListener("submit", async function (e) {
@@ -1436,16 +1441,21 @@
 
     try {
       const payload = await buildPayload();
-      const response = await fetch(WEB_APP_URL, {
+      
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=doc_no`, {
         method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "resolution=merge-duplicates"
+        },
         body: JSON.stringify(payload)
       });
-      const result = await response.json();
 
-      if (result.ok) {
-        showSubmitMessage(result.message || "Protocol completed successfully.", true);
+      if (response.ok) {
+        showSubmitMessage("Protocol completed successfully. Registry recorded.", true);
 
-        // Store active session credentials so worker enters dashboard authenticated
         localStorage.setItem("mcl_doc_no", safeVal("docNumber"));
 
         setTimeout(() => {
@@ -1457,7 +1467,8 @@
         }, 1500);
 
       } else {
-        showSubmitMessage("Transmission Failed: " + (result.message || "Unknown anomaly"));
+        const errorText = await response.text();
+        showSubmitMessage("Transmission Failed: " + errorText);
       }
     } catch (error) {
       showSubmitMessage("Network Disconnect: " + error.message);
