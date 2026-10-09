@@ -6,8 +6,6 @@
   <title>Casual Labour Dashboard</title>
 
   <!-- Speed Optimizations -->
-  <link rel="preconnect" href="https://script.google.com" crossorigin>
-  <link rel="dns-prefetch" href="https://script.google.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -757,7 +755,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
           Attendance History
         </a>
-        <a href="#" onclick="navigateToVoucherReplacement(event)" class="submenu-item">
+        <a href="voucher_replacement.html" class="submenu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
           Voucher Replacement
         </a>
@@ -942,7 +940,6 @@
   </nav>
 
   <script>
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyBP0-dwtWZV-bxbg12bYTIUvkoBtdwnzjKFIj8hSc1my2g0gUHQ-xD2vW_rb8KT4JJSw/exec";
   const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
   let supabaseClient = null;
@@ -975,10 +972,8 @@
   }
 
   function navigateToVoucherReplacement(event) {
-    event.preventDefault();
-    const worker = getStoredWorker();
-    const docNo = worker.doc_no || worker.mykad_passport_no || localStorage.getItem("mcl_doc_no") || "";
-    alert("Forwarding active session for Voucher Replacement (Doc No: " + docNo + ")");
+    if (event) event.preventDefault();
+    window.location.href = "voucher_replacement.html";
   }
 
   function logout() {
@@ -1010,7 +1005,7 @@
     document.getElementById("heroName").textContent = toProperCase(nameStr);
 
     const fallbackSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231B365D'/></svg>";
-    
+
     let photoUrl = worker.photo_link || worker.photo || "";
     if (photoUrl) {
       setImageWithFallback("headerPhoto", photoUrl, fallbackSvg);
@@ -1107,72 +1102,96 @@
     }
   }
 
-  function loadHubSpreadsheetData() {
-    const script = document.createElement("script");
-    script.src = `${WEB_APP_URL}?action=get_hub_data&prefix=processMasterHubPackage&_=${new Date().getTime()}`;
-    script.onerror = function() { showAnnouncementFallback(); };
-    document.head.appendChild(script);
-  }
+  // DIRECT SUPABASE FETCH FOR ANNOUNCEMENTS & DYNAMIC BIRTHDAYS
+  async function loadHubSupabaseData() {
+    try {
+      const client = getSupabase();
 
-  window.processMasterHubPackage = function(data) {
-    if (data && data.ok) {
+      // 1. Fetch Active Announcements
+      const { data: announcements, error: annErr } = await client
+        .from('announcements')
+        .select('*')
+        .eq('active', true)
+        .order('created_at', { ascending: false });
+
       const track = document.getElementById("announcementTrack");
       const dotsContainer = document.getElementById("carouselDots");
       track.innerHTML = "";
-      if(dotsContainer) dotsContainer.innerHTML = "";
+      if (dotsContainer) dotsContainer.innerHTML = "";
 
-      if (data.announcements && data.announcements.length > 0) {
-        data.announcements.forEach((ann, index) => {
+      if (!annErr && announcements && announcements.length > 0) {
+        announcements.forEach((ann, index) => {
           track.innerHTML += `
             <div class="announcement-card" id="announcementCard-${index}">
-              <div class="announcement-tag">${ann.tag}</div>
-              <p class="announcement-body" id="announcementBody-${index}">${ann.body}</p>
+              <div class="announcement-tag">${ann.tag || 'NOTICE'}</div>
+              <p class="announcement-body" id="announcementBody-${index}">${ann.body || ''}</p>
               <button class="read-more-btn" id="readMoreBtn-${index}" onclick="toggleReadMore(${index})" style="display: none;">Read More</button>
             </div>`;
-          if(dotsContainer) dotsContainer.innerHTML += `<div class="dot ${index === 0 ? 'active' : ''}"></div>`;
+          if (dotsContainer) dotsContainer.innerHTML += `<div class="dot ${index === 0 ? 'active' : ''}"></div>`;
         });
 
         setTimeout(() => {
-          data.announcements.forEach((ann, index) => {
+          announcements.forEach((ann, index) => {
             const bodyEl = document.getElementById(`announcementBody-${index}`);
             const btnEl = document.getElementById(`readMoreBtn-${index}`);
-            if (bodyEl && btnEl) {
-              if (bodyEl.scrollHeight > bodyEl.clientHeight) {
-                btnEl.style.display = "inline-flex";
-              }
+            if (bodyEl && btnEl && bodyEl.scrollHeight > bodyEl.clientHeight) {
+              btnEl.style.display = "inline-flex";
             }
           });
         }, 50);
 
-        if (data.announcements.length > 1) {
+        if (announcements.length > 1) {
           track.classList.add("animate-track");
-          setupCarouselDotTriggers(data.announcements.length);
+          setupCarouselDotTriggers(announcements.length);
         }
       } else {
         showAnnouncementFallback();
       }
 
+      // 2. Fetch Real Worker Profiles for Today's Birthday
+      const today = new Date();
+      const monthDay = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+      const { data: profiles, error: bdayErr } = await client
+        .from('casual_labour_profile')
+        .select('name_mykad, doc_no')
+        .not('doc_no', 'is', null);
+
       const spinWindow = document.getElementById("spinWindow");
-      if (data.birthdays && data.birthdays.length > 0) {
+      
+      // Dynamic Birthday Identification Logic (MyKAD YYMMDD)
+      const bdayList = profiles ? profiles.filter(p => {
+        if (!p.doc_no) return false;
+        const cleanDoc = String(p.doc_no).replace(/[^\d]/g, '');
+        if (cleanDoc.length < 6) return false;
+        
+        const mm = cleanDoc.substring(2, 4);
+        const dd = cleanDoc.substring(4, 6);
+        return `${mm}-${dd}` === monthDay;
+      }) : [];
+
+      if (!bdayErr && bdayList.length > 0) {
         let bdayListHtml = "";
-        data.birthdays.forEach(name => { bdayListHtml += `<div class="person"><span class="person-name">${toProperCase(name)}</span></div>`; });
+        bdayList.forEach(item => {
+          bdayListHtml += `<div class="person"><span class="person-name">${toProperCase(item.name_mykad)}</span></div>`;
+        });
         spinWindow.innerHTML = `<div class="spin-list animate-spin">${bdayListHtml}${bdayListHtml}</div>`;
       } else {
         spinWindow.innerHTML = `<div class="person" style="width:100%; justify-content:center;"><span class="person-name">No birthdays scheduled today 🎉</span></div>`;
       }
+
+    } catch (err) {
+      console.error("Failed to load Supabase Hub data:", err);
+      showAnnouncementFallback();
     }
-  };
+  }
 
   function toggleReadMore(index) {
     const card = document.getElementById(`announcementCard-${index}`);
     const btn = document.getElementById(`readMoreBtn-${index}`);
     if (card && btn) {
       card.classList.toggle("expanded");
-      if (card.classList.contains("expanded")) {
-        btn.textContent = "Read Less";
-      } else {
-        btn.textContent = "Read More";
-      }
+      btn.textContent = card.classList.contains("expanded") ? "Read Less" : "Read More";
     }
   }
 
@@ -1198,11 +1217,11 @@
       window.location.href = "index.html";
     } else {
       fillWorkerData();
-      loadHubSpreadsheetData();
+      loadHubSupabaseData();
     }
   }
 
-    initDashboard();
+  initDashboard();
   </script>
 </body>
 </html>
