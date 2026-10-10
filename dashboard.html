@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Casual Labour Dashboard</title>
 
+  <!-- PWA Manifest & Meta Tags -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#1B365D">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="https://mitec.com.my/static/img/logos/logo-footer.png">
+
   <!-- Speed Optimizations -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -939,7 +946,8 @@
     </a>
   </nav>
 
-      <script>
+  <!-- LOW-EGRESS DASHBOARD SCRIPT LOGIC -->
+  <script>
   const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
   let supabaseClient = null;
@@ -968,8 +976,8 @@
   }
 
   function logout() {
-    localStorage.removeItem("mitecWorkerRecord");
-    localStorage.removeItem("mcl_doc_no");
+    localStorage.clear();
+    sessionStorage.clear();
     window.location.href = "index.html";
   }
 
@@ -1004,6 +1012,16 @@
 
     if (!docNo) return;
 
+    // 2-minute client-side caching for shift summary to reduce network egress
+    const cachedSummary = sessionStorage.getItem(`dash_summary_cache_${docNo}`);
+    const cachedTime = sessionStorage.getItem(`dash_summary_time_${docNo}`);
+    const nowTime = Date.now();
+
+    if (cachedSummary && cachedTime && (nowTime - Number(cachedTime) < 120000)) {
+      renderShiftSummary(JSON.parse(cachedSummary));
+      return;
+    }
+
     try {
       const client = getSupabase();
 
@@ -1028,13 +1046,26 @@
         }
       }
 
-      // 2. Fetch Attendance (Only specific columns to reduce data transfer)
+      // 2. Try fetching from the bundled RPC function first (ultra-low egress)
+      const { data: rpcData, error: rpcErr } = await client.rpc('get_dashboard_summary', { p_doc_no: docNo });
+
+      if (!rpcErr && rpcData && rpcData.ok) {
+        sessionStorage.setItem(`dash_summary_cache_${docNo}`, JSON.stringify(rpcData.summary || {}));
+        sessionStorage.setItem(`dash_summary_time_${docNo}`, String(nowTime));
+        renderShiftSummary(rpcData.summary);
+        
+        // Cache announcements and birthdays from bundled RPC
+        if (rpcData.announcements) renderAnnouncements(rpcData.announcements);
+        if (rpcData.birthdays) renderBirthdays(rpcData.birthdays);
+        return;
+      }
+
+      // Fallback: Query attendance_records directly
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const day = String(now.getDate()).padStart(2, '0');
       const todayDateString = `${year}-${month}-${day}`;
-      const todayFormattedDate = `${day}/${month}/${year}`;
 
       const { data: summary } = await client
         .from('attendance_records')
@@ -1045,32 +1076,47 @@
         .limit(1)
         .maybeSingle();
 
-      loaderState.style.display = "none";
-      summaryGrid.style.display = "grid";
+      sessionStorage.setItem(`dash_summary_cache_${docNo}`, JSON.stringify(summary || {}));
+      sessionStorage.setItem(`dash_summary_time_${docNo}`, String(nowTime));
+      renderShiftSummary(summary);
 
-      if (summary) {
-        let formattedClockIn = "--:--";
-        if (summary.clock_in) {
-          formattedClockIn = `${todayFormattedDate}<br>${summary.clock_in}`;
-        } else if (summary.timestamp) {
-          let timePart = summary.timestamp.includes('T') ? summary.timestamp.split('T')[1].substring(0, 8) : summary.timestamp.split(' ')[1]?.substring(0, 8);
-          if (timePart) formattedClockIn = `${todayFormattedDate}<br>${timePart}`;
-        }
-
-        inVal.innerHTML = formattedClockIn;
-        outVal.innerHTML = summary.clock_out ? `${todayFormattedDate}<br>${summary.clock_out}` : "--:--";
-        vouchVal.textContent = summary.voucher || "-";
-        hoursVal.textContent = (summary.hours !== null && summary.hours !== undefined) ? summary.hours : "0.0";
-      } else {
-        inVal.innerHTML = "--:--";
-        outVal.innerHTML = "--:--";
-        vouchVal.textContent = "-";
-        hoursVal.textContent = "0.0";
-      }
     } catch (e) { 
       console.error("Dashboard Sync Error:", e);
-      loaderState.style.display = "none";
-      summaryGrid.style.display = "grid";
+      renderShiftSummary(null);
+    }
+  }
+
+  function renderShiftSummary(summary) {
+    const loaderState = document.getElementById("loaderState");
+    const summaryGrid = document.getElementById("summaryGrid");
+    const inVal = document.getElementById("dashSignIn");
+    const outVal = document.getElementById("dashSignOut");
+    const vouchVal = document.getElementById("dashVoucher");
+    const hoursVal = document.getElementById("dashHours");
+
+    loaderState.style.display = "none";
+    summaryGrid.style.display = "grid";
+
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const year = now.getFullYear();
+    const todayFormattedDate = `${day}/${month}/${year}`;
+
+    if (summary) {
+      let formattedClockIn = "--:--";
+      if (summary.clock_in) {
+        formattedClockIn = `${todayFormattedDate}<br>${summary.clock_in}`;
+      } else if (summary.timestamp) {
+        let timePart = summary.timestamp.includes('T') ? summary.timestamp.split('T')[1].substring(0, 8) : summary.timestamp.split(' ')[1]?.substring(0, 8);
+        if (timePart) formattedClockIn = `${todayFormattedDate}<br>${timePart}`;
+      }
+
+      inVal.innerHTML = formattedClockIn;
+      outVal.innerHTML = summary.clock_out ? `${todayFormattedDate}<br>${summary.clock_out}` : "--:--";
+      vouchVal.textContent = summary.voucher || "-";
+      hoursVal.textContent = (summary.hours !== null && summary.hours !== undefined) ? summary.hours : "0.0";
+    } else {
       inVal.innerHTML = "--:--";
       outVal.innerHTML = "--:--";
       vouchVal.textContent = "-";
@@ -1082,7 +1128,7 @@
     try {
       const client = getSupabase();
 
-      // 1. Fetch active announcements (Limited to 5 recent posts)
+      // Fetch active announcements (Limited to 5 recent posts)
       const { data: announcements, error: annErr } = await client
         .from('announcements')
         .select('tag, body')
@@ -1090,57 +1136,73 @@
         .order('created_at', { ascending: false })
         .limit(5);
 
-      const track = document.getElementById("announcementTrack");
-      const dotsContainer = document.getElementById("carouselDots");
-      track.innerHTML = "";
-      if (dotsContainer) dotsContainer.innerHTML = "";
-
-      if (!annErr && announcements && announcements.length > 0) {
-        announcements.forEach((ann, index) => {
-          track.innerHTML += `
-            <div class="announcement-card" id="announcementCard-${index}">
-              <div class="announcement-tag">${ann.tag || 'NOTICE'}</div>
-              <p class="announcement-body" id="announcementBody-${index}">${ann.body || ''}</p>
-              <button class="read-more-btn" id="readMoreBtn-${index}" onclick="toggleReadMore(${index})" style="display: none;">Read More</button>
-            </div>`;
-          if (dotsContainer) dotsContainer.innerHTML += `<div class="dot ${index === 0 ? 'active' : ''}"></div>`;
-        });
-
-        setTimeout(() => {
-          announcements.forEach((ann, index) => {
-            const bodyEl = document.getElementById(`announcementBody-${index}`);
-            const btnEl = document.getElementById(`readMoreBtn-${index}`);
-            if (bodyEl && btnEl && bodyEl.scrollHeight > bodyEl.clientHeight) {
-              btnEl.style.display = "inline-flex";
-            }
-          });
-        }, 50);
-
-        if (announcements.length > 1) {
-          track.classList.add("animate-track");
-          setupCarouselDotTriggers(announcements.length);
-        }
+      if (!annErr && announcements) {
+        renderAnnouncements(announcements);
       } else {
         showAnnouncementFallback();
       }
 
-      // 2. Fetch Birthdays using the server-side RPC function created in Step 1
-      const spinWindow = document.getElementById("spinWindow");
+      // Fetch Birthdays using the server-side RPC function
       const { data: bdayList, error: bdayErr } = await client.rpc('get_todays_birthdays');
 
-      if (!bdayErr && bdayList && bdayList.length > 0) {
-        let bdayListHtml = "";
-        bdayList.forEach(item => {
-          bdayListHtml += `<div class="person"><span class="person-name">${toProperCase(item.name_mykad)}</span></div>`;
-        });
-        spinWindow.innerHTML = `<div class="spin-list animate-spin">${bdayListHtml}${bdayListHtml}</div>`;
+      if (!bdayErr && bdayList) {
+        renderBirthdays(bdayList);
       } else {
-        spinWindow.innerHTML = `<div class="person" style="width:100%; justify-content:center;"><span class="person-name">No birthdays scheduled today 🎉</span></div>`;
+        document.getElementById("spinWindow").innerHTML = `<div class="person" style="width:100%; justify-content:center;"><span class="person-name">No birthdays scheduled today 🎉</span></div>`;
       }
 
     } catch (err) {
       console.error("Hub Data Load Failed:", err);
       showAnnouncementFallback();
+    }
+  }
+
+  function renderAnnouncements(announcements) {
+    const track = document.getElementById("announcementTrack");
+    const dotsContainer = document.getElementById("carouselDots");
+    track.innerHTML = "";
+    if (dotsContainer) dotsContainer.innerHTML = "";
+
+    if (announcements && announcements.length > 0) {
+      announcements.forEach((ann, index) => {
+        track.innerHTML += `
+          <div class="announcement-card" id="announcementCard-${index}">
+            <div class="announcement-tag">${ann.tag || 'NOTICE'}</div>
+            <p class="announcement-body" id="announcementBody-${index}">${ann.body || ''}</p>
+            <button class="read-more-btn" id="readMoreBtn-${index}" onclick="toggleReadMore(${index})" style="display: none;">Read More</button>
+          </div>`;
+        if (dotsContainer) dotsContainer.innerHTML += `<div class="dot ${index === 0 ? 'active' : ''}"></div>`;
+      });
+
+      setTimeout(() => {
+        announcements.forEach((ann, index) => {
+          const bodyEl = document.getElementById(`announcementBody-${index}`);
+          const btnEl = document.getElementById(`readMoreBtn-${index}`);
+          if (bodyEl && btnEl && bodyEl.scrollHeight > bodyEl.clientHeight) {
+            btnEl.style.display = "inline-flex";
+          }
+        });
+      }, 50);
+
+      if (announcements.length > 1) {
+        track.classList.add("animate-track");
+        setupCarouselDotTriggers(announcements.length);
+      }
+    } else {
+      showAnnouncementFallback();
+    }
+  }
+
+  function renderBirthdays(bdayList) {
+    const spinWindow = document.getElementById("spinWindow");
+    if (bdayList && bdayList.length > 0) {
+      let bdayListHtml = "";
+      bdayList.forEach(item => {
+        bdayListHtml += `<div class="person"><span class="person-name">${toProperCase(item.name_mykad)}</span></div>`;
+      });
+      spinWindow.innerHTML = `<div class="spin-list animate-spin">${bdayListHtml}${bdayListHtml}</div>`;
+    } else {
+      spinWindow.innerHTML = `<div class="person" style="width:100%; justify-content:center;"><span class="person-name">No birthdays scheduled today 🎉</span></div>`;
     }
   }
 
@@ -1170,6 +1232,15 @@
 
   function goToPage(url) { window.location.href = url; }
 
+  // Register PWA Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('PWA SW Registered:', reg.scope))
+        .catch(err => console.error('PWA SW Registration Failed:', err));
+    });
+  }
+
   function initDashboard() {
     if (!localStorage.getItem("mitecWorkerRecord")) {
       window.location.href = "index.html";
@@ -1181,7 +1252,6 @@
 
   initDashboard();
   </script>
-
 
 </body>
 </html>
