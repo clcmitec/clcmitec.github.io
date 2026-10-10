@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QUBE — Booking Manager</title>
+  <title>QUBE — Booking Manager | Operations Console</title>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Google Tag -->
+  <!-- Google Tag -->
   <script defer src="https://www.googletagmanager.com/gtag/js?id=G-S3RRBZB4NJ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -15,18 +15,22 @@
     gtag('config', 'G-S3RRBZB4NJ');
   </script>
 
-
   <style>
     :root {
-      --admin-dark: #8cc63f; /* Signature Qube Lime Green */
-      --admin-dark-text: #1e232a; /* Qube Dark Charcoal/Navy */
-      --admin-gradient: linear-gradient(135deg, #8cc63f 0%, #75ab31 100%);
-      --bg-slate: #f8fafc;
+      /* MotoGP Theme Palette */
+      --mgp-black: #111111;
+      --mgp-dark-nav: #1a1a1a;
+      --mgp-red: #C80502;
+      --mgp-red-hover: #a10402;
+      --mgp-lime: #8cc63f;
+      --bg-slate: #f4f5f7;
       --card-bg: #ffffff;
-      --text-main: #1e232a;
-      --text-muted: #64748b;
+      --text-main: #111111;
+      --text-muted: #666666;
+      --text-light: #ffffff;
       --border-thin: #e2e8f0;
 
+      /* Status Pill Color Palette */
       --pill-teal-bg: #f3f9e9;
       --pill-teal-text: #598522;
       --pill-teal-border: #cbe69d;
@@ -49,76 +53,177 @@
 
       --accent-emerald: #8cc63f;
       --accent-warn: #9b1c1c;
-      --font-main: 'Trebuchet MS', sans-serif;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-    body { margin: 0; background-color: var(--bg-slate); font-family: var(--font-main); color: var(--text-main); padding-bottom: 90px; }
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
+    body { background-color: var(--bg-slate); font-family: var(--font-main); color: var(--text-main); line-height: 1.5; padding-bottom: 60px; }
 
-    .header { 
-      position: sticky; 
-      top: 0; 
-      z-index: 1100; 
-      background: #fff; 
-      border-bottom: 1px solid var(--border-thin); 
-      height: 60px; 
+    /* Top Utility Bar */
+    .top-bar {
+      background: var(--mgp-black);
+      color: #888;
+      font-size: 0.75rem;
+      padding: 0.5rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #222;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .top-bar-left { display: flex; align-items: center; gap: 8px; color: #aaa; }
+    .top-bar-left .live-dot { width: 8px; height: 8px; background: var(--mgp-red); border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    /* Sticky Main Navigation */
+    .main-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1100;
+      background: var(--mgp-dark-nav);
+      color: var(--text-light);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .brand-container { display: flex; align-items: center; gap: 12px; }
+    .brand-img { height: 26px; width: auto; display: block; filter: brightness(0) invert(1); }
+    .brand-tag { font-size: 0.75rem; font-weight: 900; color: var(--mgp-red); text-transform: uppercase; letter-spacing: 1px; }
+
+    .user-profile-tag { 
+      font-size: 10px; 
+      font-weight: 800; 
+      color: #ffffff; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px; 
+      background: var(--mgp-red); 
+      padding: 4px 10px; 
+      border-radius: 4px; 
+      max-width: 200px; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
+
+    /* Hero Header */
+    .hero-header {
+      background: var(--mgp-black);
+      color: var(--text-light);
+      padding: 2rem 1.5rem 1.25rem 1.5rem;
+      border-top: 1px solid #222;
+    }
+    .hero-header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hero-header h1 span { color: var(--mgp-red); }
+
+    /* Tab Bar (MotoGP Sub-Nav Tabs) */
+    .tab-bar { 
       display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      padding: 0 16px; 
+      background: var(--mgp-black); 
+      border-bottom: 1px solid #2a2a2a; 
+      position: sticky; 
+      top: 51px; 
+      z-index: 1000; 
+      padding: 0 1rem;
     }
-    .brand-img { height: 28px; width: auto; display: block; }
-    .user-profile-tag { font-size: 11px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; background: #f3f9e9; border: 1px solid #cbe69d; padding: 5px 12px; border-radius: 6px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tab-item { 
+      flex: 1; 
+      text-align: center; 
+      padding: 14px 0; 
+      font-size: 11px; 
+      font-weight: 800; 
+      color: #888888; 
+      text-transform: uppercase; 
+      cursor: pointer; 
+      letter-spacing: 0.5px; 
+      border-bottom: 3px solid transparent; 
+      transition: all 0.2s ease;
+    }
+    .tab-item:hover { color: #ffffff; }
+    .tab-item.active { color: #ffffff; border-bottom-color: var(--mgp-red); }
 
-    .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px 15px; }
 
-    #login-overlay { position: fixed; inset: 0; background: var(--bg-slate); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .login-card { background: #fff; width: 100%; max-width: 400px; border-radius: 16px; padding: 32px 24px; border: 1px solid var(--border-thin); box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
-    .login-logo { font-size: 44px; color: var(--admin-dark); margin-bottom: 12px; }
-
-    .tab-bar { display: flex; background: #fff; border-bottom: 1px solid var(--border-thin); position: sticky; top: 60px; z-index: 900; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .tab-item { flex: 1; text-align: center; padding: 16px 0; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; border-bottom: 3px solid transparent; }
-    .tab-item.active { color: var(--text-main); border-color: var(--admin-dark); }
+    /* Login Overlay */
+    #login-overlay { position: fixed; inset: 0; background: var(--mgp-black); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .login-card { background: #fff; width: 100%; max-width: 400px; border-radius: 12px; padding: 36px 28px; border: 1px solid var(--border-thin); box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; }
+    .login-logo { font-size: 48px; color: var(--mgp-red); margin-bottom: 12px; }
 
     .app-page { display: none; }
     .app-page.active { display: block; }
 
-    .section-label { font-size: 11px; font-weight: 800; color: var(--text-main); margin: 25px 0 12px 5px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
+    .section-label { 
+      font-size: 11px; 
+      font-weight: 900; 
+      color: var(--text-main); 
+      margin: 25px 0 12px 2px; 
+      text-transform: uppercase; 
+      letter-spacing: 1.5px; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+    }
     .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border-thin); }
 
-    /* 4 Scorecard Dashboard Layout */
-    .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0 20px 0; }
+    /* 4 Scorecard Dashboard Grid */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0 20px 0; }
 
-    .dash-tile { background: #fff; border: 1px solid var(--border-thin); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: all 0.15s ease; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .dash-tile:active { transform: scale(0.96); }
-    .dash-tile.selected { border-width: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); }
+    .dash-tile { 
+      background: #fff; 
+      border: 1px solid var(--border-thin); 
+      border-radius: 8px; 
+      padding: 16px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 4px; 
+      cursor: pointer; 
+      transition: all 0.2s ease; 
+      position: relative; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+    }
+    .dash-tile:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+    .dash-tile:active { transform: scale(0.97); }
+    .dash-tile.selected { border-width: 2px; border-color: var(--mgp-red) !important; box-shadow: 0 4px 14px rgba(200, 5, 2, 0.2); }
 
-    .dash-tile.tile-cap.selected { border-color: var(--admin-dark); color: var(--text-main); }
-    .dash-tile.tile-conf.selected { border-color: var(--admin-dark); color: var(--text-main); background: var(--pill-teal-bg); }
-    .dash-tile.tile-wait.selected { border-color: var(--pill-amber-text); color: var(--pill-amber-text); background: var(--pill-amber-bg); }
-    .dash-tile.tile-pres.selected { border-color: var(--pill-emerald-text); color: var(--pill-emerald-text); background: var(--pill-emerald-bg); }
+    .dash-tile.tile-cap.selected { background: #ffffff; color: var(--text-main); }
+    .dash-tile.tile-conf.selected { background: var(--pill-teal-bg); }
+    .dash-tile.tile-wait.selected { background: var(--pill-amber-bg); }
+    .dash-tile.tile-pres.selected { background: var(--pill-emerald-bg); }
 
-    .dash-tile span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
-    .dash-tile h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--text-main); transition: color 0.2s; }
-    .matrix-title-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #f3f9e9; border: 1px solid #cbe69d; color: var(--text-main); margin-left: 6px; vertical-align: middle; }
+    .dash-tile span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.8px; }
+    .dash-tile h2 { margin: 0; font-size: 24px; font-weight: 900; color: var(--text-main); transition: color 0.2s; letter-spacing: -0.5px; }
+    .matrix-title-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; background: var(--mgp-black); color: #ffffff; font-weight: 800; text-transform: uppercase; margin-left: 6px; vertical-align: middle; }
 
     /* Calendar UI Elements */
-    .calendar-wrapper { background: #fff; border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 20px; box-shadow: 0 3px 8px rgba(0,0,0,0.03); }
-    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .cal-header h3 { margin: 0; font-size: 15px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
-    .btn-cal-nav { background: #f3f9e9; border: 1px solid #cbe69d; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; color: var(--text-main); font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
+    .calendar-wrapper { background: #fff; border: 1px solid var(--border-thin); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .cal-header h3 { margin: 0; font-size: 15px; font-weight: 900; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
+    .btn-cal-nav { background: var(--mgp-black); border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; color: #fff; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .btn-cal-nav:hover { background: var(--mgp-red); }
     .btn-cal-nav:active { transform: scale(0.9); }
 
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
-    .cal-day-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
-    .cal-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--text-main); cursor: pointer; border: 1px solid transparent; transition: 0.2s; position: relative; }
-    .cal-cell:hover { background: #f8fafc; }
-    .cal-cell.empty { background: transparent; cursor: default; }
-    .cal-cell.has-shifts { background: #f3f9e9; border-color: #cbe69d; color: var(--text-main); }
-    .cal-cell.selected { background: var(--admin-dark); color: #fff; border-color: var(--admin-dark); box-shadow: 0 4px 10px rgba(140, 198, 63, 0.4); transform: scale(1.05); z-index: 2; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+    .cal-day-label { font-size: 10px; font-weight: 900; color: var(--mgp-red); text-transform: uppercase; margin-bottom: 6px; }
+    .cal-cell { aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--text-main); cursor: pointer; border: 1px solid var(--border-thin); transition: 0.2s; position: relative; background: #fafafa; }
+    .cal-cell:hover { background: #f0f0f0; border-color: #ccc; }
+    .cal-cell.empty { background: transparent; border-color: transparent; cursor: default; }
+    .cal-cell.has-shifts { background: #ffffff; border-color: #000; color: var(--text-main); }
+    .cal-cell.selected { background: var(--mgp-red) !important; color: #fff !important; border-color: var(--mgp-red) !important; box-shadow: 0 4px 12px rgba(200, 5, 2, 0.4); transform: scale(1.06); z-index: 2; }
 
-    .cal-indicator { font-size: 9px; font-weight: 800; border-radius: 4px; padding: 1px 4px; margin-top: 2px; line-height: 1.2; }
-    .cal-cell.selected .cal-indicator { background: rgba(0,0,0,0.15) !important; color: #fff !important; }
+    .cal-indicator { font-size: 8px; font-weight: 800; border-radius: 3px; padding: 1px 4px; margin-top: 3px; line-height: 1.2; text-transform: uppercase; }
+    .cal-cell.selected .cal-indicator { background: rgba(0,0,0,0.25) !important; color: #fff !important; }
 
     /* Pivot Interactive Accordion Styles */
     details.pivot-cat-card, details.pivot-date-block, details.pivot-dept-block, details.pivot-shift-item { display: block; width: 100%; }
@@ -128,47 +233,72 @@
     .pivot-chevron { font-size: 13px; color: var(--text-muted); transition: transform 0.2s ease; display: inline-block; }
     details[open] > summary.pivot-summary .pivot-chevron { transform: rotate(180deg); }
 
-    .pivot-cat-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: 0 3px 8px rgba(0,0,0,0.02); border-left: 5px solid var(--admin-dark); }
-    .pivot-cat-title { font-size: 14px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); padding-bottom: 8px; margin-bottom: 12px; }
+    .pivot-cat-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border-left: 5px solid var(--mgp-red); }
+    .pivot-cat-title { font-size: 14px; font-weight: 900; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); padding-bottom: 10px; margin-bottom: 12px; }
 
     .pivot-date-block { margin-bottom: 10px; padding-left: 4px; border-bottom: 1px dashed var(--border-thin); padding-bottom: 10px; }
     .pivot-date-block:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     .pivot-date-title { font-size: 13px; font-weight: 800; color: #475569; padding: 4px 0; }
 
     .pivot-dept-block { margin-left: 12px; border-left: 2px dashed #cbd5e1; padding-left: 12px; margin-top: 8px; margin-bottom: 8px; }
-    .pivot-dept-title { font-size: 12px; font-weight: 800; color: var(--pill-teal-text); text-transform: uppercase; padding: 2px 0; }
+    .pivot-dept-title { font-size: 12px; font-weight: 800; color: var(--mgp-red); text-transform: uppercase; padding: 2px 0; }
 
-    .pivot-shift-item { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0; margin-top: 8px; margin-bottom: 4px; }
+    .pivot-shift-item { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 8px; padding: 0; margin-top: 8px; margin-bottom: 4px; }
     .pivot-shift-header { font-size: 12px; font-weight: 700; color: var(--text-main); display: flex; width: 100%; justify-content: space-between; align-items: center; }
 
     /* Cards & Roster Styling */
-    .stat-row-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s ease; }
+    .stat-row-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s ease; }
+    .stat-row-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
     .stat-row-card:active { transform: scale(0.98); }
-    .stat-row-card.selected-card { border: 2px solid var(--admin-dark); box-shadow: 0 4px 12px rgba(140, 198, 63, 0.25); transform: scale(1.02); }
+    .stat-row-card.selected-card { border: 2px solid var(--mgp-red); box-shadow: 0 4px 14px rgba(200, 5, 2, 0.2); }
 
-    .stat-info h3 { margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .stat-info h3 { margin: 0; font-size: 16px; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
     .stat-info p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; display: flex; flex-direction: column; gap: 3px; }
     .meta-data-line { display: flex; align-items: center; gap: 6px; }
 
     /* 6-Pill Grid Container for Shift Details Cards */
     .metrics-pill-pack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; align-items: center; }
-    .mini-badge { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 5px; text-transform: uppercase; display: inline-block; text-align: center; min-width: 65px; }
+    .mini-badge { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; text-align: center; min-width: 65px; letter-spacing: 0.5px; }
 
     .pill-pres { background: var(--pill-emerald-bg); color: var(--pill-emerald-text); border: 1px solid var(--pill-emerald-border); }
     .pill-noshow { background: var(--pill-orange-bg); color: var(--pill-orange-text); border: 1px solid var(--pill-orange-border); }
 
-    .roster-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 14px; padding: 18px; margin-bottom: 12px; cursor: pointer; transition: all 0.15s ease; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-    .roster-card:active { transform: scale(0.98); background: #f8fafc; }
+    .roster-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 10px; padding: 18px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s ease; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+    .roster-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+    .roster-card:active { transform: scale(0.98); }
     .roster-card .chevron-indicator { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 18px; }
 
-    /* Worker Profile & Avatar Layout */
-    .worker-profile-cell { display: flex; align-items: center; gap: 10px; }
-    .worker-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background-color: #e2e8f0; flex-shrink: 0; border: 1px solid var(--border-thin); }
+    /* MotoGP-Style Racer Profile Frame & Silhouette */
+    .worker-profile-cell { display: flex; align-items: center; gap: 12px; }
+    
+    .worker-avatar-frame {
+      width: 48px;
+      height: 54px;
+      background: linear-gradient(180deg, #2b2b2b 0%, #111111 100%);
+      border-radius: 6px 6px 0 0;
+      border: 1px solid #333;
+      border-bottom: 2px solid var(--mgp-red);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+      position: relative;
+    }
+
+    .worker-avatar { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      object-position: top center;
+      display: block;
+    }
 
     /* Status CTA Dropdown Select Styling */
     .wm-status-select-wrapper { position: relative; display: inline-block; width: 100%; max-width: 120px; }
-    .wm-status-select { width: 100%; padding: 6px 20px 6px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
-    .wm-status-select.status-confirmed { background-color: var(--admin-dark); color: #ffffff; border: 1px solid var(--admin-dark); }
+    .wm-status-select { width: 100%; padding: 6px 20px 6px 8px; border-radius: 4px; font-size: 9px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
+    .wm-status-select.status-confirmed { background-color: var(--mgp-black); color: #ffffff; border: 1px solid var(--mgp-black); }
     .wm-status-select.status-waitlist { background-color: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
     .wm-status-select.status-cancelled { background-color: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); cursor: not-allowed; }
     .wm-status-chevron { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 10px; }
@@ -176,60 +306,103 @@
     .status-waitlist + .wm-status-chevron { color: var(--pill-amber-text); }
     .status-cancelled + .wm-status-chevron { color: var(--pill-red-text); }
 
-    .view-drawable-name { color: var(--text-main); font-weight: 700; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
-    .view-drawable-name:hover { color: var(--pill-teal-text); text-decoration: underline; }
+    .view-drawable-name { color: var(--text-main); font-weight: 800; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
+    .view-drawable-name:hover { color: var(--mgp-red); text-decoration: underline; }
 
     /* Drawers Overlays Hierarchy */
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 2000; display: none; align-items: flex-end; }
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(2px); z-index: 2000; display: none; align-items: flex-end; }
     #worker-profile-drawer { z-index: 2500; }
 
-    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 24px 20px; overflow-y: auto; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
-    .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
-    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--text-main); font-weight: 800; display: flex; flex-direction: column; gap: 4px; }
-    .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
-    .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; }
+    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 26px 22px; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.25); border-top: 4px solid var(--mgp-red); }
+    .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
+    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--text-main); font-weight: 900; text-transform: uppercase; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; text-transform: none; }
+    .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; transition: color 0.2s; }
+    .btn-close-drawer:hover { color: var(--mgp-red); }
 
     .roster-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; text-align: left; }
-    .roster-table th { background: #f8fafc; padding: 12px 10px; font-weight: 700; color: var(--text-main); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
-    .roster-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
+    .roster-table th { background: var(--mgp-black); padding: 10px; font-weight: 800; color: #fff; text-transform: uppercase; font-size: 9px; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-thin); }
+    .roster-table td { padding: 10px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
     .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
 
-    .pill-sub { background: var(--admin-dark); color: #ffffff; border: 1px solid var(--admin-dark); }
+    .pill-sub { background: var(--mgp-black); color: #ffffff; border: 1px solid var(--mgp-black); }
     .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
     .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
 
-    .btn-approve { background: transparent; border: 1px solid var(--admin-dark); color: var(--text-main); font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; text-align: center; width: 100px; }
+    .btn-approve { background: transparent; border: 1px solid var(--mgp-black); color: var(--text-main); font-size: 10px; font-weight: 800; padding: 6px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; text-align: center; width: 100px; transition: all 0.2s; }
+    .btn-approve:hover { background: var(--mgp-black); color: #fff; }
 
     /* Export Config Options Panel */
-    .export-options-group { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
-    .export-checkbox-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--text-main); cursor: pointer; }
+    .export-options-group { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+    .export-checkbox-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; font-weight: 700; color: var(--text-main); cursor: pointer; }
     .export-checkbox-item:last-child { margin-bottom: 0; }
-    .export-checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--admin-dark); cursor: pointer; }
+    .export-checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--mgp-red); cursor: pointer; }
 
     .form-group { margin-bottom: 16px; text-align: left; }
-    .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 900; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
 
-    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--text-main); background: #fff; appearance: auto; }
-    .form-control:focus { outline: none; border-color: var(--admin-dark); box-shadow: 0 0 0 3px rgba(140, 198, 63, 0.25); }
+    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 6px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--text-main); background: #fff; appearance: auto; }
+    .form-control:focus { outline: none; border-color: var(--mgp-red); box-shadow: 0 0 0 3px rgba(200, 5, 2, 0.15); }
     .form-control:disabled { background: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
     textarea.form-control { height: 80px; padding: 12px; resize: none; appearance: none; }
 
-    .btn-submit-shift { width: 100%; height: 50px; background: var(--admin-dark); color: #fff; font-size: 14px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; }
+    .btn-submit-shift { width: 100%; height: 48px; background: var(--mgp-red); color: #fff; font-size: 13px; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+    .btn-submit-shift:hover { background: var(--mgp-red-hover); }
     .btn-submit-shift:active { transform: scale(0.98); }
-    .btn-logout { background: none; border: 1px solid var(--pill-red-text); color: var(--pill-red-text); font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.15s; }
+    .btn-logout { background: none; border: 1px solid var(--mgp-red); color: var(--mgp-red); font-weight: 800; font-size: 11px; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; letter-spacing: 0.5px; }
+    .btn-logout:hover { background: var(--mgp-red); color: #fff; }
 
-    #sync-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: var(--text-main); letter-spacing: 1px; }
-    .loader-text { margin-top: 12px; }
+    #sync-loader { position: fixed; inset: 0; background: var(--mgp-black); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #ffffff; letter-spacing: 1.5px; }
+    .loader-text { margin-top: 16px; text-transform: uppercase; }
+
+    /* Footer */
+    .footer { background: var(--mgp-black); color: #888; padding: 3rem 1.5rem 1.5rem 1.5rem; margin-top: 4rem; border-top: 4px solid var(--mgp-red); }
+    .footer-grid { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; }
+    .footer-col h4 { color: #fff; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1rem; letter-spacing: 1px; font-weight: 900; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 0.5rem; }
+    .footer-col a { color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: color 0.2s; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom { max-width: 800px; margin: 2rem auto 0 auto; padding-top: 1.5rem; border-top: 1px solid #222; text-align: center; font-size: 0.75rem; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
   </style>
 </head>
 <body>
+
+  <!-- TOP UTILITY BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span class="live-dot"></span> Official Operations Portal
+    </div>
+    <div>Live Data Sync • Active</div>
+  </div>
+
+  <!-- HEADER / STICKY MAIN NAVIGATION -->
+  <nav class="main-nav">
+    <div class="brand-container">
+      <img class="brand-img" src="https://qube.com.my/img/logos/qube.png" alt="QUBE">
+      <span class="brand-tag"></span>
+    </div>
+    <div id="adminUserDisplayTag" class="user-profile-tag">SUPER ADMIN</div>
+  </nav>
+
+  <!-- HERO HEADER -->
+  <header class="hero-header">
+    <h1>   🏁 Human Resources <span> Recruitment</span></h1>
+  </header>
+
+  <!-- NAVIGATION TAB BAR -->
+  <nav class="tab-bar">
+    <div id="tab-btn-1" class="tab-item active" onclick="switchTab(1)">Statistics & Deployment</div>
+    <div id="tab-btn-2" class="tab-item" onclick="switchTab(2)">Shift Schedule</div>
+    <div id="tab-btn-3" class="tab-item" onclick="switchTab(3)">Staffing Manager</div>
+  </nav>
 
   <!-- LOGIN OVERLAY -->
   <div id="login-overlay">
     <div class="login-card">
       <div class="login-logo"><i class="ph ph-shield-check"></i></div>
-      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--text-main);">Operations Console</h2>
-      <p style="margin: 0 0 24px 0; font-size: 13px; color: var(--text-muted);">Please provide credentials to scan matrix.</p>
+      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--text-main); font-weight: 900; text-transform: uppercase;">Operations Console</h2>
+      <p style="margin: 0 0 24px 0; font-size: 13px; color: var(--text-muted); font-weight: 600;">Please provide administrative credentials to access matrix.</p>
       <form id="login-form" onsubmit="handleAdminLogin(event)">
         <div class="form-group">
           <label>MyKad / Passport ID</label>
@@ -242,22 +415,9 @@
 
   <!-- SYNC LOADER -->
   <div id="sync-loader">
-    <i class="ph ph-gear-six ph-spin" style="font-size: 40px; color: var(--admin-dark);"></i>
-    <div class="loader-text">LOADING MANAGEMENT PORTAL...</div>
+    <i class="ph ph-gear-six ph-spin" style="font-size: 44px; color: var(--mgp-red);"></i>
+    <div class="loader-text">Loading Management Portal...</div>
   </div>
-
-  <!-- HEADER -->
-  <header class="header">
-    <img class="brand-img" src="https://qube.com.my/img/logos/qube.png" alt="QUBE">
-    <div id="adminUserDisplayTag" class="user-profile-tag">SUPER ADMIN</div>
-  </header>
-
-  <!-- NAVIGATION TAB BAR -->
-  <nav class="tab-bar">
-    <div id="tab-btn-1" class="tab-item active" onclick="switchTab(1)">Statistics & Deployment</div>
-    <div id="tab-btn-2" class="tab-item" onclick="switchTab(2)">Shift Schedule</div>
-    <div id="tab-btn-3" class="tab-item" onclick="switchTab(3)">Staffing Manager</div>
-  </nav>
 
   <div class="container">
 
@@ -445,6 +605,11 @@
             <option value="2200">22:00</option>
             <option value="2300">23:00</option>
             <option value="0000">00:00</option>
+            <option value="0100">01:00</option>
+            <option value="0200">02:00</option>
+            <option value="0300">03:00</option>
+            <option value="0400">04:00</option>
+            <option value="0500">05:00</option>
           </select>
         </div>
         <div class="form-group">
@@ -459,6 +624,39 @@
       </form>
     </div>
   </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#" onclick="switchTab(1)">Statistics & Deployment</a></li>
+          <li><a href="#" onclick="switchTab(2)">Shift Schedule</a></li>
+          <li><a href="#" onclick="switchTab(3)">Staffing Manager</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>System Operations</h4>
+        <ul>
+          <li><a href="#">Matrix Overview</a></li>
+          <li><a href="#">Analytic Report Tools</a></li>
+          <li><a href="admi.html">Attendance Tracker</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Contact Admin</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; QUBE Integrated Malaysia Sdn Bhd .   All rights reserved 2026.
+    </div>
+  </footer>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOQA9l1lpjs9eSOHwQmdZe4axc6OR6E9ohXmHQI3d9B-3apRtl6mFValUpepCorlqs/exec"; 
@@ -516,32 +714,7 @@
     function switchTab(tabIndex) {
       for (let i = 1; i <= 3; i++) { 
         document.getElementById(`tab-btn-${i}`).classList.toggle('active', i === tabIndex);
-        document.getElementById(`page-${i}`).classList.toggle('active', i === tabIndex);
-      }
-    }
-
-    function formatPhoneForDialing(phone) {
-      if (!phone) return '';
-      let cleaned = String(phone).replace(/[^0-9+]/g, '');
-      if (!cleaned) return '';
-      if (cleaned.startsWith('60')) return '+' + cleaned;
-      if (!cleaned.startsWith('+') && !cleaned.startsWith('0')) return '+' + cleaned;
-      return cleaned;
-    }
-
-    function formatAttendanceTime(timeVal) {
-      if (!timeVal) return "";
-      const str = String(timeVal).trim();
-      if (str.includes("1899")) {
-        try {
-          const d = new Date(str);
-          return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-        } catch(e) { return str; }
-      }
-      if (str.includes("GMT")) {
-        try {
-          const d = new Date(str);
-          return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        document.getElementById(`page-${i}`).classList.toggle('active', i === tabIndex);       }     }      function formatPhoneForDialing(phone) {       if (!phone) return '';       let cleaned = String(phone).replace(/[^0-9+]/g, '');       if (!cleaned) return '';       if (cleaned.startsWith('60')) return '+' + cleaned;       if (!cleaned.startsWith('+') && !cleaned.startsWith('0')) return '+' + cleaned;       return cleaned;     }      function formatAttendanceTime(timeVal) {       if (!timeVal) return "";       const str = String(timeVal).trim();       if (str.includes("1899")) {         try {           const d = new Date(str);           return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;         } catch(e) { return str; }       }       if (str.includes("GMT")) {         try {           const d = new Date(str);           return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         } catch(e) { return str; }
       }
       let cleanDigits = str.replace(/[^0-9]/g, "");
@@ -552,20 +725,19 @@
     }
 
     function formatFullTimestamp(timeVal) {
-  if (!timeVal) return "No Show";
-  let str = String(timeVal).trim();
-  if (str.toLowerCase() === "no show" || str === "0" || str === "-" || str === "") return "No Show";
-  if (str.includes("GMT")) {
-    try {
-      let d = new Date(str);
-      if (!isNaN(d.getTime())) {
-        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+      if (!timeVal) return "No Show";
+      let str = String(timeVal).trim();
+      if (str.toLowerCase() === "no show" || str === "0" || str === "-" || str === "") return "No Show";
+      if (str.includes("GMT")) {
+        try {
+          let d = new Date(str);
+          if (!isNaN(d.getTime())) {
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+          }
+        } catch(e) {}
       }
-    } catch(e) {}
-  }
-  return str; 
-}
-
+      return str; 
+    }
 
     function getShiftDateObj(dateStr) {
       try {
@@ -661,9 +833,7 @@
       document.getElementById('dash-txt-cap').textContent = totalCap;
       document.getElementById('dash-txt-conf').textContent = totalConf;
       document.getElementById('dash-txt-wait').textContent = totalWait;
-      document.getElementById('dash-txt-pres').textContent = `${totalPres} /${totalCap}`;
-
-      document.getElementById("matrixFilterActiveLabel").innerHTML = `${labelScope} <span class="matrix-title-badge">${badgeScope}</span>`;
+      document.getElementById('dash-txt-pres').textContent = `${totalPres} /${totalCap}`;        document.getElementById("matrixFilterActiveLabel").innerHTML = `${labelScope} <span class="matrix-title-badge">${badgeScope}</span>`;
     }
 
     function setDashboardFilter(filterType) {
@@ -816,7 +986,7 @@
                       </div>
                       <!-- Full 6-Pill Detailed Layout -->
                       <div class="metrics-pill-pack">
-                        <span class="mini-badge" style="background:#e2e8f0; color:#1e293b; border: 1px solid ${currentActiveFilter === 'ALL' ? 'var(--admin-dark)' : 'transparent'}">Cap: ${maxCapacitySlots}</span>
+                        <span class="mini-badge" style="background:#e2e8f0; color:#1e293b; border: 1px solid ${currentActiveFilter === 'ALL' ? 'var(--mgp-red)' : 'transparent'}">Cap: ${maxCapacitySlots}</span>
                         <span class="mini-badge pill-sub" style="border-width: ${currentActiveFilter === 'CONF' ? '2px' : '1px'}">Conf: ${confirmedCount}</span>
                         <span class="mini-badge pill-pres" style="border-width: ${currentActiveFilter === 'PRES' ? '2px' : '1px'}">Pres: ${presCount}</span>
                         <span class="mini-badge pill-noshow">NoShow: ${noShowCount}</span>
@@ -829,7 +999,7 @@
           if (visibleCards === 0) detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts match filters.</p>`;
       }
       if (isFutureOrToday(calSelectedDateStr)) {
-          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #f8fafc; color: var(--text-main); border: 2px dashed #cbe69d;" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px;"></i> DEPLOY NEW SHIFT HERE</button>`;
+          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #ffffff; color: var(--text-main); border: 2px dashed var(--mgp-red);" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px; color: var(--mgp-red);"></i> Deploy New Shift Here</button>`;
       }
       listContainer.innerHTML = detailsHTML;
     }
@@ -1081,8 +1251,8 @@
 
         htmlOutput += `
           <div class="roster-card" onclick="openRosterDrawer('${s.id}', '${s.dept}', '${s.date}', '${s.time}', '${capacity}', false)">
-            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--text-main); font-weight:700;">
-              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f3f9e9; border:1px solid #cbe69d; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
+            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--text-main); font-weight:900;">
+              ${s.dept} <span style="font-size:10px; color:var(--mgp-red); float:right; background:#fff; border:1px solid var(--mgp-red); padding:2px 8px; border-radius:4px; font-weight:800;">${s.date} • ${displayTime}</span>
             </h3>
             <span style="font-size:12px; color:var(--text-muted); font-weight:600; display:inline-block;">
               <i class="ph ph-users"></i> Confirmed: <b>${confirmedCount} / ${capacity}</b> 
@@ -1110,8 +1280,8 @@
 
         htmlOutput += `
           <div class="roster-card" onclick="openRosterDrawer('${s.id}', '${s.dept}', '${s.date}', '${s.time}', '${capacity}', true)">
-            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--text-main); font-weight:700;">
-              ${s.dept} <span style="font-size:10px; color:var(--text-muted); float:right; background:#f3f9e9; border:1px solid #cbe69d; padding:2px 6px; border-radius:4px;">${s.date} • ${displayTime}</span>
+            <h3 style="margin:0 0 6px 0; font-size:16px; color:var(--text-main); font-weight:900;">
+              ${s.dept} <span style="font-size:10px; color:var(--mgp-black); float:right; background:#f4f5f7; border:1px solid var(--mgp-black); padding:2px 8px; border-radius:4px; font-weight:800;">${s.date} • ${displayTime}</span>
             </h3>
             <span style="font-size:12px; color:var(--text-main); font-weight:700; display:inline-block;">
               <i class="ph ph-check-circle" style="color:var(--pill-teal-text);"></i> Attendance: ${attendedCount} / ${capacity}
@@ -1167,14 +1337,16 @@
           return String(a.worker_name || "").trim().toUpperCase().localeCompare(String(b.worker_name || "").trim().toUpperCase());
         });
 
+        // High-Quality MotoGP Dark Silhouette Default Fallback SVG
+        const defaultRacerSilhouette = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><rect width='100%' height='100%' fill='%231a1a1a'/><path d='M50 22c-12 0-22 10-22 22 0 9 5.5 16.7 13.3 20.1C25 69 15 80 15 95h70c0-15-10-26-26.3-30.9C66.5 60.7 72 53 72 44c0-12-10-22-22-22z' fill='%23444444'/><path d='M50 28c-8.8 0-16 7.2-16 16 0 8.8 7.2 16 16 16s16-7.2 16-16c0-8.8-7.2-16-16-16z' fill='%23555555'/></svg>`;
+
         applicants.forEach(w => {
           const rawStatus = String(w.status).toUpperCase();
           const isConfirmed = (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED');
           const isWaitlist = (rawStatus === 'WAITLIST' || rawStatus === 'WAITING LIST');
           const isCancelled = (rawStatus === 'CANCELLED');
 
-          const defaultAvatar = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>`;
-          const photoUrl = w.photo_url || w.photo || defaultAvatar;
+          const photoUrl = w.photo_url || w.photo || defaultRacerSilhouette;
 
           let statusColumnMarkup = "";
           let actionColumnMarkup = "";
@@ -1228,10 +1400,12 @@
             <tr>
               <td>
                 <div class="worker-profile-cell">
-                  <img src="${photoUrl}" class="worker-avatar" alt="Photo" onerror="this.onerror=null; this.src='${defaultAvatar}';" />
+                  <div class="worker-avatar-frame">
+                    <img src="${photoUrl}" class="worker-avatar" alt="" onerror="this.onerror=null; this.src='${defaultRacerSilhouette}';" />
+                  </div>
                   <div>
-                    <div class="view-drawable-name" style="font-size:13px; text-transform:uppercase; line-height:1.2;" onclick="openWorkerProfileDrawer('${w.user_id}', '${String(w.worker_name || '').replace(/'/g, "\\'")}')">${w.worker_name}</div>
-                    <div style="font-size:10px; color:var(--text-muted); margin-top:2px; font-family:monospace;">ID: ${w.user_id}</div>
+                    <div class="view-drawable-name" style="font-size:12px; font-weight:900; text-transform:uppercase; line-height:1.2;" onclick="openWorkerProfileDrawer('${w.user_id}', '${String(w.worker_name || '').replace(/'/g, "\\'")}')">${w.worker_name}</div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-top:2px; font-family:monospace; font-weight:600;">ID: ${w.user_id}</div>
                   </div>
                 </div>
               </td>
@@ -1333,7 +1507,7 @@
 
       if (!confirm(promptMsg)) return;
 
-      document.getElementById('sync-loader').querySelector('.loader-text').textContent = "SYNCHRONIZING STATUS TRANSACTION...";
+      document.getElementById('sync-loader').querySelector('.loader-text').textContent = "Synchronizing Status Transaction...";
       document.getElementById('sync-loader').style.display = 'flex';
 
       fetch(`${SCRIPT_URL}?action=updateStatus&shiftId=${shiftId}&date=${date}&dept=${dept}&time=${time}&userDocNo=${workerId}&isWaitlist=${targetToWaitlist}`)
