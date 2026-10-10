@@ -782,7 +782,7 @@
         <a href="industry .html" class="submenu-item"><i class="ph-bold ph-info"></i> About MITEC</a>
         <a href="calendar.html" class="submenu-item"><i class="ph-bold ph-calendar-blank"></i> Event Calendar</a>
         <a href="student.html" class="submenu-item"><i class="ph-bold ph-student"></i> Student Ambassador Programme</a>
-        <a href="location.html" class="submenu-item"><i class="ph-bold ph-map-pin-line"></i> How to Get to MITEC</a>
+        <a href="twuw.html" class="submenu-item"><i class="ph-bold ph-map-pin-line"></i> How to Get to MITEC</a>
         <a href="faq.html" class="submenu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Help & Support
@@ -939,7 +939,7 @@
     </a>
   </nav>
 
-  <script>
+      <script>
   const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
   let supabaseClient = null;
@@ -964,16 +964,7 @@
     const submenu = document.getElementById(submenuId);
     const caret = document.getElementById(caretId);
     submenu.classList.toggle("open");
-    if (submenu.classList.contains("open")) {
-      caret.style.transform = "rotate(180deg)";
-    } else {
-      caret.style.transform = "rotate(0deg)";
-    }
-  }
-
-  function navigateToVoucherReplacement(event) {
-    if (event) event.preventDefault();
-    window.location.href = "voucher_replacement.html";
+    caret.style.transform = submenu.classList.contains("open") ? "rotate(180deg)" : "rotate(0deg)";
   }
 
   function logout() {
@@ -983,19 +974,13 @@
   }
 
   function getStoredWorker() { return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}"); }
-  function toProperCase(str) { if (!str) return ""; return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
-
-  function convertToDirectLink(url) {
-    if (!url) return "";
-    return String(url).trim();
-  }
+  function toProperCase(str) { return str ? str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : ""; }
 
   function setImageWithFallback(imgId, src, fallback) {
     const imgEl = document.getElementById(imgId);
     if (!imgEl) return;
     imgEl.onerror = function() { this.onerror = null; this.src = fallback; };
-    const finalSrc = convertToDirectLink(src);
-    if (finalSrc && finalSrc.length > 5) imgEl.src = finalSrc;
+    if (src && src.length > 5) imgEl.src = src;
   }
 
   async function fillWorkerData() {
@@ -1006,9 +991,8 @@
 
     const fallbackSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231B365D'/></svg>";
 
-    let photoUrl = worker.photo_link || worker.photo || "";
-    if (photoUrl) {
-      setImageWithFallback("headerPhoto", photoUrl, fallbackSvg);
+    if (worker.photo_link) {
+      setImageWithFallback("headerPhoto", worker.photo_link, fallbackSvg);
     }
 
     const loaderState = document.getElementById("loaderState");
@@ -1018,10 +1002,13 @@
     const vouchVal = document.getElementById("dashVoucher");
     const hoursVal = document.getElementById("dashHours");
 
-    if (docNo) {
-      try {
-        const client = getSupabase();
+    if (!docNo) return;
 
+    try {
+      const client = getSupabase();
+
+      // 1. Fetch profile ONLY if missing from local storage (Saves egress on return visits)
+      if (!worker.photo_link || !worker.name_mykad) {
         const { data: profile } = await client
           .from('casual_labour_profile')
           .select('photo_link, name_mykad')
@@ -1039,80 +1026,69 @@
           }
           localStorage.setItem("mitecWorkerRecord", JSON.stringify(worker));
         }
+      }
 
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const todayDateString = `${year}-${month}-${day}`;
-        const todayFormattedDate = `${day}/${month}/${year}`;
+      // 2. Fetch Attendance (Only specific columns to reduce data transfer)
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const todayDateString = `${year}-${month}-${day}`;
+      const todayFormattedDate = `${day}/${month}/${year}`;
 
-        const { data: summary } = await client
-          .from('attendance_records')
-          .select('*')
-          .eq('doc_no', docNo)
-          .eq('working_date', todayDateString)
-          .order('timestamp', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+      const { data: summary } = await client
+        .from('attendance_records')
+        .select('clock_in, clock_out, voucher, hours, timestamp')
+        .eq('doc_no', docNo)
+        .eq('working_date', todayDateString)
+        .order('timestamp', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-        loaderState.style.display = "none";
-        summaryGrid.style.display = "grid";
+      loaderState.style.display = "none";
+      summaryGrid.style.display = "grid";
 
-        if (summary) {
-          let formattedClockIn = "--:--";
-          if (summary.clock_in) {
-            formattedClockIn = `${todayFormattedDate}<br>${summary.clock_in}`;
-          } else if (summary.timestamp) {
-            let timePart = "";
-            if (summary.timestamp.includes('T')) {
-              timePart = summary.timestamp.split('T')[1].substring(0, 8);
-            } else if (summary.timestamp.includes(' ')) {
-              timePart = summary.timestamp.split(' ')[1].substring(0, 8);
-            }
-            if (timePart) {
-              formattedClockIn = `${todayFormattedDate}<br>${timePart}`;
-            }
-          }
-
-          let formattedClockOut = "--:--";
-          if (summary.clock_out) {
-            formattedClockOut = `${todayFormattedDate}<br>${summary.clock_out}`;
-          }
-
-          inVal.innerHTML = formattedClockIn;
-          outVal.innerHTML = formattedClockOut;
-          vouchVal.textContent = summary.voucher ? summary.voucher : "-";
-          hoursVal.textContent = (summary.hours !== null && summary.hours !== undefined) ? summary.hours : "0.0";
-        } else {
-          inVal.innerHTML = "--:--";
-          outVal.innerHTML = "--:--";
-          vouchVal.textContent = "-";
-          hoursVal.textContent = "0.0";
+      if (summary) {
+        let formattedClockIn = "--:--";
+        if (summary.clock_in) {
+          formattedClockIn = `${todayFormattedDate}<br>${summary.clock_in}`;
+        } else if (summary.timestamp) {
+          let timePart = summary.timestamp.includes('T') ? summary.timestamp.split('T')[1].substring(0, 8) : summary.timestamp.split(' ')[1]?.substring(0, 8);
+          if (timePart) formattedClockIn = `${todayFormattedDate}<br>${timePart}`;
         }
-      } catch (e) { 
-        console.error(e);
-        loaderState.style.display = "none";
-        summaryGrid.style.display = "grid";
+
+        inVal.innerHTML = formattedClockIn;
+        outVal.innerHTML = summary.clock_out ? `${todayFormattedDate}<br>${summary.clock_out}` : "--:--";
+        vouchVal.textContent = summary.voucher || "-";
+        hoursVal.textContent = (summary.hours !== null && summary.hours !== undefined) ? summary.hours : "0.0";
+      } else {
         inVal.innerHTML = "--:--";
         outVal.innerHTML = "--:--";
         vouchVal.textContent = "-";
         hoursVal.textContent = "0.0";
       }
+    } catch (e) { 
+      console.error("Dashboard Sync Error:", e);
+      loaderState.style.display = "none";
+      summaryGrid.style.display = "grid";
+      inVal.innerHTML = "--:--";
+      outVal.innerHTML = "--:--";
+      vouchVal.textContent = "-";
+      hoursVal.textContent = "0.0";
     }
   }
 
-  // DIRECT SUPABASE FETCH FOR ANNOUNCEMENTS & DYNAMIC BIRTHDAYS
   async function loadHubSupabaseData() {
     try {
       const client = getSupabase();
 
-      // 1. Fetch Active Announcements
+      // 1. Fetch active announcements (Limited to 5 recent posts)
       const { data: announcements, error: annErr } = await client
         .from('announcements')
-        .select('*')
+        .select('tag, body')
         .eq('active', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(5);
 
       const track = document.getElementById("announcementTrack");
       const dotsContainer = document.getElementById("carouselDots");
@@ -1148,29 +1124,11 @@
         showAnnouncementFallback();
       }
 
-      // 2. Fetch Real Worker Profiles for Today's Birthday
-      const today = new Date();
-      const monthDay = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-      const { data: profiles, error: bdayErr } = await client
-        .from('casual_labour_profile')
-        .select('name_mykad, doc_no')
-        .not('doc_no', 'is', null);
-
+      // 2. Fetch Birthdays using the server-side RPC function created in Step 1
       const spinWindow = document.getElementById("spinWindow");
-      
-      // Dynamic Birthday Identification Logic (MyKAD YYMMDD)
-      const bdayList = profiles ? profiles.filter(p => {
-        if (!p.doc_no) return false;
-        const cleanDoc = String(p.doc_no).replace(/[^\d]/g, '');
-        if (cleanDoc.length < 6) return false;
-        
-        const mm = cleanDoc.substring(2, 4);
-        const dd = cleanDoc.substring(4, 6);
-        return `${mm}-${dd}` === monthDay;
-      }) : [];
+      const { data: bdayList, error: bdayErr } = await client.rpc('get_todays_birthdays');
 
-      if (!bdayErr && bdayList.length > 0) {
+      if (!bdayErr && bdayList && bdayList.length > 0) {
         let bdayListHtml = "";
         bdayList.forEach(item => {
           bdayListHtml += `<div class="person"><span class="person-name">${toProperCase(item.name_mykad)}</span></div>`;
@@ -1181,7 +1139,7 @@
       }
 
     } catch (err) {
-      console.error("Failed to load Supabase Hub data:", err);
+      console.error("Hub Data Load Failed:", err);
       showAnnouncementFallback();
     }
   }
@@ -1221,8 +1179,9 @@
     }
   }
 
-
   initDashboard();
   </script>
+
+
 </body>
 </html>
