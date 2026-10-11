@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Casual Labour Dashboard</title>
 
   <!-- PWA Manifest & Meta Tags -->
@@ -68,7 +68,7 @@
       flex-direction: column;
       min-height: 100vh;
       padding-top: 80px; 
-      padding-bottom: 110px;
+      padding-bottom: 90px;
       overflow-x: hidden;
     }
 
@@ -641,26 +641,24 @@
       letter-spacing: 0.02em; 
     }
 
-    /* FLOATING BOTTOM NAVIGATION BAR */
+    /* DOCKED BOTTOM NAVIGATION BAR */
     .bottom-nav {
       position: fixed; 
-      bottom: 14px; 
-      left: 50%; 
-      transform: translateX(-50%); 
-      width: 92%; 
-      max-width: 430px;
-      height: 70px; 
-      background: rgba(255, 255, 255, 0.9);
+      bottom: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 62px; 
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(0,0,0,0.08); 
-      border-radius: 24px; 
+      border-top: 1px solid rgba(0, 0, 0, 0.08); 
+      border-radius: 0; 
       display: grid; 
       grid-template-columns: repeat(5, 1fr); 
       padding: 0; 
-      box-shadow: 0 12px 28px rgba(9, 34, 83, 0.12); 
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      box-shadow: 0 -4px 20px rgba(9, 34, 83, 0.06); 
       z-index: 1000; 
-      overflow: hidden;
     }
 
     .nav-item { 
@@ -668,11 +666,17 @@
       flex-direction: column; 
       align-items: center; 
       justify-content: center; 
-      gap: 4px; 
+      gap: 3px; 
       position: relative; 
       color: var(--md-on-surface-variant);
       text-decoration: none; 
       transition: background 0.2s ease, color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-item svg,
+    .nav-label {
+      pointer-events: none; /* Passes tap events through directly to the anchor container */
     }
 
     .nav-item svg { width: 20px; height: 20px; stroke-width: 2; position: relative; z-index: 2; stroke: currentColor; }
@@ -742,19 +746,19 @@
     <!-- Scrollable Menu Content Area -->
     <div class="nav-content-scroll">
       <!-- Group 1: Core Navigation -->
-      <a href="dashboard.html" class="dropdown-item"><i class="ph-bold ph-house"></i> Home</a>
-      <a href="hub.html" class="dropdown-item"><i class="ph-bold ph-squares-four"></i> Services</a>
-      <a href="booking.html" class="dropdown-item"><i class="ph-bold ph-calendar"></i> Schedule</a>
-      <a href="history.html" class="dropdown-item"><i class="ph-bold ph-clock-counter-clockwise"></i> History</a>
-      <a href="profile.html" class="dropdown-item"><i class="ph-bold ph-user"></i> Profile</a>
+      <a href="javascript:void(0)" onclick="goToPage('dashboard.html')" class="dropdown-item"><i class="ph-bold ph-house"></i> Home</a>
+      <a href="javascript:void(0)" onclick="goToPage('hub.html')" class="dropdown-item"><i class="ph-bold ph-squares-four"></i> Services</a>
+      <a href="javascript:void(0)" onclick="goToPage('booking.html')" class="dropdown-item"><i class="ph-bold ph-calendar"></i> Schedule</a>
+      <a href="javascript:void(0)" onclick="goToPage('history.html')" class="dropdown-item"><i class="ph-bold ph-clock-counter-clockwise"></i> History</a>
+      <a href="javascript:void(0)" onclick="goToPage('profile.html')" class="dropdown-item"><i class="ph-bold ph-user"></i> Profile</a>
 
       <!-- Group 2: Shift & Attendance Group -->
-      <div class="dropdown-item" onclick="toggleGroupMenu('shiftGroupSubmenu', 'shiftCaret')" style="cursor: pointer;">
+      <div class="dropdown-item" onclick="toggleGroupMenu('shiftGroupSubmenu', 'shiftCaret')">
         <i class="ph-bold ph-timer"></i> Shift & Attendance
         <i class="ph-bold ph-caret-down" id="shiftCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
       </div>
       <div id="shiftGroupSubmenu" class="dropdown-submenu">
-        <a href="booking.html" class="submenu-item">
+        <a href="javascript:void(0)" onclick="goToPage('booking.html')" class="submenu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           Shift Schedule
         </a>
@@ -762,14 +766,14 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
           Attendance History
         </a>
-        <a href="voucher_replacement.html" class="submenu-item">
+        <a href="javascript:void(0)" onclick="goToPage('voucher_replacement.html')" class="submenu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
           Voucher Replacement
         </a>
       </div>
 
       <!-- Group 3: Account & Finance Group -->
-      <div class="dropdown-item" onclick="toggleGroupMenu('financeGroupSubmenu', 'financeCaret')" style="cursor: pointer;">
+      <div class="dropdown-item" onclick="toggleGroupMenu('financeGroupSubmenu', 'financeCaret')">
         <i class="ph-bold ph-wallet"></i> Account & Finance
         <i class="ph-bold ph-caret-down" id="financeCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
       </div>
@@ -781,27 +785,27 @@
       </div>
 
       <!-- Group 4: About & Information Group -->
-      <div class="dropdown-item" onclick="toggleGroupMenu('infoGroupSubmenu', 'infoCaret')" style="cursor: pointer;">
+      <div class="dropdown-item" onclick="toggleGroupMenu('infoGroupSubmenu', 'infoCaret')">
         <i class="ph-bold ph-info"></i> Information & Guides
         <i class="ph-bold ph-caret-down" id="infoCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
       </div>
       <div id="infoGroupSubmenu" class="dropdown-submenu">
-        <a href="industry .html" class="submenu-item"><i class="ph-bold ph-info"></i> About MITEC</a>
-        <a href="calendar.html" class="submenu-item"><i class="ph-bold ph-calendar-blank"></i> Event Calendar</a>
-        <a href="student.html" class="submenu-item"><i class="ph-bold ph-student"></i> Student Ambassador Programme</a>
-        <a href="twuw.html" class="submenu-item"><i class="ph-bold ph-map-pin-line"></i> How to Get to MITEC</a>
-        <a href="faq.html" class="submenu-item">
+        <a href="javascript:void(0)" onclick="goToPage('industry .html')" class="submenu-item"><i class="ph-bold ph-info"></i> About MITEC</a>
+        <a href="javascript:void(0)" onclick="goToPage('calendar.html')" class="submenu-item"><i class="ph-bold ph-calendar-blank"></i> Event Calendar</a>
+        <a href="javascript:void(0)" onclick="goToPage('student.html')" class="submenu-item"><i class="ph-bold ph-student"></i> Student Ambassador Programme</a>
+        <a href="javascript:void(0)" onclick="goToPage('location.html')" class="submenu-item"><i class="ph-bold ph-map-pin-line"></i> How to Get to MITEC</a>
+        <a href="javascript:void(0)" onclick="goToPage('faq.html')" class="submenu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Help & Support
         </a>
-        <a href="feedback-form.html" class="submenu-item">
+        <a href="javascript:void(0)" onclick="goToPage('feedback-form.html')" class="submenu-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
           Contact Us
         </a>
       </div>
 
       <!-- Group 5: Quick Links Group -->
-      <div class="dropdown-item" onclick="toggleGroupMenu('quickLinksSubmenu', 'quickLinksCaret')" style="cursor: pointer;">
+      <div class="dropdown-item" onclick="toggleGroupMenu('quickLinksSubmenu', 'quickLinksCaret')">
         <i class="ph-bold ph-link-simple"></i> Quick Links 
         <i class="ph-bold ph-caret-down" id="quickLinksCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
       </div>
@@ -922,25 +926,25 @@
     <p class="footer-meta">© MITEC. All rights reserved.</p>
   </footer>
 
-  <!-- FLOATING NAVIGATION MATRIX -->
+  <!-- DOCKED BOTTOM NAVIGATION MATRIX -->
   <nav class="bottom-nav">
-    <a href="dashboard.html" class="nav-item active">
+    <a href="javascript:void(0)" onclick="goToPage('dashboard.html')" class="nav-item active">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="nav-label">Home</span>
     </a>
-    <a href="hub.html" class="nav-item">
+    <a href="javascript:void(0)" onclick="goToPage('hub.html')" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
       <span class="nav-label">Services</span>
     </a>
-    <a href="booking.html" class="nav-item">
+    <a href="javascript:void(0)" onclick="goToPage('booking.html')" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span class="nav-label">Schedule</span>
     </a>
-    <a href="history.html" class="nav-item">
+    <a href="javascript:void(0)" onclick="goToPage('history.html')" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       <span class="nav-label">History</span>
     </a>
-    <a href="profile.html" class="nav-item">
+    <a href="javascript:void(0)" onclick="goToPage('profile.html')" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="nav-label">Profile</span>
     </a>
@@ -1053,7 +1057,7 @@
         sessionStorage.setItem(`dash_summary_cache_${docNo}`, JSON.stringify(rpcData.summary || {}));
         sessionStorage.setItem(`dash_summary_time_${docNo}`, String(nowTime));
         renderShiftSummary(rpcData.summary);
-        
+
         // Cache announcements and birthdays from bundled RPC
         if (rpcData.announcements) renderAnnouncements(rpcData.announcements);
         if (rpcData.birthdays) renderBirthdays(rpcData.birthdays);
