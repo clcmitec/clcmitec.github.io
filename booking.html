@@ -328,7 +328,7 @@
       box-shadow: 0 2px 4px rgba(6, 62, 153, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
     }
 
-    /* SUBTLE MUTED WAITLIST BUTTON (DOES NOT OVERPOWER BOOK NOW) */
+    /* SUBTLE MUTED WAITLIST BUTTON */
     .btn-shadcn-outline-waitlist {
       background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
       color: #4b6b94 !important;
@@ -534,6 +534,10 @@
   <script>
     const REQUIRED_APP_VERSION = "v1.1"; 
 
+    // DIRECT SUPABASE CREDENTIALS (< 150ms INSTANT READS & WRITES)
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+
     function goToPage(url) { window.location.href = url; }
 
     if (localStorage.getItem("mcl_app_version") !== REQUIRED_APP_VERSION) {
@@ -542,8 +546,6 @@
       localStorage.setItem("mcl_app_version", REQUIRED_APP_VERSION);
       window.location.href = "index.html"; 
     }
-
-    const SPREADSHEET_URL = "https://script.google.com/macros/s/AKfycbwcC4H4Nl-MyxnoMhEM67okwHAP9Ha7NKya6WbangXT-U069ayqPfEY53Puxqguu7zf/exec"; 
 
     let isRequestInProgress = false;
     let activeController = null; 
@@ -568,8 +570,9 @@
         return; 
       }
 
-      const cleanDocNo = String(userDocNo).trim().replace(/[^0-9A-Za-z]/g, "").toUpperCase();
-      localStorage.setItem("mcl_doc_no", cleanDocNo);
+      // Store exact doc_no from profile without stripping
+      const docNo = String(userDocNo).trim();
+      localStorage.setItem("mcl_doc_no", docNo);
 
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       const rawName = record.full_name || record.name_mykad || "MITEC Casual Labour";
@@ -579,7 +582,8 @@
       if (record.photo_link) document.getElementById("userAvatar").src = record.photo_link;
 
       // SPEED OPTIMIZATION: Instant render from Session Storage
-      const cachedDataStr = sessionStorage.getItem(`mcl_portal_cache_${cleanDocNo}`);
+      const cleanKey = docNo.replace(/[']/g, '');
+      const cachedDataStr = sessionStorage.getItem(`mcl_portal_cache_${cleanKey}`);
       if (cachedDataStr) {
         try {
           const cachedData = JSON.parse(cachedDataStr);
@@ -594,7 +598,7 @@
         }
       }
 
-      refreshData(cleanDocNo, !cachedDataStr);
+      refreshData(docNo, !cachedDataStr);
     };
 
     function showLoader(message) {
@@ -603,31 +607,93 @@
       loader.style.display = 'flex';
     }
 
-    function refreshData(docNo, showOverlay = true) {
+    // ACCURATE DYNAMIC SLOT COUNTING FETCH
+    async function refreshData(docNo, showOverlay = true) {
       if (activeController) activeController.abort(); 
       activeController = new AbortController();
       
       if (showOverlay) showLoader("Syncing Master Timelines...");
 
-      fetch(`${SPREADSHEET_URL}?action=getShifts&userDocNo=${encodeURIComponent(docNo)}`, { signal: activeController.signal })
-        .then(r => r.json())
-        .then(res => {
-          if(res.ok) {
-            sessionStorage.setItem(`mcl_portal_cache_${docNo}`, JSON.stringify(res));
+      try {
+        const headers = { 
+          "apikey": SUPABASE_KEY, 
+          "Authorization": `Bearer ${SUPABASE_KEY}` 
+        };
 
-            cachedShifts = res.allShifts || [];
-            cachedBookings = res.myUpcomingEvents || [];
-            renderDepartmentChips(cachedShifts);
-            renderAvailable(cachedShifts, cachedBookings);
-            renderBooked(cachedBookings);
-            renderHistoryLog(cachedBookings);
-            document.getElementById('sync-loader').style.display = 'none';
-          }
-        }).catch(err => { 
-          if (err.name !== 'AbortError') {
-             document.getElementById('sync-loader').style.display = 'none';
+        // Prepare doc_no variants for matching (with and without apostrophe)
+        const rawDoc = String(docNo).trim().replace(/^'/, '');
+        const docWithQuote = `'${rawDoc}`;
+
+        // 1. Concurrent requests to Supabase
+        const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers, signal: activeController.signal }).then(r => r.json());
+        const userBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?doc_no=in.("${encodeURIComponent(rawDoc)}","${encodeURIComponent(docWithQuote)}")&select=*`, { headers, signal: activeController.signal }).then(r => r.json());
+        
+        // Fetch all active bookings (selecting shift_id & status, up to maximum range)
+        const allBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=shift_id,status&limit=50000`, { headers, signal: activeController.signal }).then(r => r.json());
+
+        const [shiftsRes, userBookingsRes, allBookingsRes] = await Promise.all([
+          shiftsPromise, 
+          userBookingsPromise, 
+          allBookingsPromise
+        ]);
+
+        // 2. Count non-cancelled bookings per shift_id (Case-insensitive)
+        const bookingCounts = {};
+        (allBookingsRes || []).forEach(b => {
+          const st = String(b.status || '').trim().toUpperCase();
+          if (b.shift_id && st !== 'CANCELLED') {
+            bookingCounts[b.shift_id] = (bookingCounts[b.shift_id] || 0) + 1;
           }
         });
+
+        // 3. Deduct active bookings from shift_master total slots
+        cachedShifts = (shiftsRes || []).map(s => {
+          const totalCapacity = parseInt(s.slots) || 0;
+          const activeBooked = bookingCounts[s.shift_id] || 0;
+          const remainingSlots = Math.max(0, totalCapacity - activeBooked);
+
+          return {
+            id: s.shift_id,
+            date: s.date ? s.date.split('-').reverse().join('.') : '', // YYYY-MM-DD -> DD.MM.YYYY
+            dept: s.dept || '',
+            time: s.time || '',
+            totalSlots: totalCapacity,
+            slotsLeft: remainingSlots,
+            notes: s.notes || '',
+            status: s.status || 'OPEN',
+            wa_link: s.wa_link || ''
+          };
+        });
+
+        cachedBookings = (userBookingsRes || []).map(b => ({
+          shift_id: b.shift_id || '',
+          date: b.date ? b.date.split('-').reverse().join('.') : '',
+          dept: b.dept || '',
+          time: b.time || '',
+          status: b.status || '',
+          attendance: b.attendance || '',
+          wa_link: getWaLinkForShift(cachedShifts, b.shift_id)
+        }));
+
+        sessionStorage.setItem(`mcl_portal_cache_${rawDoc}`, JSON.stringify({
+          allShifts: cachedShifts,
+          myUpcomingEvents: cachedBookings
+        }));
+
+        renderDepartmentChips(cachedShifts);
+        renderAvailable(cachedShifts, cachedBookings);
+        renderBooked(cachedBookings);
+        renderHistoryLog(cachedBookings);
+      } catch (err) {
+        if (err.name !== 'AbortError') console.error("Supabase direct fetch error:", err);
+      } finally {
+        document.getElementById('sync-loader').style.display = 'none';
+      }
+    }
+
+    function getWaLinkForShift(shifts, shiftId) {
+      const match = shifts.find(s => s.id === shiftId);
+      return match ? match.wa_link : '';
     }
 
     function renderDepartmentChips(shifts) {
@@ -898,7 +964,7 @@
 
             ${isLockActive ? 
               `<div class="btn btn-shadcn-filled-muted w-100 small mt-2 d-flex align-items-center justify-content-center gap-2" disabled><i class="ph ph-lock-keyhole"></i> Cancellation Locked (Within 12 Hours)</div>` :
-              `<button class="btn btn-shadcn-filled-cancel w-100 mt-2" onclick="cancelBooking('${b.shift_id}', this)">Request Cancel</button>`
+              `<button class="btn btn-shadcn-filled-cancel w-100 mt-2" onclick="cancelBooking('${b.shift_id}', '${localStorage.getItem('mcl_doc_no')}', this)">Request Cancel</button>`
             }
           </div>`;
       });
@@ -971,10 +1037,20 @@
       container.innerHTML = htmlBuffer;
     }
 
-    function handleBooking(id, date, dept, time, waitlist, element) {
+    // DIRECT SUPABASE WRITE WITH AUTOMATIC MYKAD CONFIRMATION & PREPENDED APOSTROPHE
+    async function handleBooking(id, date, dept, time, waitlist, element) {
       if (isRequestInProgress) return;
-      const rawDocNo = localStorage.getItem("mcl_doc_no") || "";
-      const cleanDocNo = String(rawDocNo).trim().replace(/[^0-9A-Za-z]/g, "");
+      
+      // Direct exact string from profile
+      const rawDocNo = String(localStorage.getItem("mcl_doc_no") || "").trim();
+      if (!rawDocNo) { alert("Session invalid. Please log in again."); return; }
+
+      // Enforce mandatory leading apostrophe (') for storage/formatting compliance
+      const docNo = rawDocNo.startsWith("'") ? rawDocNo : `'${rawDocNo}`;
+
+      // Retrieve worker profile details from local storage
+      const workerRecord = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+      const docType = String(workerRecord.document_type || "MYKAD").trim().toUpperCase();
 
       if (!confirm(waitlist ? `Join waitlist for ${dept}?` : `Book shift for ${dept}?`)) return;
 
@@ -982,44 +1058,80 @@
       if (element) { element.disabled = true; element.style.opacity = "0.4"; element.innerText = "Processing..."; }
       showLoader(waitlist ? "Securing Standby Placement..." : "Booking Selected Shift...");
 
-      let formattedDate = String(date).trim();
-      if (formattedDate.includes("-")) {
-        formattedDate = formattedDate.split('-').reverse().join('.');
-      } else if (formattedDate.includes("/")) {
-        formattedDate = formattedDate.replace(/\//g, '.');
+      // Match current shift capacity from cached shifts
+      const targetShift = cachedShifts.find(s => s.id === id);
+      const totalSlots = targetShift ? parseInt(targetShift.totalSlots || 0) : 0;
+
+      // AUTOMATIC STATUS LOGIC
+      let status = "SUBMITTED";
+      if (waitlist) {
+        status = "WAITLIST";
+      } else if (totalSlots <= 15) {
+        // Shifts with 15 or fewer slots: ONLY MYKAD holders automatically get CONFIRMED
+        status = (docType === "MYKAD") ? "CONFIRMED" : "WAITLIST";
       }
 
-      let formattedTime = formatAttendanceTime(time);
-      if (formattedTime.includes("-")) {
-        formattedTime = formattedTime.split('-').map(t => {
-          let segment = t.trim().replace(/[^0-9]/g, "");
-          if(segment.length === 4) return segment.substring(0,2) + ":" + segment.substring(2,4);
-          return t.trim();
-        }).join(" - ");
-      } else {
-        let cleanTime = formattedTime.replace(/[^0-9]/g, "");
-        if (cleanTime.length === 4) {
-          formattedTime = cleanTime.substring(0, 2) + ":" + cleanTime.substring(2, 4);
-        }
-      }
+      const cleanDate = String(date).trim().replace(/\//g, '.'); // DD.MM.YYYY
+      const rawTime = String(time).trim();
+      const hourPart = rawTime.includes(':') ? rawTime.split(':')[0] : rawTime.substring(0, 2);
+      
+      // Construct shift_timevalue & booking_id formulas using docNo (including leading apostrophe)
+      const shiftTimevalue = `${cleanDate}${dept}${hourPart}${docNo}`;
+      const cleanTime = rawTime.replace(/[^0-9]/g, "");
+      const bookingId = `${cleanDate}${dept}${cleanTime}${docNo}`;
 
-      if (activeController) activeController.abort();
-      activeController = new AbortController();
+      const dateParts = cleanDate.split('.');
+      const isoDate = dateParts.length === 3 ? `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}` : date;
 
-      const targetUrl = `${SPREADSHEET_URL}?action=submit&shiftId=${id}&date=${formattedDate}&dept=${dept}&time=${formattedTime}&userDocNo=${cleanDocNo}${waitlist ? '&isWaitlist=true' : ''}`;
+      const payload = [{
+        booking_id: bookingId,
+        timestamp: new Date().toISOString(),
+        shift_id: id,
+        doc_no: docNo, // Always starts with (') e.g. "'060715120474"
+        date: isoDate,
+        dept: dept,
+        time: time,
+        status: status,
+        shift_timevalue: shiftTimevalue,
+        document_type: docType,
+        updated_at: new Date().toISOString()
+      }];
 
-      fetch(targetUrl, { signal: activeController.signal })
-        .then(() => {
-          sessionStorage.removeItem(`mcl_portal_cache_${cleanDocNo}`);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/booking_record?on_conflict=booking_id`, {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          sessionStorage.removeItem(`mcl_portal_cache_${rawDocNo.replace(/[']/g, '')}`);
           window.location.reload();
-        })
-        .catch(err => { if (err.name !== 'AbortError') isRequestInProgress = false; });
+        } else {
+          const errData = await res.json();
+          alert("Booking failed: " + (errData.message || "Database error"));
+          if (element) { element.disabled = false; element.style.opacity = "1"; element.innerText = "Book Now"; }
+        }
+      } catch (err) {
+        alert("Network error: " + err.message);
+        if (element) { element.disabled = false; element.style.opacity = "1"; element.innerText = "Book Now"; }
+      } finally {
+        document.getElementById('sync-loader').style.display = 'none';
+        isRequestInProgress = false;
+      }
     }
 
-    function cancelBooking(shiftId, element) {
+    // DIRECT SUPABASE WRITE FOR CANCELLATION (< 100ms)
+    async function cancelBooking(shiftId, docNo, element) {
       if (isRequestInProgress) return;
-      const rawDocNo = localStorage.getItem("mcl_doc_no") || "";
-      const cleanDocNo = String(rawDocNo).trim().replace(/[^0-9A-Za-z]/g, "");
+      const rawDocNo = String(docNo || localStorage.getItem("mcl_doc_no") || "").trim();
+      const docNoWithQuote = rawDocNo.startsWith("'") ? rawDocNo : `'${rawDocNo}`;
+      const docNoWithoutQuote = rawDocNo.replace(/^'/, '');
 
       if (!confirm("Are you sure you want to request cancellation for this duty registration?")) return;
 
@@ -1027,17 +1139,36 @@
       if (element) { element.disabled = true; element.style.opacity = "0.4"; element.innerText = "Cancelling..."; }
       showLoader("Processing Cancellation Request...");
 
-      if (activeController) activeController.abort();
-      activeController = new AbortController();
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/booking_record?shift_id=eq.${encodeURIComponent(shiftId)}&doc_no=in.("${encodeURIComponent(docNoWithoutQuote)}","${encodeURIComponent(docNoWithQuote)}")`;
+        const res = await fetch(url, {
+          method: "PATCH",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ 
+            status: "CANCELLED", 
+            cancel_time: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+        });
 
-      fetch(`${SPREADSHEET_URL}?action=cancel&shiftId=${shiftId}&userDocNo=${cleanDocNo}`, { signal: activeController.signal })
-        .then(r => r.json())
-        .then(res => { 
-          if (!res.ok) alert("Cancellation failed: " + res.msg);
-          sessionStorage.removeItem(`mcl_portal_cache_${cleanDocNo}`);
-          window.location.reload(); 
-        })
-        .catch(err => { if (err.name !== 'AbortError') { isRequestInProgress = false; window.location.reload(); } });
+        if (res.ok) {
+          sessionStorage.removeItem(`mcl_portal_cache_${docNoWithoutQuote}`);
+          window.location.reload();
+        } else {
+          alert("Cancellation failed.");
+          if (element) { element.disabled = false; element.style.opacity = "1"; element.innerText = "Request Cancel"; }
+        }
+      } catch (err) {
+        alert("Error: " + err.message);
+        if (element) { element.disabled = false; element.style.opacity = "1"; element.innerText = "Request Cancel"; }
+      } finally {
+        document.getElementById('sync-loader').style.display = 'none';
+        isRequestInProgress = false;
+      }
     }
   </script>
 
