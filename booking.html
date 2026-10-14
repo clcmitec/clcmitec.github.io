@@ -1,217 +1,410 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W18GC0F7SG"></script>
+  <!-- Google tag (gtag.js) - Deferred -->
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-W18GC0F7SG"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-W18GC0F7SG');
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>MITEC — Shift Booking Portal</title>
   
-  <!-- Speed & Async Font Loading (Inter & Caveat) -->
+  <!-- Fonts (Inter + Caveat for Worker Name) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Phosphor Icons -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <!-- Phosphor Icons (Deferred) -->
+  <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
   
   <!-- Bootstrap 5.3 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
+    /* SHADCN OKLCH + 3D ELEVATION COLOR SYSTEM */
     :root {
-      --md-surface: #f4f6f9;
-      --md-surface-container: #ffffff;
-      --md-on-surface: #1d1d1f;
-      --md-on-surface-variant: #51525c;
-      --md-outline: #e1e4ea; 
+      --background: #eef2f7;
+      --foreground: oklch(0.147 0.004 49.3);
+      --card: #ffffff;
+      --card-foreground: oklch(0.147 0.004 49.3);
+      --popover: #ffffff;
+      --popover-foreground: oklch(0.147 0.004 49.3);
+      --primary: #063e99;
+      --primary-foreground: #ffffff;
+      --secondary: #e2e8f0;
+      --secondary-foreground: #1e293b;
+      --muted: #f1f5f9;
+      --muted-foreground: #64748b;
+      --accent: #e2e8f0;
+      --accent-foreground: #0f172a;
+      --destructive: #dc2626;
+      --border: #cad5e2;
+      --input: #cbd5e1;
+      --ring: #3b82f6;
+      --radius: 0.75rem;
 
-      --mitec-blue: #1B365D;         
-      --mitec-blue-hover: #2D68C4;   
-      --mitec-accent: #0f4a82;       
-
-      --accent-amber: #b45309;
-      --accent-gold: #d97706;
-      --accent-red: #be123c;
-
-      --md-font: 'Inter', -apple-system, sans-serif;
-      --brand-font: 'Caveat', cursive, sans-serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; font-family: var(--md-font); }
+    .dark {
+      --background: #0f172a;
+      --foreground: #f8fafc;
+      --card: #1e293b;
+      --card-foreground: #f8fafc;
+      --popover: #1e293b;
+      --popover-foreground: #f8fafc;
+      --primary: #2563eb;
+      --primary-foreground: #ffffff;
+      --secondary: #334155;
+      --secondary-foreground: #f8fafc;
+      --muted: #334155;
+      --muted-foreground: #94a3b8;
+      --accent: #334155;
+      --accent-foreground: #f8fafc;
+      --destructive: #ef4444;
+      --border: rgba(255, 255, 255, 0.12);
+      --input: rgba(255, 255, 255, 0.15);
+      --ring: #60a5fa;
+    }
+
+    * { 
+      box-sizing: border-box; 
+      -webkit-font-smoothing: antialiased; 
+      font-family: var(--font-sans); 
+    }
     
     body { 
-      background-color: var(--md-surface); 
-      color: var(--md-on-surface); 
+      background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--foreground); 
       padding-bottom: 90px; 
+      min-height: 100vh;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Header Styling */
+    /* FLOATING 3D HEADER */
     .header { 
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      height: 60px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      height: 58px;
+      border-bottom: 1px solid rgba(203, 213, 225, 0.8);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), inset 0 -1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .back-action-arrow {
-      color: var(--mitec-blue);
-      font-size: 22px;
+      color: var(--foreground);
+      font-size: 18px;
       text-decoration: none;
-      width: 38px;
-      height: 38px;
-      border-radius: 11px;
-      border: 1px solid rgba(0,0,0,0.08);
-      background: #ffffff;
-      transition: all 0.2s ease;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(0,0,0,0.1);
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08), inset 0 1px 0 #ffffff;
+      transition: all 0.15s ease;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .back-action-arrow:hover, .back-action-arrow:active { 
-      background: var(--md-surface);
+    .back-action-arrow:hover { 
       transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 #ffffff;
     }
-    .brand-img { height: 26px; width: auto; }
+    .back-action-arrow:active { 
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(0,0,0,0.15);
+    }
+    .brand-img { height: 22px; width: auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
 
-    .portal-container { max-width: 430px; margin: 0 auto; padding: 16px; }
+    .portal-container { max-width: 440px; margin: 0 auto; padding: 16px; }
 
-    /* MITEC Sapphire Profile Card */
+    /* 1. 3D GLOSSY PROFILE HEADER CARD */
     .profile-card { 
-      background: linear-gradient(135deg, #1B365D 0%, #0f4a82 100%); 
-      border-radius: 20px; 
-      color: #fff;
-      box-shadow: 0 6px 20px rgba(27, 54, 93, 0.15);
+      background: linear-gradient(135deg, #094ebf 0%, #063e99 65%, #03245c 100%); 
+      border-radius: var(--radius); 
+      color: var(--primary-foreground);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 12px 28px -6px rgba(6, 62, 153, 0.38), 0 4px 10px -2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255, 255, 255, 0.35);
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.12);
     }
     .profile-card::after {
       content: "";
       position: absolute;
-      top: -30%;
-      right: -20%;
-      width: 140px;
-      height: 140px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255,255,255,0) 70%);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
       pointer-events: none;
     }
-    .avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); object-fit: cover; }
+    .avatar { 
+      width: 44px; 
+      height: 44px; 
+      border-radius: 50%; 
+      border: 2px solid rgba(255, 255, 255, 0.8); 
+      object-fit: cover; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
 
-    /* Filter Chips Row */
+    /* CAVEAT FONT STYLING FOR WORKER NAME */
+    #userNameDisplay {
+      font-family: 'Caveat', cursive !important;
+      font-size: 1.55rem !important;
+      font-weight: 700 !important;
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      color: var(--primary-foreground);
+    }
+
+    /* FILTER CHIPS (TACTILE EMBOSSED) */
     .filter-chips-container {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding: 4px 0 14px 0;
+      padding: 6px 2px 14px 2px;
       scrollbar-width: none;
     }
     .filter-chips-container::-webkit-scrollbar { display: none; }
 
     .filter-chip-btn {
-      font-size: 11px;
-      font-weight: 700;
-      border-radius: 999px !important;
-      padding: 6px 16px !important;
-      transition: all 0.2s ease;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 20px !important;
+      padding: 7px 16px !important;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
     }
     .filter-chip-btn.active-chip {
-      background-color: var(--mitec-blue) !important;
+      background: linear-gradient(180deg, #094ebf 0%, #063e99 100%) !important;
       color: #ffffff !important;
-      border-color: var(--mitec-blue) !important;
-      box-shadow: 0 2px 8px rgba(27, 54, 93, 0.25);
+      border: 1px solid #042d70 !important;
+      box-shadow: 0 4px 12px rgba(6, 62, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
     }
     .filter-chip-btn.inactive-chip {
-      background-color: #ffffff !important;
-      color: var(--md-on-surface-variant) !important;
-      border: 1px solid var(--md-outline) !important;
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
+      color: #334155 !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05), inset 0 1px 0 #ffffff !important;
+    }
+    .filter-chip-btn.inactive-chip:hover {
+      transform: translateY(-1px);
+      background: #ffffff !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 #ffffff !important;
+    }
+    .filter-chip-btn:active {
+      transform: translateY(1px) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
     }
 
+    /* DATE SECTION HEADERS - SIGNIFICANT SPACING */
     .date-label { 
-      font-size: 11px; font-weight: 800; color: var(--mitec-blue); 
-      margin: 20px 0 12px 2px; text-transform: uppercase; letter-spacing: 1.2px;
-      display: flex; align-items: center; gap: 12px;
+      font-size: 12px; 
+      font-weight: 700; 
+      color: #334155; 
+      margin-top: 68px; 
+      margin-bottom: 16px;
+      margin-left: 2px;
+      text-transform: uppercase; 
+      letter-spacing: 0.12em;
+      display: flex; 
+      align-items: center; 
+      gap: 15px;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
     }
-    .date-label::after { content: ""; flex: 1; height: 1px; background: var(--md-outline); }
+    .date-label.first-date { margin-top: 10px; }
+    .date-label::after { 
+      content: ""; 
+      flex: 1; 
+      height: 2px; 
+      background: linear-gradient(90deg, var(--border) 0%, rgba(202, 213, 226, 0.2) 100%); 
+      border-radius: 1px;
+    }
 
-    /* Card Layout & States */
+    /* 3D RAISED SHIFT CARDS */
     .card-shift {
-      background: var(--md-surface-container);
-      border: 1px solid rgba(9, 34, 83, 0.08) !important;
-      border-radius: 18px !important;
-      box-shadow: 0 4px 16px rgba(9, 34, 83, 0.03);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid rgba(6, 62, 153, 0.12) !important;
+      border-radius: var(--radius) !important;
+      color: var(--card-foreground);
+      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      margin-bottom: 12px !important; 
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .card-shift:hover {
+      transform: translateY(-3px) scale(1.008);
+      box-shadow: 0 14px 28px -6px rgba(6, 62, 153, 0.14), 0 6px 12px -2px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
+      border-color: rgba(6, 62, 153, 0.25) !important;
     }
 
-    .card.locked { opacity: 0.55; filter: grayscale(0.8); pointer-events: none; }
+    .card.locked { opacity: 0.35; filter: grayscale(0.8); pointer-events: none; }
 
     .card.full-shift {
-      background: #fdfefe;
-      border-color: var(--md-outline) !important;
-    }
-    .card.full-shift .card-header,
-    .card.full-shift .card-meta {
-      opacity: 0.6;
+      background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-color: rgba(0,0,0,0.08) !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.6);
     }
 
-    /* Hot Item Shift: Vibrant Gold Highlight */
-    .card.spotlight {
-      border: 2px solid var(--accent-gold) !important;
-      background: linear-gradient(180deg, #fffdf2 0%, #ffffff 35%);
-      animation: hotGlow 2.5s infinite ease-in-out, hotShiftShake 4s infinite ease-in-out;
+    /* 3D BADGES */
+    .badge-shadcn-full {
+      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%) !important;
+      color: #ffffff !important;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: calc(var(--radius) - 0.3rem);
+      padding: 4px 9px;
+      box-shadow: 0 2px 5px rgba(220, 38, 38, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    .badge-shadcn-left {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
+      color: #1e293b !important;
+      border: 1px solid rgba(0,0,0,0.12) !important;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: calc(var(--radius) - 0.3rem);
+      padding: 4px 9px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), inset 0 1px 0 #ffffff;
+    }
+    .badge-shadcn-wait {
+      background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%) !important;
+      color: #92400e !important;
+      border: 1px solid #fcd34d !important;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: calc(var(--radius) - 0.3rem);
+      padding: 4px 9px;
+      box-shadow: 0 2px 5px rgba(217, 119, 6, 0.18), inset 0 1px 0 #ffffff;
+    }
+    .badge-shadcn-confirmed {
+      background: linear-gradient(180deg, #dcfce7 0%, #bbf7d0 100%) !important;
+      color: #14532d !important;
+      border: 1px solid #86efac !important;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: calc(var(--radius) - 0.3rem);
+      padding: 4px 9px;
+      box-shadow: 0 2px 5px rgba(22, 101, 52, 0.15), inset 0 1px 0 #ffffff;
     }
 
-    @keyframes hotGlow {
-      0% { box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2); }
-      50% { box-shadow: 0 8px 22px rgba(217, 119, 6, 0.4); }
-      100% { box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2); }
-    }
-
-    @keyframes hotShiftShake {
-      0%, 90%, 100% { transform: translateY(0) rotate(0deg); }
-      92% { transform: translateY(-2px) rotate(-0.5deg); }
-      94% { transform: translateY(1px) rotate(0.5deg); }
-      96% { transform: translateY(-1px) rotate(-0.3deg); }
-      98% { transform: translateY(1px) rotate(0.3deg); }
-    }
-
+    /* SPOTLIGHT BANNER */
     .spotlight-banner {
-      background: #fef3c7;
+      background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
       border: 1px solid #fde68a;
       color: #92400e;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 600;
       padding: 8px 12px;
-      border-radius: 10px;
+      border-radius: calc(var(--radius) - 0.3rem);
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.1), inset 0 1px 0 #ffffff;
     }
 
-    /* Primary Action Buttons */
-    .btn-mitec-primary {
-      background-color: var(--mitec-blue) !important;
+    /* TACTILE 3D BUTTONS */
+    .btn-shadcn-primary {
+      background: linear-gradient(180deg, #1b63d7 0%, #063e99 100%) !important;
       color: #ffffff !important;
-      border: none !important;
-      font-weight: 700 !important;
-      transition: background-color 0.2s ease, transform 0.2s ease !important;
+      border: 1px solid #05337e !important;
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      border-radius: calc(var(--radius) - 0.15rem) !important;
+      padding: 10px 16px !important;
+      box-shadow: 0 4px 12px rgba(6, 62, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      transition: all 0.15s ease !important;
     }
-    .btn-mitec-primary:hover, .btn-mitec-primary:active {
-      background-color: var(--mitec-blue-hover) !important;
+    .btn-shadcn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(6, 62, 153, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+    }
+    .btn-shadcn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(6, 62, 153, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+    }
+
+    /* SUBTLE MUTED WAITLIST BUTTON (DOES NOT OVERPOWER BOOK NOW) */
+    .btn-shadcn-outline-waitlist {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+      color: #4b6b94 !important;
+      border: 1px solid rgba(6, 62, 153, 0.28) !important;
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      border-radius: calc(var(--radius) - 0.15rem) !important;
+      padding: 10px 16px !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 #ffffff;
+      transition: all 0.15s ease !important;
+    }
+    .btn-shadcn-outline-waitlist:hover {
+      background: linear-gradient(180deg, #f0f5ff 0%, #e6efff 100%) !important;
+      color: #063e99 !important;
+      border-color: rgba(6, 62, 153, 0.5) !important;
+      box-shadow: 0 2px 6px rgba(6, 62, 153, 0.12), inset 0 1px 0 #ffffff !important;
       transform: translateY(-1px);
     }
+    .btn-shadcn-outline-waitlist:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+    }
 
-    /* Docked Bottom Navigation Bar */
+    .btn-shadcn-filled-muted {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
+      color: #334155 !important;
+      border: 1px solid #cbd5e1 !important;
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      border-radius: calc(var(--radius) - 0.15rem) !important;
+      padding: 10px 16px !important;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05), inset 0 1px 0 #ffffff;
+      transition: all 0.15s ease !important;
+    }
+    .btn-shadcn-filled-muted:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.08), inset 0 1px 0 #ffffff !important;
+    }
+    .btn-shadcn-filled-muted:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 2px 3px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .btn-shadcn-filled-cancel {
+      background: linear-gradient(180deg, #fef2f2 0%, #fecaca 100%) !important;
+      color: #991b1b !important;
+      border: 1px solid #fca5a5 !important;
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      border-radius: calc(var(--radius) - 0.15rem) !important;
+      padding: 10px 16px !important;
+      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15), inset 0 1px 0 #ffffff;
+      transition: all 0.15s ease !important;
+    }
+    .btn-shadcn-filled-cancel:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 3px rgba(220, 38, 38, 0.2), inset 0 2px 3px rgba(0,0,0,0.1) !important;
+    }
+
+    .btn-shadcn-filled-whatsapp {
+      background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%) !important;
+      color: #166534 !important;
+      border: 1px solid #86efac !important;
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      border-radius: calc(var(--radius) - 0.15rem) !important;
+      padding: 10px 16px !important;
+      box-shadow: 0 4px 10px rgba(22, 101, 52, 0.15), inset 0 1px 0 #ffffff;
+      transition: all 0.15s ease !important;
+    }
+    .btn-shadcn-filled-whatsapp:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 3px rgba(22, 101, 52, 0.2), inset 0 2px 3px rgba(0,0,0,0.1) !important;
+    }
+
+    /* BOTTOM NAV 3D ELEVATION */
     nav.bottom-nav { 
       position: fixed; 
       bottom: 0; 
@@ -219,61 +412,72 @@
       right: 0; 
       width: 100%; 
       height: 62px;
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(18px); 
-      -webkit-backdrop-filter: blur(18px); 
+      background: rgba(255, 255, 255, 0.88); 
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px); 
       z-index: 1000; 
-      border-top: 1px solid rgba(0, 0, 0, 0.08); 
-      border-radius: 0; 
+      border-top: 1px solid rgba(203, 213, 225, 0.8); 
       padding: 0; 
       padding-bottom: env(safe-area-inset-bottom, 0px);
-      box-shadow: 0 -4px 20px rgba(9, 34, 83, 0.06); 
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08); 
     }
 
     .bottom-nav .nav-link {
-      color: var(--md-on-surface-variant);
-      font-size: 9px;
-      font-weight: 700;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       border: none;
       background: transparent;
-      padding: 8px 0;
-      transition: color 0.2s ease, background 0.2s ease;
+      padding: 6px 0;
+      transition: color 0.15s ease;
     }
 
     .bottom-nav .nav-link.active {
-      color: var(--mitec-blue) !important;
-      background: rgba(9, 34, 83, 0.05) !important;
+      color: var(--primary) !important;
+      background: transparent !important;
+      filter: drop-shadow(0 2px 4px rgba(6, 62, 153, 0.25));
     }
 
-    /* Loader */
+    /* LOADER */
     #sync-loader { 
       position: fixed; 
       inset: 0; 
-      background: #ffffff; 
+      background: rgba(238, 242, 247, 0.85); 
+      color: var(--foreground);
+      backdrop-filter: blur(12px);
       z-index: 9999; 
       display: none; 
       flex-direction: column; 
       align-items: center; 
       justify-content: center; 
     }
-    .loader-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; margin-bottom: 16px; }
-    .loader-pulse { position: absolute; width: 100%; height: 100%; background: rgba(27, 54, 93, 0.08); border-radius: 50%; animation: fluidPulse 1.8s infinite ease-in-out; }
-    .loader-text { font-size: 11px; font-weight: 800; color: var(--mitec-blue); letter-spacing: 1.5px; text-transform: uppercase; animation: textBlink 1.4s infinite ease-in-out; }
+    .loader-spinner { 
+      width: 36px; 
+      height: 36px; 
+      border: 3px solid #cbd5e1; 
+      border-top-color: var(--primary); 
+      border-radius: 50%; 
+      animation: spin 0.7s linear infinite; 
+      margin-bottom: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .loader-text { 
+      font-size: 12px; 
+      font-weight: 700; 
+      color: #334155; 
+      letter-spacing: 0.05em; 
+    }
 
-    @keyframes fluidPulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
-    @keyframes textBlink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
   <!-- SYNC LOADER -->
   <div id="sync-loader">
-    <div class="loader-icon-wrapper">
-      <div class="loader-pulse"></div>
-      <i class="ph ph-shield-check" style="font-size: 42px; color: var(--mitec-blue); position: relative; z-index: 2;"></i>
-    </div>
+    <div class="loader-spinner"></div>
     <div class="loader-text">Processing Request...</div>
   </div>
 
@@ -288,12 +492,12 @@
   </header>
 
   <div class="portal-container">
-    <!-- PROFILE CARD -->
+    <!-- 1. BLUE PROFILE CARD -->
     <div class="profile-card p-3 mb-3 d-flex align-items-center gap-3">
-      <img id="userAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231B365D'/></svg>" alt="User Profile">
+      <img id="userAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23ffffff'/></svg>" alt="User Profile">
       <div class="profile-info">
-        <span class="d-block text-uppercase opacity-75 fw-semibold" style="letter-spacing: 0.8px; font-size: 9px;">Current User</span>
-        <h2 id="userNameDisplay" class="h6 fw-bold mb-0">MITEC Casual Labour</h2>
+        <span class="d-block text-uppercase fw-semibold" style="letter-spacing: 0.08em; font-size: 10px; opacity: 0.85; color: var(--primary-foreground);">Authenticated User</span>
+        <h2 id="userNameDisplay" class="mb-0">MITEC Casual Labour</h2>
       </div>
     </div>
 
@@ -347,6 +551,14 @@
     let cachedBookings = [];
     let activeFilterDept = "ALL";
 
+    // PROPER CASE CONVERTOR FUNCTION
+    function toTitleCase(str) {
+      if (!str) return "";
+      return String(str)
+        .toLowerCase()
+        .replace(/(^|\s)\S/g, match => match.toUpperCase());
+    }
+
     window.onload = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const userDocNo = urlParams.get('id') || localStorage.getItem("mcl_doc_no");
@@ -360,10 +572,29 @@
       localStorage.setItem("mcl_doc_no", cleanDocNo);
 
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
-      document.getElementById("userNameDisplay").textContent = record.full_name || record.name_mykad || "MITEC STAFF";
+      const rawName = record.full_name || record.name_mykad || "MITEC Casual Labour";
+      
+      // DISPLAY WORKER NAME IN PROPER CASE
+      document.getElementById("userNameDisplay").textContent = toTitleCase(rawName);
       if (record.photo_link) document.getElementById("userAvatar").src = record.photo_link;
 
-      refreshData(cleanDocNo);
+      // SPEED OPTIMIZATION: Instant render from Session Storage
+      const cachedDataStr = sessionStorage.getItem(`mcl_portal_cache_${cleanDocNo}`);
+      if (cachedDataStr) {
+        try {
+          const cachedData = JSON.parse(cachedDataStr);
+          cachedShifts = cachedData.allShifts || [];
+          cachedBookings = cachedData.myUpcomingEvents || [];
+          renderDepartmentChips(cachedShifts);
+          renderAvailable(cachedShifts, cachedBookings);
+          renderBooked(cachedBookings);
+          renderHistoryLog(cachedBookings);
+        } catch (e) {
+          console.warn("Cache parse error", e);
+        }
+      }
+
+      refreshData(cleanDocNo, !cachedDataStr);
     };
 
     function showLoader(message) {
@@ -372,15 +603,18 @@
       loader.style.display = 'flex';
     }
 
-    function refreshData(docNo) {
+    function refreshData(docNo, showOverlay = true) {
       if (activeController) activeController.abort(); 
       activeController = new AbortController();
-      showLoader("Syncing Master Timelines...");
+      
+      if (showOverlay) showLoader("Syncing Master Timelines...");
 
       fetch(`${SPREADSHEET_URL}?action=getShifts&userDocNo=${encodeURIComponent(docNo)}`, { signal: activeController.signal })
         .then(r => r.json())
         .then(res => {
           if(res.ok) {
+            sessionStorage.setItem(`mcl_portal_cache_${docNo}`, JSON.stringify(res));
+
             cachedShifts = res.allShifts || [];
             cachedBookings = res.myUpcomingEvents || [];
             renderDepartmentChips(cachedShifts);
@@ -484,12 +718,29 @@
       return str;
     }
 
+    function toggleInstructions(btnEl) {
+      const details = document.getElementById("instructionsContent");
+      if (!details) return;
+      if (details.style.display === "none") {
+        details.style.display = "block";
+        btnEl.textContent = "Read Less";
+      } else {
+        details.style.display = "none";
+        btnEl.textContent = "Read More...";
+      }
+    }
+
+    /* BATCH HTML RENDERING FOR AVAILABLE SHIFTS */
     function renderAvailable(shifts, bookings) {
       const container = document.getElementById('available-view');
-      container.innerHTML = '';
       const today = new Date(); today.setHours(0,0,0,0);
 
-      let upcomingShifts = shifts.filter(s => parseDateString(s.date) >= today);
+      // Filter out past shifts AND shifts already booked by the user
+      let upcomingShifts = shifts.filter(s => {
+        const isPast = parseDateString(s.date) < today;
+        const isBooked = bookings.some(b => b.shift_id === s.id && String(b.status).toUpperCase() !== 'CANCELLED');
+        return !isPast && !isBooked;
+      });
 
       if (activeFilterDept !== 'ALL') {
         upcomingShifts = upcomingShifts.filter(s => s.dept === activeFilterDept);
@@ -503,36 +754,30 @@
       upcomingShifts.sort((a, b) => parseDateString(a.date) - parseDateString(b.date));
       const dates = [...new Set(upcomingShifts.map(s => s.date))];
 
-      dates.forEach(date => {
-        container.innerHTML += `<div class="date-label">${date}</div>`;
+      let htmlBuffer = '';
+
+      dates.forEach((date, dateIndex) => {
+        const isFirst = dateIndex === 0;
+        htmlBuffer += `<div class="date-label ${isFirst ? 'first-date' : ''}">${date}</div>`;
         const hasBookingToday = bookings.some(b => b.date === date && String(b.status).toUpperCase() !== 'CANCELLED');
 
         upcomingShifts.filter(s => s.date === date).forEach(s => {
-          const myBooking = bookings.find(b => b.shift_id === s.id && String(b.status).toUpperCase() !== 'CANCELLED');
-          const isMyShift = !!myBooking;
           const isFull = s.slotsLeft <= 0;
-          const isLockedByPolicy = hasBookingToday && !isMyShift;
+          const isLockedByPolicy = hasBookingToday;
           
           const hasSpotlight = s.notes && String(s.notes).trim() !== "";
 
-          let badgeClass = 'bg-primary-subtle text-primary border border-primary-subtle';
-          let statusPillText = isFull ? 'Full' : s.slotsLeft + ' Left';
+          let badgeMarkup = `<span class="badge-shadcn-left">${s.slotsLeft} LEFT</span>`;
+          if (isFull) badgeMarkup = `<span class="badge-shadcn-full">FULL</span>`;
 
-          if (isMyShift) {
-            const rawStatus = String(myBooking.status).toUpperCase();
-            const isWait = rawStatus === 'WAITLIST' || rawStatus === 'WAITING LIST';
-            badgeClass = isWait ? 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' : 'bg-success-subtle text-success border border-success-subtle';
-            statusPillText = isWait ? 'In Waiting List' : 'Confirmed';
-          } else if (isLockedByPolicy) {
-            badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle'; statusPillText = 'Locked';
-          } else if (isFull) {
-            badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
+          if (isLockedByPolicy) {
+            badgeMarkup = `<span class="badge-shadcn-full">LOCKED</span>`;
           }
 
           let displayTime = formatAttendanceTime(s.time);
 
           let spotlightHtml = '';
-          if (hasSpotlight && !isMyShift && !isLockedByPolicy) {
+          if (hasSpotlight && !isLockedByPolicy) {
             spotlightHtml = `
               <div class="spotlight-banner">
                 <i class="ph ph-lightning fs-6 text-warning"></i>
@@ -540,45 +785,54 @@
               </div>`;
           }
 
-          container.innerHTML += `
-            <div class="card card-shift border-0 p-3 mb-3 ${hasSpotlight && !isMyShift && !isLockedByPolicy ? 'spotlight' : ''} ${isFull && !isMyShift && !isLockedByPolicy ? 'full-shift' : ''} ${isLockedByPolicy ? 'locked' : ''}">
+          htmlBuffer += `
+            <div class="card card-shift p-3 ${isFull && !isLockedByPolicy ? 'full-shift' : ''} ${isLockedByPolicy ? 'locked' : ''}">
               ${spotlightHtml}
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h3 class="h6 fw-bold mb-0" style="color: var(--mitec-blue);">${s.dept}</h3>
-                <span class="badge ${badgeClass} text-uppercase px-2 py-1">${statusPillText}</span>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="h6 fw-semibold mb-0" style="color: var(--card-foreground);">${s.dept}</h3>
+                ${badgeMarkup}
               </div>
-              <div class="small text-secondary mb-3">
-                <div class="d-flex align-items-center gap-2 fw-semibold"><i class="ph ph-clock fs-6" style="color: var(--mitec-accent);"></i> ${displayTime}</div>
+              <div class="small text-muted mb-3">
+                <div class="d-flex align-items-center gap-2 fw-normal"><i class="ph ph-clock fs-6"></i> ${displayTime}</div>
               </div>
 
-              ${isMyShift ? 
-                `<button class="btn btn-light text-muted w-100 fw-bold rounded-3" disabled>Shift Booked ✔️</button>` : 
-                (isLockedByPolicy ? 
-                  `<button class="btn btn-secondary w-100 fw-bold rounded-3 opacity-50" disabled>Locked</button>` :
-                  (isFull ? 
-                    `<button class="btn btn-outline-warning text-dark w-100 fw-bold rounded-3 d-flex align-items-center justify-content-center gap-2" onclick="handleBooking('${s.id}', '${s.date}', '${s.dept}', '${s.time}', true, this)"><i class="ph ph-clock-afternoon"></i> Join Waitlist</button>` : 
-                    `<button class="btn btn-mitec-primary w-100 rounded-3 py-2" onclick="handleBooking('${s.id}', '${s.date}', '${s.dept}', '${s.time}', false, this)">Book Now</button>`
-                  )
+              ${isLockedByPolicy ? 
+                `<button class="btn btn-shadcn-filled-muted w-100 opacity-50" disabled>Locked</button>` :
+                (isFull ? 
+                  `<button class="btn btn-shadcn-outline-waitlist w-100 d-flex align-items-center justify-content-center gap-2" onclick="handleBooking('${s.id}', '${s.date}', '${s.dept}', '${s.time}', true, this)"><i class="ph ph-clock-afternoon"></i> Join Waitlist</button>` : 
+                  `<button class="btn btn-shadcn-primary w-100" onclick="handleBooking('${s.id}', '${s.date}', '${s.dept}', '${s.time}', false, this)">Book Now</button>`
                 )
               }
             </div>`;
         });
       });
+
+      container.innerHTML = htmlBuffer;
     }
 
     function renderBooked(bookings) {
       const container = document.getElementById('booked-view');
-      container.innerHTML = '<div class="date-label">My Registered Schedule</div>';
+      let htmlBuffer = '<div class="date-label first-date">My Registered Schedule</div>';
 
-      container.innerHTML += `
-        <div class="alert alert-warning border-warning-subtle rounded-4 p-3 mb-3 small" style="background-color: #fdf4e3; color: #744210;">
-          <div class="d-flex align-items-start gap-2 mb-2">
-            <i class="ph ph-info fs-6 mt-1" style="color: var(--mitec-blue);"></i>
-            <div><b>Confirmed:</b> Attendance is <b>compulsory</b>. You must attend this shift.</div>
+      /* Guidelines Box with Always-Visible Confirmed Notice + Read More Below */
+      htmlBuffer += `
+        <div class="card border p-3 mb-3" style="background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border-color: rgba(6, 62, 153, 0.15) !important; border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0,0,0,0.04), inset 0 1px 0 #ffffff;">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="ph ph-info fs-6" style="color: var(--primary);"></i>
+            <span class="fw-bold" style="font-size: 12px; color: var(--card-foreground);">Duty Attendance Guidelines</span>
           </div>
-          <div class="d-flex align-items-start gap-2">
-            <i class="ph ph-clock fs-6 text-warning mt-1"></i>
-            <div><b>Waiting List:</b> Please check your status regularly. If you are committed to attend, you may request HR to upgrade your status to <b>confirmed</b>.</div>
+          <div class="d-flex align-items-start gap-2" style="font-size: 11px; color: var(--card-foreground);">
+            <i class="ph ph-check-circle text-success fs-6 mt-0.5"></i>
+            <div><b>Confirmed:</b> Attendance is <b>compulsory</b>. You must attend this shift slot.</div>
+          </div>
+          <div id="instructionsContent" style="display: none; font-size: 11px; color: var(--card-foreground);" class="mt-2 pt-2 border-top">
+            <div class="d-flex align-items-start gap-2">
+              <i class="ph ph-clock text-warning fs-6 mt-0.5"></i>
+              <div><b>Waiting List:</b> Please check your status regularly. If you are committed to attend, you may request HR to upgrade your status to confirmed.</div>
+            </div>
+          </div>
+          <div class="mt-1 pt-1">
+            <button class="btn btn-link p-0 text-decoration-none fw-semibold" style="font-size: 11px; color: var(--primary);" onclick="toggleInstructions(this)">Read More...</button>
           </div>
         </div>`;
 
@@ -589,7 +843,8 @@
       const upcomingBookings = activeBookings.filter(b => parseDateString(b.date) >= today);
 
       if (upcomingBookings.length === 0) { 
-        container.innerHTML += '<p class="text-center py-5 text-muted">No upcoming duties registered.</p>'; 
+        htmlBuffer += '<p class="text-center py-5 text-muted small">No upcoming duties registered.</p>'; 
+        container.innerHTML = htmlBuffer;
         return; 
       }
 
@@ -598,7 +853,7 @@
       upcomingBookings.forEach(b => {
         const rawStatus = String(b.status).toUpperCase();
         const isWait = rawStatus === "WAITLIST" || rawStatus === "WAITING LIST";
-        const displayStatusText = isWait ? "Waiting List" : "Confirmed";
+        const badgeMarkup = isWait ? `<span class="badge-shadcn-wait">WAITING LIST</span>` : `<span class="badge-shadcn-confirmed">CONFIRMED</span>`;
 
         let isLockActive = false;
         try {
@@ -622,36 +877,38 @@
         let waGroupBtnHtml = '';
         if (!isWait && b.wa_link && String(b.wa_link).trim() !== "") {
           waGroupBtnHtml = `
-            <a href="${b.wa_link}" target="_blank" class="btn btn-success w-100 rounded-3 fw-bold my-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="background-color: #25D366; border: none;">
+            <a href="${b.wa_link}" target="_blank" class="btn btn-shadcn-filled-whatsapp w-100 my-2 d-flex align-items-center justify-content-center gap-2">
               <i class="ph ph-whatsapp-logo fs-5"></i>
-              Join Shift WhatsApp Group
+              Join WhatsApp Group
             </a>`;
         }
 
-        container.innerHTML += `
-          <div class="card card-shift border-0 p-3 mb-3" style="border-left: 5px solid ${isWait ? 'var(--accent-amber)' : 'var(--mitec-blue)'} !important;">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <h3 class="h6 fw-bold mb-0" style="color: var(--mitec-blue);">${b.dept}</h3>
-              <span class="badge ${isWait ? 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' : 'bg-success-subtle text-success border border-success-subtle'} text-uppercase px-2 py-1">${displayStatusText}</span>
+        htmlBuffer += `
+          <div class="card card-shift p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h3 class="h6 fw-semibold mb-0" style="color: var(--card-foreground);">${b.dept}</h3>
+              ${badgeMarkup}
             </div>
-            <div class="small text-secondary mb-2">
-              <div class="d-flex align-items-center gap-2 fw-semibold mb-1"><i class="ph ph-calendar fs-6" style="color: var(--mitec-accent);"></i> ${b.date}</div>
-              <div class="d-flex align-items-center gap-2 fw-semibold"><i class="ph ph-clock fs-6" style="color: var(--mitec-accent);"></i> ${cleanedShiftTime}</div>
+            <div class="small text-muted mb-2">
+              <div class="d-flex align-items-center gap-2 mb-1"><i class="ph ph-calendar fs-6"></i> ${b.date}</div>
+              <div class="d-flex align-items-center gap-2"><i class="ph ph-clock fs-6"></i> ${cleanedShiftTime}</div>
             </div>
             
             ${waGroupBtnHtml}
 
             ${isLockActive ? 
-              `<div class="btn btn-light border text-muted w-100 small fw-bold mt-2 d-flex align-items-center justify-content-center gap-2" disabled><i class="ph ph-lock-keyhole"></i> Cancellation Locked (Within 12 Hours)</div>` :
-              `<button class="btn btn-outline-danger w-100 fw-bold rounded-3 mt-2" onclick="cancelBooking('${b.shift_id}', this)">Request Cancel</button>`
+              `<div class="btn btn-shadcn-filled-muted w-100 small mt-2 d-flex align-items-center justify-content-center gap-2" disabled><i class="ph ph-lock-keyhole"></i> Cancellation Locked (Within 12 Hours)</div>` :
+              `<button class="btn btn-shadcn-filled-cancel w-100 mt-2" onclick="cancelBooking('${b.shift_id}', this)">Request Cancel</button>`
             }
           </div>`;
       });
+
+      container.innerHTML = htmlBuffer;
     }
 
     function renderHistoryLog(bookings) {
       const container = document.getElementById('history-view');
-      container.innerHTML = '<div class="date-label">Attendance History Ledger</div>';
+      let htmlBuffer = '<div class="date-label first-date">Attendance History Ledger</div>';
 
       const today = new Date(); today.setHours(0,0,0,0);
 
@@ -661,16 +918,17 @@
       });
 
       if (pastBookings.length === 0) {
-        container.innerHTML += '<p class="text-center py-5 text-muted fst-italic">No past attendance records discovered.</p>';
+        htmlBuffer += '<p class="text-center py-5 text-muted fst-italic">No past attendance records discovered.</p>';
+        container.innerHTML = htmlBuffer;
         return;
       }
 
       pastBookings.sort((a, b) => parseDateString(a.date) - parseDateString(b.date));
 
-      let tableMarkup = `
-        <div class="table-responsive bg-white rounded-4 border shadow-sm mt-2">
+      htmlBuffer += `
+        <div class="table-responsive rounded-3 border shadow-sm mt-2" style="background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border-color: rgba(6, 62, 153, 0.15) !important;">
           <table class="table table-hover align-middle mb-0">
-            <thead class="table-light small text-uppercase fw-bold" style="color: var(--mitec-blue);">
+            <thead class="small text-uppercase fw-semibold" style="color: var(--muted-foreground); background: #f1f5f9;">
               <tr>
                 <th scope="col" class="py-3 px-3">Date / Dept</th>
                 <th scope="col" class="py-3 px-3 text-center" style="width: 140px;">Attendance Status</th>
@@ -697,20 +955,20 @@
         }
 
         let isNoShow = rawAttendance.toLowerCase() === "no show" || rawAttendance === "" || rawAttendance === "-" || rawAttendance === "0";
-        let statusDisplayMarkup = isNoShow ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 text-uppercase">No Show</span>` : `<span class="badge bg-light border px-2 py-1 fw-bold" style="color: var(--mitec-blue);">${rawAttendance}</span>`;
+        let statusDisplayMarkup = isNoShow ? `<span class="badge-shadcn-full">NO SHOW</span>` : `<span class="badge-shadcn-confirmed">${rawAttendance}</span>`;
 
-        tableMarkup += `
+        htmlBuffer += `
           <tr>
             <td class="px-3 py-3">
-              <div class="fw-bold small" style="color: var(--mitec-blue);">${b.date}</div>
-              <div class="text-muted small fw-semibold">${b.dept}</div>
+              <div class="fw-semibold small" style="color: var(--card-foreground);">${b.date}</div>
+              <div class="text-muted small">${b.dept}</div>
             </td>
             <td class="px-3 py-3 text-center">${statusDisplayMarkup}</td>
           </tr>`;
       });
 
-      tableMarkup += `</tbody></table></div>`;
-      container.innerHTML += tableMarkup;
+      htmlBuffer += `</tbody></table></div>`;
+      container.innerHTML = htmlBuffer;
     }
 
     function handleBooking(id, date, dept, time, waitlist, element) {
@@ -751,7 +1009,10 @@
       const targetUrl = `${SPREADSHEET_URL}?action=submit&shiftId=${id}&date=${formattedDate}&dept=${dept}&time=${formattedTime}&userDocNo=${cleanDocNo}${waitlist ? '&isWaitlist=true' : ''}`;
 
       fetch(targetUrl, { signal: activeController.signal })
-        .then(() => window.location.reload())
+        .then(() => {
+          sessionStorage.removeItem(`mcl_portal_cache_${cleanDocNo}`);
+          window.location.reload();
+        })
         .catch(err => { if (err.name !== 'AbortError') isRequestInProgress = false; });
     }
 
@@ -773,6 +1034,7 @@
         .then(r => r.json())
         .then(res => { 
           if (!res.ok) alert("Cancellation failed: " + res.msg);
+          sessionStorage.removeItem(`mcl_portal_cache_${cleanDocNo}`);
           window.location.reload(); 
         })
         .catch(err => { if (err.name !== 'AbortError') { isRequestInProgress = false; window.location.reload(); } });
