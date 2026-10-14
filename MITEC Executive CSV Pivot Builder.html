@@ -1,0 +1,1561 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC Executive CSV Pivot Builder & Intelligence Suite</title>
+
+  <!-- External Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <!-- Tailwind CSS, PapaParse, & Chart.js via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      /* MITEC Light Executive & Deep Sapphire Palette */
+      --md-surface: #f4f6f9;
+      --md-surface-container: #ffffff;
+      --md-on-surface: #1d1d1f;
+      --md-on-surface-variant: #51525c;
+      --md-outline: #e1e4ea; 
+
+      --mitec-blue: #1B365D;         
+      --mitec-blue-hover: #2D68C4;   
+      --mitec-accent: #0f4a82;
+
+      --danger: #EF4444;
+      --danger-bg: rgba(239, 68, 68, 0.08);
+      --ok: #10B981;
+      --ok-bg: rgba(16, 185, 129, 0.08);
+
+      --radius: 16px;
+      --shadow-card: 0 6px 20px rgba(9, 34, 83, 0.04);
+      --font-stack: 'Inter', -apple-system, sans-serif;
+      --brand-font: 'Trebuchet MS', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-stack);
+      background-color: var(--md-surface);
+      color: var(--md-on-surface);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1400px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+
+    /* Topbar Layout */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .brand-logo-badge {
+      width: 42px;
+      height: 42px;
+      background: var(--mitec-blue);
+      color: #fff;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      font-family: var(--brand-font);
+      box-shadow: 0 4px 12px rgba(27, 54, 93, 0.25);
+    }
+
+    .brand h1 {
+      font-size: 16px;
+      font-family: var(--brand-font);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin: 0;
+      color: var(--mitec-blue);
+      text-transform: uppercase;
+    }
+
+    @media (min-width: 768px) {
+      .brand h1 { font-size: 20px; }
+      .brand-logo-badge { width: 48px; height: 48px; font-size: 22px; border-radius: 12px; }
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--md-on-surface-variant);
+    }
+
+    .chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border: 1px solid var(--md-outline);
+      border-radius: 30px;
+      background: var(--md-surface-container);
+      color: var(--mitec-blue);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(9, 34, 83, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Executive Cards & Sapphire Headers */
+    .card {
+      background: var(--md-surface-container);
+      border: 1px solid rgba(9, 34, 83, 0.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .about-header {
+      background-color: #0e3581;
+      background-image: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.05) 1%, transparent 1%, transparent 50%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.02) 52%, transparent 52%),
+        linear-gradient(65deg, transparent 45%, rgba(255, 255, 255, 0.04) 45%, rgba(255, 255, 255, 0.04) 47%, transparent 47%, transparent 70%, rgba(255, 255, 255, 0.02) 70%, rgba(255, 255, 255, 0.02) 71%, transparent 71%),
+        radial-gradient(circle at 20% 30%, rgba(20, 80, 160, 0.45), transparent 65%),
+        radial-gradient(circle at 80% 70%, #0e3581, #082154);
+      color: white;
+      padding: 24px;
+      border-bottom: 3px solid var(--mitec-accent);
+    }
+    @media (min-width: 768px) { .about-header { padding: 28px 32px; } }
+
+    .about-header h2 {
+      margin: 0;
+      font-family: var(--brand-font);
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    @media (min-width: 768px) { .about-header h2 { font-size: 24px; } }
+
+    .about-header .sub {
+      margin-top: 6px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Buttons */
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btnSecondary {
+      background: var(--md-surface);
+      color: var(--md-on-surface);
+      border: 1px solid var(--md-outline);
+    }
+    .btnSecondary:hover {
+      border-color: var(--mitec-blue);
+      background: #ffffff;
+      color: var(--mitec-blue);
+    }
+
+    .btnPrimary {
+      background: var(--mitec-blue);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(27, 54, 93, 0.15);
+    }
+    .btnPrimary:hover {
+      background: var(--mitec-blue-hover);
+      box-shadow: 0 6px 16px rgba(27, 54, 93, 0.25);
+    }
+
+    .btnOutline {
+      background: transparent;
+      border: 1px solid var(--md-outline);
+      color: var(--md-on-surface);
+    }
+    .btnOutline:hover {
+      background: var(--md-surface);
+      border-color: var(--mitec-blue);
+    }
+
+    /* File Request Dropzone Box */
+    .fileRequestBox {
+      border: 2px dashed var(--mitec-blue);
+      border-radius: var(--radius);
+      padding: 40px 16px;
+      background: rgba(27, 54, 93, 0.02);
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    @media (min-width: 768px) { .fileRequestBox { padding: 56px 24px; } }
+    
+    .fileRequestBox:hover, .fileRequestBox.dragover {
+      border-color: var(--mitec-blue-hover);
+      background: rgba(45, 104, 196, 0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Drag & Drop Zones */
+    .drop-zone {
+      min-height: 80px;
+      border: 1.5px dashed var(--md-outline);
+      border-radius: 12px;
+      padding: 10px;
+      background: var(--md-surface);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-content: flex-start;
+    }
+
+    .drop-zone.drag-active {
+      border-color: var(--mitec-blue-hover);
+      background: rgba(45, 104, 196, 0.06);
+    }
+
+    /* Field Badges */
+    .field-tag {
+      background: #ffffff;
+      border: 1px solid var(--md-outline);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--md-on-surface);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .field-tag:hover {
+      border-color: var(--mitec-blue);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(27, 54, 93, 0.12);
+    }
+
+    .badge-type {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 4px;
+      background: var(--md-surface);
+      border: 1px solid var(--md-outline);
+    }
+    .badge-num { color: #0284c7; background: #e0f2fe; border-color: #bae6fd; }
+    .badge-str { color: #059669; background: #d1fae5; border-color: #a7f3d0; }
+    .badge-date { color: #d97706; background: #fef3c7; border-color: #fde68a; }
+
+    /* Pivot Matrix Table */
+    .pivot-table-container {
+      max-height: 600px;
+      overflow: auto;
+      border: 1px solid var(--md-outline);
+      border-radius: 12px;
+    }
+
+    .pivot-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+    }
+    @media (min-width: 768px) { .pivot-table { font-size: 13px; } }
+
+    .pivot-table th, .pivot-table td {
+      padding: 8px 12px;
+      border-right: 1px solid var(--md-outline);
+      border-bottom: 1px solid var(--md-outline);
+      white-space: nowrap;
+    }
+
+    .pivot-table th {
+      background: #f1f4f9;
+      color: var(--mitec-blue);
+      font-weight: 700;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .pivot-table th.col-header {
+      text-align: center;
+      background: #e8edf5;
+    }
+
+    .pivot-table td.num-cell {
+      text-align: right;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+
+    .pivot-table tr.total-row {
+      background-color: #f8fafc;
+      font-weight: 700;
+    }
+
+    .pivot-table tr.grand-total-row {
+      background-color: #e2e8f0;
+      font-weight: 800;
+      color: var(--mitec-blue);
+    }
+
+    .pivot-table tr:hover td {
+      background-color: rgba(27, 54, 93, 0.02);
+    }
+
+    .tree-toggle {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      background: rgba(27, 54, 93, 0.1);
+      color: var(--mitec-blue);
+      margin-right: 6px;
+      font-size: 11px;
+      font-weight: bold;
+      user-select: none;
+    }
+
+    .tree-toggle:hover {
+      background: var(--mitec-blue);
+      color: #fff;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      transform: translateY(10px);
+      transition: transform 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+
+    /* Tabs */
+    .nav-tab {
+      padding: 10px 14px;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--md-on-surface-variant);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    @media (min-width: 768px) { .nav-tab { font-size: 13.5px; padding: 10px 18px; } }
+
+    .nav-tab.active {
+      color: var(--mitec-blue);
+      border-bottom-color: var(--mitec-blue);
+      background: rgba(27, 54, 93, 0.03);
+    }
+
+    .tabs-container {
+      display: flex;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--md-outline);
+      background: white;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .tabs-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 100px);
+      background: var(--mitec-blue);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      width: max-content;
+      max-width: 90vw;
+    }
+
+    .toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px 0 0;
+      margin-top: 24px;
+    }
+    .footer-brand {
+      font-family: var(--brand-font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mitec-blue);
+      margin-bottom: 4px;
+    }
+    .footer p {
+      font-size: 11px;
+      color: var(--md-on-surface-variant);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    
+    <!-- Executive Topbar Branding -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-logo-badge">M</div>
+        <div>
+          <h1>MITEC Pivot Matrix Builder</h1>
+          <p>Executive CSV Analytics Suite</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="chip">
+          <span class="material-symbols-outlined text-[14px]">table_chart</span>
+          <span id="dataStatusChip" class="hidden md:inline">Requesting CSV</span>
+        </div>
+        <button id="btnChangeCSV" class="btn btnOutline hidden !py-1.5 !px-3 !text-[11px]" onclick="resetToCSVRequestScreen()">
+          <span class="material-symbols-outlined text-[14px]">upload_file</span> Change
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 1: INITIAL CSV REQUEST SCREEN -->
+    <div id="stepRequestCSV">
+      
+      <div class="card">
+        <div class="about-header">
+          <h2>Welcome to MITEC Pivot Matrix Builder</h2>
+          <div class="sub">Please select or drag & drop a CSV data file below to initialize your cross-tabulated analytics matrix.</div>
+        </div>
+
+        <div class="p-6 md:p-8">
+          
+          <!-- File Alert Box for Errors -->
+          <div id="uploadAlert" class="hidden mb-6 p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 text-sm font-semibold flex items-start gap-3">
+            <span class="material-symbols-outlined text-[20px] text-red-500 mt-0.5">error</span>
+            <span id="uploadAlertText">Error reading CSV file.</span>
+          </div>
+
+          <!-- Pure Dropzone Box -->
+          <div id="initialFileRequestBox" class="fileRequestBox" onclick="document.getElementById('csvFileInput').click()">
+            <input type="file" id="csvFileInput" accept=".csv,text/csv,application/csv,text/plain" class="hidden" onchange="handleFileSelect(event)">
+            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center mx-auto mb-4">
+              <span class="material-symbols-outlined text-3xl md:text-4xl">upload_file</span>
+            </div>
+            <h3 class="text-lg md:text-xl font-extrabold text-slate-800 mb-2">Click to Upload CSV or Drag & Drop File</h3>
+            <p class="text-xs md:text-sm text-slate-500 max-w-md mx-auto mb-6 leading-relaxed">
+              Supports standard CSV / TSV files with comma, semicolon, tab, or pipe delimiters, quoted strings, and UTF-8 encoding. Parsed 100% locally in your browser.
+            </p>
+            <button class="btn btnPrimary text-xs md:text-sm px-6 py-2.5 md:py-3">
+              <span class="material-symbols-outlined text-[18px]">folder_open</span> Browse Computer Files
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: INTERACTIVE PIVOT BUILDER DASHBOARD -->
+    <div id="stepPivotDashboard" class="hidden">
+
+      <!-- Navigation Tabs Header -->
+      <div class="tabs-container px-2 pt-2 md:px-4">
+        <div id="tabBtnBuilder" class="nav-tab active flex items-center gap-1.5" onclick="switchTab('builder')">
+          <span class="material-symbols-outlined text-[16px]">tune</span> Pivot Builder
+        </div>
+        <div id="tabBtnData" class="nav-tab flex items-center gap-1.5" onclick="switchTab('data')">
+          <span class="material-symbols-outlined text-[16px]">dataset</span> Raw Data
+        </div>
+        <div id="tabBtnCharts" class="nav-tab flex items-center gap-1.5" onclick="switchTab('charts')">
+          <span class="material-symbols-outlined text-[16px]">bar_chart</span> Visuals
+        </div>
+      </div>
+
+      <!-- TAB 1: PIVOT BUILDER & MATRIX -->
+      <div id="tabContentBuilder">
+        
+        <!-- Mobile/Desktop Grid for Builder Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6 mt-4 mb-6">
+          
+          <!-- Left Column: Available Fields List -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1 flex flex-col h-[400px] lg:h-auto">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-xs font-extrabold text-blue-900 uppercase tracking-wider">Dataset Fields</h3>
+              <span id="fieldCountBadge" class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">0</span>
+            </div>
+            <div class="relative mb-3">
+              <input type="text" id="fieldSearchInput" oninput="filterFieldList()" placeholder="Search fields..." class="w-full text-xs py-2 pl-8 pr-3 border border-slate-200 rounded-lg outline-none focus:border-blue-800">
+              <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[16px] text-slate-400">search</span>
+            </div>
+            <div id="fieldsContainer" class="flex flex-col gap-2 overflow-y-auto pr-1 flex-1 pb-2">
+              <!-- Field tags populated dynamically -->
+            </div>
+            <div class="mt-2 pt-2 border-t border-slate-100 text-[11px] text-slate-400 text-center">
+              Tap <span class="font-semibold text-slate-600">+</span> or drag to assign fields.
+            </div>
+          </div>
+
+          <!-- Right 3 Columns: 4 Target Dropzones -->
+          <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Filters Zone -->
+            <div class="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-[11px] md:text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px] text-blue-700">filter_alt</span> Report Filters
+                </span>
+                <button onclick="clearZone('filters')" class="text-[10px] md:text-[11px] text-slate-400 hover:text-red-500 font-semibold">Clear</button>
+              </div>
+              <div id="zoneFilters" class="drop-zone flex-1" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'filters')">
+                <div class="text-[11px] text-slate-400 self-center mx-auto placeholder-text">Drop fields for filtering</div>
+              </div>
+            </div>
+
+            <!-- Column Fields Zone -->
+            <div class="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-[11px] md:text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px] text-blue-700">view_column</span> Column Headers
+                </span>
+                <button onclick="clearZone('columns')" class="text-[10px] md:text-[11px] text-slate-400 hover:text-red-500 font-semibold">Clear</button>
+              </div>
+              <div id="zoneColumns" class="drop-zone flex-1" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'columns')">
+                <div class="text-[11px] text-slate-400 self-center mx-auto placeholder-text">Drop fields for columns</div>
+              </div>
+            </div>
+
+            <!-- Row Fields Zone -->
+            <div class="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-[11px] md:text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px] text-blue-700">table_rows</span> Row Hierarchy
+                </span>
+                <button onclick="clearZone('rows')" class="text-[10px] md:text-[11px] text-slate-400 hover:text-red-500 font-semibold">Clear</button>
+              </div>
+              <div id="zoneRows" class="drop-zone flex-1" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'rows')">
+                <div class="text-[11px] text-slate-400 self-center mx-auto placeholder-text">Drop fields for nested rows</div>
+              </div>
+            </div>
+
+            <!-- Value Aggregations Zone -->
+            <div class="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-[11px] md:text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px] text-blue-700">calculate</span> Values & Metrics
+                </span>
+                <button onclick="clearZone('values')" class="text-[10px] md:text-[11px] text-slate-400 hover:text-red-500 font-semibold">Clear</button>
+              </div>
+              <div id="zoneValues" class="drop-zone flex-1" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'values')">
+                <div class="text-[11px] text-slate-400 self-center mx-auto placeholder-text">Drop fields for aggregations</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Pivot Table Matrix Output Card -->
+        <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm mb-6">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4 pb-3 border-b border-slate-100">
+            <div class="flex flex-col gap-2">
+              <h3 class="text-xs md:text-sm font-extrabold text-blue-900 uppercase tracking-wider">Calculated Pivot Matrix</h3>
+              <div class="flex items-center gap-3 flex-wrap">
+                <label class="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-medium text-slate-600 cursor-pointer">
+                  <input type="checkbox" id="chkSubtotals" checked onchange="renderPivotTable()" class="rounded accent-blue-900 w-3.5 h-3.5">
+                  Subtotals
+                </label>
+                <label class="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-medium text-slate-600 cursor-pointer">
+                  <input type="checkbox" id="chkGrandTotals" checked onchange="renderPivotTable()" class="rounded accent-blue-900 w-3.5 h-3.5">
+                  Grand Totals
+                </label>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="copyTableToClipboard()" class="btn btnSecondary !text-[11px] md:!text-xs">
+                <span class="material-symbols-outlined text-[14px]">content_copy</span> Copy Excel
+              </button>
+              <button onclick="exportPivotToCSV()" class="btn btnPrimary !text-[11px] md:!text-xs">
+                <span class="material-symbols-outlined text-[14px]">download</span> Export
+              </button>
+            </div>
+          </div>
+
+          <!-- Output Container -->
+          <div id="pivotTableOutput" class="pivot-table-container">
+            <div class="p-8 text-center text-slate-400 text-sm">
+              Configure fields above to render the matrix.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: RAW DATA PREVIEW -->
+      <div id="tabContentData" class="hidden mt-4">
+        <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm mb-6">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
+            <div class="relative w-full sm:w-64">
+              <input type="text" id="rawSearchInput" oninput="filterRawData()" placeholder="Filter raw data..." class="w-full text-xs py-2 pl-8 pr-3 border border-slate-200 rounded-lg outline-none focus:border-blue-800">
+              <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[16px] text-slate-400">search</span>
+            </div>
+            <div class="text-[11px] md:text-xs text-slate-500 font-medium" id="rawPaginationInfo">
+              Showing records...
+            </div>
+          </div>
+
+          <div class="overflow-x-auto max-h-[500px] rounded-xl border border-slate-200">
+            <table id="rawDataTable" class="pivot-table">
+              <thead id="rawDataHeader"></thead>
+              <tbody id="rawDataBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: VISUAL ANALYTICS CHARTS -->
+      <div id="tabContentCharts" class="hidden mt-4">
+        <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm mb-6">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4 pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="text-xs md:text-sm font-extrabold text-blue-900 uppercase tracking-wider">Visual Data Analytics</h3>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-[11px] md:text-xs font-semibold text-slate-600">Chart Type:</label>
+              <select id="chartTypeSelect" onchange="renderPivotChart()" class="text-xs border border-slate-200 rounded-lg py-1.5 px-2 outline-none focus:border-blue-900 bg-white">
+                <option value="bar">Bar Chart</option>
+                <option value="line">Line Chart</option>
+                <option value="pie">Pie Chart</option>
+                <option value="doughnut">Doughnut Chart</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="relative h-[300px] md:h-[450px] w-full">
+            <canvas id="pivotChartCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-brand">MALAYSIA INTERNATIONAL TRADE AND EXHIBITION CENTRE</div>
+      <p>© 2026 MITEC Analytics Suite. Executive CSV Pivot & Business Intelligence Solution.</p>
+    </div>
+
+  </div>
+
+  <!-- MODAL: REPORT FILTER SELECTOR -->
+  <div id="modalFilter" class="modal-overlay">
+    <div class="modal-card">
+      <div class="p-3 md:p-4 bg-slate-900 text-white flex justify-between items-center shrink-0">
+        <h3 id="modalFilterTitle" class="text-[13px] md:text-sm font-bold truncate pr-2">Filter Field</h3>
+        <button onclick="closeModal('modalFilter')" class="text-slate-400 hover:text-white shrink-0">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-3 md:p-4 flex flex-col flex-1 overflow-hidden min-h-[200px]">
+        <div class="relative mb-2 shrink-0">
+          <input type="text" id="filterValueSearch" oninput="filterModalValueList()" placeholder="Search values..." class="w-full text-xs py-2 pl-8 pr-3 border border-slate-200 rounded-lg outline-none">
+          <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[16px] text-slate-400">search</span>
+        </div>
+        <div class="flex justify-between items-center mb-2 shrink-0">
+          <button onclick="selectAllModalFilters(true)" class="text-[11px] text-blue-700 font-semibold hover:underline">Select All</button>
+          <button onclick="selectAllModalFilters(false)" class="text-[11px] text-slate-500 font-semibold hover:underline">Clear All</button>
+        </div>
+        <div id="modalFilterList" class="flex-1 overflow-y-auto space-y-1 border border-slate-100 p-1.5 rounded-lg bg-slate-50/50">
+          <!-- Checkboxes generated here -->
+        </div>
+      </div>
+      <div class="p-3 md:p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2 shrink-0">
+        <button onclick="closeModal('modalFilter')" class="btn btnSecondary !text-xs !py-2">Cancel</button>
+        <button onclick="applyModalFilter()" class="btn btnPrimary !text-xs !py-2">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VALUE FIELD SETTINGS -->
+  <div id="modalValueConfig" class="modal-overlay">
+    <div class="modal-card">
+      <div class="p-3 md:p-4 bg-slate-900 text-white flex justify-between items-center shrink-0">
+        <h3 class="text-[13px] md:text-sm font-bold">Configure Metric</h3>
+        <button onclick="closeModal('modalValueConfig')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-4 space-y-4 overflow-y-auto">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Aggregation</label>
+          <select id="modalAggFunc" class="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-blue-900 bg-white">
+            <option value="SUM">SUM (Total sum of values)</option>
+            <option value="COUNT">COUNT (Total records)</option>
+            <option value="AVG">AVERAGE (Mean of values)</option>
+            <option value="MIN">MIN (Minimum value)</option>
+            <option value="MAX">MAX (Maximum value)</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-3 md:p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2 shrink-0">
+        <button onclick="closeModal('modalValueConfig')" class="btn btnSecondary !text-xs !py-2">Cancel</button>
+        <button onclick="saveValueConfig()" class="btn btnPrimary !text-xs !py-2">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: QUICK FIELD ASSIGN -->
+  <div id="modalFieldAssign" class="modal-overlay">
+    <div class="modal-card !max-w-[400px]">
+      <div class="p-3 bg-slate-900 text-white flex justify-between items-center shrink-0">
+        <h3 id="modalAssignFieldName" class="text-[13px] font-bold truncate pr-2">Assign Field</h3>
+        <button onclick="closeModal('modalFieldAssign')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-3 space-y-2">
+        <button onclick="assignSelectedFieldTo('filters')" class="w-full text-left p-2.5 hover:bg-slate-50 border border-slate-200 rounded-lg text-[11px] md:text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors">
+          <span>Add to Report Filters</span>
+          <span class="material-symbols-outlined text-[18px] text-blue-700">filter_alt</span>
+        </button>
+        <button onclick="assignSelectedFieldTo('rows')" class="w-full text-left p-2.5 hover:bg-slate-50 border border-slate-200 rounded-lg text-[11px] md:text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors">
+          <span>Add to Row Hierarchy</span>
+          <span class="material-symbols-outlined text-[18px] text-blue-700">table_rows</span>
+        </button>
+        <button onclick="assignSelectedFieldTo('columns')" class="w-full text-left p-2.5 hover:bg-slate-50 border border-slate-200 rounded-lg text-[11px] md:text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors">
+          <span>Add to Column Headers</span>
+          <span class="material-symbols-outlined text-[18px] text-blue-700">view_column</span>
+        </button>
+        <button onclick="assignSelectedFieldTo('values')" class="w-full text-left p-2.5 hover:bg-slate-50 border border-slate-200 rounded-lg text-[11px] md:text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors">
+          <span>Add to Values / Metrics</span>
+          <span class="material-symbols-outlined text-[18px] text-blue-700">calculate</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toastNotification" class="toast">
+    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+    <span id="toastMessage">Done</span>
+  </div>
+
+  <script>
+    /* Global Application State */
+    let rawCSVData = [];
+    let fieldMetadata = []; 
+    
+    let pivotConfig = {
+      filters: [],  
+      rows: [],     
+      columns: [],  
+      values: []    
+    };
+
+    let filterSelections = {};
+    let expandedRowKeys = new Set();
+    let chartInstance = null;
+    let editingFilterField = null;
+    let editingValueIndex = null;
+    let selectedFieldForAssign = null;
+    let draggedFieldName = null;
+
+    window.onload = function() {
+      setupInitialDragDrop();
+    };
+
+    /* Utility Functions */
+    function showToast(message) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function hideAlert() { document.getElementById('uploadAlert').classList.add('hidden'); }
+    function showAlert(msg) {
+      document.getElementById('uploadAlertText').innerText = msg;
+      document.getElementById('uploadAlert').classList.remove('hidden');
+    }
+
+    function resetToCSVRequestScreen() {
+      document.getElementById('stepPivotDashboard').classList.add('hidden');
+      document.getElementById('stepRequestCSV').classList.remove('hidden');
+      document.getElementById('btnChangeCSV').classList.add('hidden');
+      document.getElementById('dataStatusChip').innerText = "Requesting CSV";
+      document.getElementById('csvFileInput').value = ""; // clear input
+      hideAlert();
+    }
+
+    /**
+     * File selection logic implementing robust await file.text()
+     * with FileReader fallback to prevent mobile sandboxing errors.
+     */
+    async function handleFileSelect(event) {
+      hideAlert();
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        let textContent = '';
+        
+        // Strategy 1: Attempt modern standard file.text()
+        try {
+          if (typeof file.text === 'function') {
+            textContent = await file.text();
+          } else {
+            throw new Error("file.text() not supported");
+          }
+        } catch (e) {
+          console.warn("Modern file.text() failed, executing FileReader fallback.", e);
+          // Strategy 2: Fallback to robust FileReader wrapped in Promise
+          textContent = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (err) => reject(new Error("FileReader failed to read the file."));
+            reader.readAsText(file);
+          });
+        }
+
+        if (!textContent || !textContent.trim()) {
+          showAlert("The selected file is empty or unreadable.");
+          return;
+        }
+
+        // Parse with PapaParse
+        Papa.parse(textContent, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            if (results.errors.length > 0 && results.data.length === 0) {
+              showAlert(`Parse Error: ${results.errors[0].message}`);
+              return;
+            }
+            if (results.data.length === 0) {
+              showAlert("No valid data rows found in the CSV.");
+              return;
+            }
+            processParsedData(file.name, results.data);
+          },
+          error: function(err) {
+            showAlert(`Parsing framework error: ${err.message}`);
+          }
+        });
+
+      } catch (err) {
+        showAlert(`Failed to read the selected file from disk. (${err.message})`);
+      }
+    }
+
+    function setupInitialDragDrop() {
+      const box = document.getElementById('initialFileRequestBox');
+      box.addEventListener('dragover', (e) => { e.preventDefault(); box.classList.add('dragover'); });
+      box.addEventListener('dragleave', () => box.classList.remove('dragover'));
+      box.addEventListener('drop', (e) => {
+        e.preventDefault();
+        box.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+          document.getElementById('csvFileInput').files = e.dataTransfer.files;
+          handleFileSelect({ target: { files: e.dataTransfer.files } });
+        }
+      });
+    }
+
+    function processParsedData(fileName, data) {
+      rawCSVData = data;
+
+      // Extract fields and determine basic types
+      const firstRow = data[0] || {};
+      const fields = Object.keys(firstRow);
+
+      fieldMetadata = fields.map(field => {
+        let sampleVal = null;
+        for (let i = 0; i < Math.min(data.length, 30); i++) {
+          if (data[i][field] !== null && data[i][field] !== undefined && data[i][field] !== '') {
+            sampleVal = data[i][field];
+            break;
+          }
+        }
+        let type = 'string';
+        if (typeof sampleVal === 'number') { type = 'number'; }
+        else if (typeof sampleVal === 'string' && !isNaN(Date.parse(sampleVal)) && sampleVal.length > 5 && (sampleVal.includes('-') || sampleVal.includes('/'))) { type = 'date'; }
+        return { name: field, type: type };
+      });
+
+      // Default Filters
+      filterSelections = {};
+      fieldMetadata.forEach(f => {
+        const uniqueVals = new Set(data.map(r => String(r[f.name] ?? '')));
+        filterSelections[f.name] = uniqueVals;
+      });
+
+      // Simple Auto Configuration
+      const numFields = fieldMetadata.filter(f => f.type === 'number').map(f => f.name);
+      const strFields = fieldMetadata.filter(f => f.type !== 'number').map(f => f.name);
+
+      pivotConfig = {
+        filters: [],
+        rows: strFields.slice(0, 1), // Assign first string col to Rows
+        columns: [], 
+        values: numFields.length > 0 
+          ? [{ field: numFields[0], agg: 'SUM' }]
+          : [{ field: fields[0], agg: 'COUNT' }]
+      };
+
+      // Transition UI
+      document.getElementById('stepRequestCSV').classList.add('hidden');
+      document.getElementById('stepPivotDashboard').classList.remove('hidden');
+      document.getElementById('btnChangeCSV').classList.remove('hidden');
+      document.getElementById('dataStatusChip').innerText = `${data.length} Rows`;
+      
+      // Auto-switch to Builder tab
+      switchTab('builder');
+
+      renderFieldList();
+      renderDropZones();
+      renderPivotTable();
+      showToast("Data loaded successfully!");
+    }
+
+    function renderFieldList() {
+      const container = document.getElementById('fieldsContainer');
+      container.innerHTML = '';
+      document.getElementById('fieldCountBadge').innerText = fieldMetadata.length;
+
+      const filterTxt = (document.getElementById('fieldSearchInput').value || '').toLowerCase();
+
+      fieldMetadata.forEach(field => {
+        if (filterTxt && !field.name.toLowerCase().includes(filterTxt)) return;
+
+        const el = document.createElement('div');
+        el.className = 'field-tag flex justify-between items-center';
+        el.draggable = true;
+        el.ondragstart = (e) => handleDragStart(e, field.name);
+
+        let typeBadgeClass = 'badge-str';
+        let typeChar = 'T';
+        if (field.type === 'number') { typeBadgeClass = 'badge-num'; typeChar = '#'; }
+        if (field.type === 'date') { typeBadgeClass = 'badge-date'; typeChar = 'D'; }
+
+        el.innerHTML = `
+          <div class="flex items-center gap-1.5 overflow-hidden">
+            <span class="material-symbols-outlined text-[14px] text-slate-400 hidden sm:block">drag_indicator</span>
+            <span class="badge-type ${typeBadgeClass}">${typeChar}</span>
+            <span class="truncate font-semibold text-[11px] md:text-xs">${field.name}</span>
+          </div>
+          <button onclick="openAssignModal('${field.name}')" class="text-slate-400 hover:text-blue-900 px-1 font-bold text-sm bg-slate-50 hover:bg-slate-100 rounded">+</button>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function filterFieldList() { renderFieldList(); }
+
+    function renderDropZones() {
+      ['filters', 'columns', 'rows', 'values'].forEach(zone => {
+        const container = document.getElementById('zone' + zone.charAt(0).toUpperCase() + zone.slice(1));
+        const items = pivotConfig[zone];
+        
+        container.innerHTML = '';
+
+        if (!items || items.length === 0) {
+          const ph = document.createElement('div');
+          ph.className = 'text-[11px] text-slate-400 self-center mx-auto placeholder-text';
+          ph.innerText = `Drop fields here`;
+          container.appendChild(ph);
+          return;
+        }
+
+        items.forEach((item, index) => {
+          const fieldName = (zone === 'values') ? item.field : item;
+          const chip = document.createElement('div');
+          chip.className = 'field-tag bg-blue-50 border-blue-200 text-blue-900';
+
+          if (zone === 'values') {
+            chip.innerHTML = `
+              <span class="font-bold text-[11px] md:text-xs">${item.agg}(${fieldName})</span>
+              <button onclick="openValueConfigModal(${index})" class="text-blue-600 hover:text-blue-900" title="Config">
+                <span class="material-symbols-outlined text-[14px]">settings</span>
+              </button>
+              <button onclick="removeFromZone('${zone}', ${index})" class="text-slate-400 hover:text-red-500 font-bold ml-0.5">&times;</button>
+            `;
+          } else if (zone === 'filters') {
+            const activeSel = filterSelections[fieldName];
+            const allCount = new Set(rawCSVData.map(r => String(r[fieldName] ?? ''))).size;
+            const selCount = activeSel ? activeSel.size : allCount;
+            const lbl = selCount === allCount ? 'All' : `${selCount}/${allCount}`;
+
+            chip.innerHTML = `
+              <span class="font-semibold text-[11px] md:text-xs">${fieldName}</span>
+              <button onclick="openFilterModal('${fieldName}')" class="bg-blue-200 text-blue-900 px-1.5 py-0.5 rounded text-[9px] font-bold">
+                ${lbl}
+              </button>
+              <button onclick="removeFromZone('${zone}', ${index})" class="text-slate-400 hover:text-red-500 font-bold ml-0.5">&times;</button>
+            `;
+          } else {
+            chip.innerHTML = `
+              <span class="font-semibold text-[11px] md:text-xs">${fieldName}</span>
+              <button onclick="removeFromZone('${zone}', ${index})" class="text-slate-400 hover:text-red-500 font-bold ml-0.5">&times;</button>
+            `;
+          }
+          container.appendChild(chip);
+        });
+      });
+    }
+
+    function handleDragStart(e, fieldName) {
+      draggedFieldName = fieldName;
+      e.dataTransfer.setData('text/plain', fieldName);
+    }
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-active');
+    }
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('drag-active');
+    }
+    function handleDrop(e, zone) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-active');
+      if (draggedFieldName) {
+        addFieldToZone(draggedFieldName, zone);
+        draggedFieldName = null;
+      }
+    }
+
+    function openAssignModal(fieldName) {
+      selectedFieldForAssign = fieldName;
+      document.getElementById('modalAssignFieldName').innerText = `Assign: ${fieldName}`;
+      openModal('modalFieldAssign');
+    }
+
+    function assignSelectedFieldTo(zone) {
+      if (selectedFieldForAssign) {
+        addFieldToZone(selectedFieldForAssign, zone);
+        closeModal('modalFieldAssign');
+      }
+    }
+
+    function addFieldToZone(fieldName, zone) {
+      if (zone === 'values') {
+        const meta = fieldMetadata.find(f => f.name === fieldName);
+        const defaultAgg = (meta && meta.type === 'number') ? 'SUM' : 'COUNT';
+        pivotConfig.values.push({ field: fieldName, agg: defaultAgg });
+      } else {
+        if (!pivotConfig[zone].includes(fieldName)) {
+          pivotConfig[zone].push(fieldName);
+        }
+      }
+      renderDropZones();
+      renderPivotTable();
+    }
+
+    function removeFromZone(zone, index) {
+      pivotConfig[zone].splice(index, 1);
+      renderDropZones();
+      renderPivotTable();
+    }
+    function clearZone(zone) {
+      pivotConfig[zone] = [];
+      renderDropZones();
+      renderPivotTable();
+    }
+
+    function getFilteredData() {
+      return rawCSVData.filter(row => {
+        for (let f of pivotConfig.filters) {
+          const allowed = filterSelections[f];
+          if (allowed) {
+            const val = String(row[f] ?? '');
+            if (!allowed.has(val)) return false;
+          }
+        }
+        return true;
+      });
+    }
+
+    function computeAggregation(rowsArray, valConfig) {
+      if (!rowsArray || rowsArray.length === 0) return 0;
+      const field = valConfig.field;
+      const fn = valConfig.agg;
+
+      if (fn === 'COUNT') return rowsArray.length;
+      
+      const nums = rowsArray.map(r => parseFloat(r[field])).filter(v => !isNaN(v));
+      if (nums.length === 0) return 0;
+
+      if (fn === 'SUM') return nums.reduce((a, b) => a + b, 0);
+      if (fn === 'AVG') return nums.reduce((a, b) => a + b, 0) / nums.length;
+      if (fn === 'MIN') return Math.min(...nums);
+      if (fn === 'MAX') return Math.max(...nums);
+      return 0;
+    }
+
+    function formatNumber(val) {
+      return val.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    }
+
+    function renderPivotTable() {
+      const container = document.getElementById('pivotTableOutput');
+      const filteredData = getFilteredData();
+
+      if (pivotConfig.values.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">Please add a field to the <strong>Values Area</strong>.</div>`;
+        return;
+      }
+
+      // Compute Column Tuples
+      let colTuples = [[]];
+      if (pivotConfig.columns.length > 0) {
+        const colMap = new Map();
+        filteredData.forEach(row => {
+          const keyParts = pivotConfig.columns.map(c => String(row[c] ?? '(Blank)'));
+          const keyStr = keyParts.join('||');
+          if (!colMap.has(keyStr)) colMap.set(keyStr, keyParts);
+        });
+        colTuples = Array.from(colMap.values()).sort((a, b) => a.join('||').localeCompare(b.join('||')));
+      }
+
+      // Build Row Tree
+      function buildTree(data, level) {
+        if (level >= pivotConfig.rows.length) return null;
+        const fieldName = pivotConfig.rows[level];
+        const groups = new Map();
+
+        data.forEach(row => {
+          const key = String(row[fieldName] ?? '(Blank)');
+          if (!groups.has(key)) groups.set(key, []);
+          groups.get(key).push(row);
+        });
+
+        const children = [];
+        Array.from(groups.keys()).sort().forEach(key => {
+          const groupRows = groups.get(key);
+          children.push({
+            key: key,
+            rows: groupRows,
+            children: buildTree(groupRows, level + 1)
+          });
+        });
+        return children;
+      }
+      const rowTree = pivotConfig.rows.length > 0 ? buildTree(filteredData, 0) : null;
+
+      let html = `<table class="pivot-table"><thead>`;
+
+      // Draw Headers
+      if (pivotConfig.columns.length > 0) {
+        for (let level = 0; level < pivotConfig.columns.length; level++) {
+          html += `<tr>`;
+          if (level === 0) {
+            html += `<th rowspan="${pivotConfig.columns.length}" colspan="${Math.max(1, pivotConfig.rows.length)}">${pivotConfig.rows.join(' > ') || 'Row Labels'}</th>`;
+          }
+
+          let lastKey = null;
+          let spanCount = 0;
+
+          colTuples.forEach((tuple, idx) => {
+            const hText = tuple[level] || '';
+            const subKey = tuple.slice(0, level + 1).join('||');
+
+            if (subKey === lastKey) {
+              spanCount += pivotConfig.values.length;
+            } else {
+              if (lastKey !== null) {
+                html += `<th class="col-header" colspan="${spanCount}">${lastKey.split('||').pop()}</th>`;
+              }
+              lastKey = subKey;
+              spanCount = pivotConfig.values.length;
+            }
+
+            if (idx === colTuples.length - 1) {
+              html += `<th class="col-header" colspan="${spanCount}">${hText}</th>`;
+            }
+          });
+
+          if (level === 0 && document.getElementById('chkGrandTotals').checked) {
+            html += `<th class="col-header" rowspan="${pivotConfig.columns.length}" colspan="${pivotConfig.values.length}">Grand Total</th>`;
+          }
+          html += `</tr>`;
+        }
+      } else {
+        html += `<tr><th colspan="${Math.max(1, pivotConfig.rows.length)}">${pivotConfig.rows.join(' > ') || 'Row Labels'}</th>`;
+        pivotConfig.values.forEach(v => { html += `<th class="col-header">${v.agg}(${v.field})</th>`; });
+        if (document.getElementById('chkGrandTotals').checked) {
+          pivotConfig.values.forEach(v => { html += `<th class="col-header">Total ${v.field}</th>`; });
+        }
+        html += `</tr>`;
+      }
+      html += `</thead><tbody>`;
+
+      // Draw Body
+      function renderTreeNodes(nodes, depth = 0, path = '') {
+        nodes.forEach(node => {
+          const currentPath = path ? `${path} > ${node.key}` : node.key;
+          const isExpanded = expandedRowKeys.has(currentPath) || depth === 0;
+          const hasChild = node.children && node.children.length > 0;
+
+          html += `<tr class="${depth === 0 ? 'font-semibold' : ''}">`;
+          html += `<td>`;
+          html += `<span style="margin-left: ${depth * 16}px;"></span>`;
+          if (hasChild) {
+            const icon = isExpanded ? '−' : '+';
+            html += `<span class="tree-toggle" onclick="toggleTreeExpand('${currentPath.replace(/'/g, "\\'")}')">${icon}</span>`;
+          } else {
+            html += `<span class="inline-block w-4"></span>`;
+          }
+          html += `<span>${node.key}</span></td>`;
+          for (let i = 1; i < pivotConfig.rows.length - depth; i++) { html += `<td></td>`; }
+
+          colTuples.forEach(tuple => {
+            const cellRows = node.rows.filter(r => pivotConfig.columns.every((c, idx) => String(r[c] ?? '(Blank)') === tuple[idx]));
+            pivotConfig.values.forEach(vc => {
+              const val = computeAggregation(cellRows, vc);
+              html += `<td class="num-cell">${formatNumber(val)}</td>`;
+            });
+          });
+
+          if (document.getElementById('chkGrandTotals').checked) {
+            pivotConfig.values.forEach(vc => {
+              const rt = computeAggregation(node.rows, vc);
+              html += `<td class="num-cell font-bold bg-slate-50">${formatNumber(rt)}</td>`;
+            });
+          }
+          html += `</tr>`;
+
+          if (hasChild && isExpanded) {
+            renderTreeNodes(node.children, depth + 1, currentPath);
+            if (document.getElementById('chkSubtotals').checked) {
+              html += `<tr class="total-row"><td colspan="${pivotConfig.rows.length}"><em>Subtotal (${node.key})</em></td>`;
+              colTuples.forEach(tuple => {
+                const cellRows = node.rows.filter(r => pivotConfig.columns.every((c, idx) => String(r[c] ?? '(Blank)') === tuple[idx]));
+                pivotConfig.values.forEach(vc => {
+                  html += `<td class="num-cell font-semibold">${formatNumber(computeAggregation(cellRows, vc))}</td>`;
+                });
+              });
+              if (document.getElementById('chkGrandTotals').checked) {
+                pivotConfig.values.forEach(vc => {
+                  html += `<td class="num-cell font-bold bg-slate-100">${formatNumber(computeAggregation(node.rows, vc))}</td>`;
+                });
+              }
+              html += `</tr>`;
+            }
+          }
+        });
+      }
+
+      if (rowTree) {
+        renderTreeNodes(rowTree);
+      } else {
+        html += `<tr><td><em>Overall Dataset</em></td>`;
+        colTuples.forEach(tuple => {
+          const cellRows = filteredData.filter(r => pivotConfig.columns.every((c, idx) => String(r[c] ?? '(Blank)') === tuple[idx]));
+          pivotConfig.values.forEach(vc => {
+            html += `<td class="num-cell">${formatNumber(computeAggregation(cellRows, vc))}</td>`;
+          });
+        });
+        if (document.getElementById('chkGrandTotals').checked) {
+          pivotConfig.values.forEach(vc => { html += `<td class="num-cell font-bold bg-slate-100">${formatNumber(computeAggregation(filteredData, vc))}</td>`; });
+        }
+        html += `</tr>`;
+      }
+
+      if (document.getElementById('chkGrandTotals').checked) {
+        html += `<tr class="grand-total-row"><td colspan="${Math.max(1, pivotConfig.rows.length)}">GRAND TOTAL</td>`;
+        colTuples.forEach(tuple => {
+          const cellRows = filteredData.filter(r => pivotConfig.columns.every((c, idx) => String(r[c] ?? '(Blank)') === tuple[idx]));
+          pivotConfig.values.forEach(vc => {
+            html += `<td class="num-cell">${formatNumber(computeAggregation(cellRows, vc))}</td>`;
+          });
+        });
+        if (document.getElementById('chkGrandTotals').checked) {
+          pivotConfig.values.forEach(vc => { html += `<td class="num-cell">${formatNumber(computeAggregation(filteredData, vc))}</td>`; });
+        }
+        html += `</tr>`;
+      }
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    function toggleTreeExpand(path) {
+      if (expandedRowKeys.has(path)) expandedRowKeys.delete(path);
+      else expandedRowKeys.add(path);
+      renderPivotTable();
+    }
+
+    function openFilterModal(field) {
+      editingFilterField = field;
+      document.getElementById('modalFilterTitle').innerText = `Filter: ${field}`;
+      const allVals = Array.from(new Set(rawCSVData.map(r => String(r[field] ?? '(Blank)')))).sort();
+      const curr = filterSelections[field] || new Set(allVals);
+      
+      const list = document.getElementById('modalFilterList');
+      list.innerHTML = '';
+      allVals.forEach(val => {
+        const isC = curr.has(val);
+        const row = document.createElement('label');
+        row.className = 'flex items-center gap-2 text-xs font-medium text-slate-700 hover:bg-slate-100 p-1.5 rounded cursor-pointer';
+        row.innerHTML = `<input type="checkbox" value="${val.replace(/"/g, '&quot;')}" ${isC ? 'checked' : ''} class="filter-cb accent-blue-900 w-3.5 h-3.5"><span class="truncate">${val}</span>`;
+        list.appendChild(row);
+      });
+      document.getElementById('filterValueSearch').value = '';
+      openModal('modalFilter');
+    }
+
+    function filterModalValueList() {
+      const q = document.getElementById('filterValueSearch').value.toLowerCase();
+      document.querySelectorAll('#modalFilterList label').forEach(lbl => {
+        lbl.style.display = lbl.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function selectAllModalFilters(state) {
+      document.querySelectorAll('.filter-cb').forEach(cb => {
+        if(cb.parentElement.style.display !== 'none') cb.checked = state;
+      });
+    }
+
+    function applyModalFilter() {
+      if (!editingFilterField) return;
+      const checked = new Set();
+      document.querySelectorAll('.filter-cb:checked').forEach(cb => checked.add(cb.value));
+      filterSelections[editingFilterField] = checked;
+      closeModal('modalFilter');
+      renderDropZones();
+      renderPivotTable();
+    }
+
+    function openValueConfigModal(idx) {
+      editingValueIndex = idx;
+      document.getElementById('modalAggFunc').value = pivotConfig.values[idx].agg;
+      openModal('modalValueConfig');
+    }
+    function saveValueConfig() {
+      if (editingValueIndex !== null) {
+        pivotConfig.values[editingValueIndex].agg = document.getElementById('modalAggFunc').value;
+      }
+      closeModal('modalValueConfig');
+      renderDropZones();
+      renderPivotTable();
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+      document.getElementById('tabContentBuilder').classList.add('hidden');
+      document.getElementById('tabContentData').classList.add('hidden');
+      document.getElementById('tabContentCharts').classList.add('hidden');
+
+      if (tab === 'builder') {
+        document.getElementById('tabBtnBuilder').classList.add('active');
+        document.getElementById('tabContentBuilder').classList.remove('hidden');
+      } else if (tab === 'data') {
+        document.getElementById('tabBtnData').classList.add('active');
+        document.getElementById('tabContentData').classList.remove('hidden');
+        renderRawDataTable();
+      } else if (tab === 'charts') {
+        document.getElementById('tabBtnCharts').classList.add('active');
+        document.getElementById('tabContentCharts').classList.remove('hidden');
+        renderPivotChart();
+      }
+    }
+
+    function renderRawDataTable() {
+      const searchTxt = document.getElementById('rawSearchInput').value.toLowerCase();
+      let filtered = rawCSVData;
+      if (searchTxt) {
+        filtered = rawCSVData.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(searchTxt)));
+      }
+      
+      const head = document.getElementById('rawDataHeader');
+      if (fieldMetadata.length > 0) {
+        head.innerHTML = `<tr>${fieldMetadata.map(f => `<th>${f.name}</th>`).join('')}</tr>`;
+      }
+      
+      const limited = filtered.slice(0, 100);
+      document.getElementById('rawDataBody').innerHTML = limited.map(row => 
+        `<tr>${fieldMetadata.map(f => `<td>${row[f.name] ?? ''}</td>`).join('')}</tr>`
+      ).join('');
+
+      document.getElementById('rawPaginationInfo').innerText = `Showing max 100 of ${filtered.length} records`;
+    }
+    function filterRawData() { renderRawDataTable(); }
+
+    function renderPivotChart() {
+      if (typeof Chart === 'undefined') return;
+      const ctx = document.getElementById('pivotChartCanvas').getContext('2d');
+      const type = document.getElementById('chartTypeSelect').value;
+      const filtered = getFilteredData();
+
+      if (pivotConfig.values.length === 0 || filtered.length === 0) {
+        if (chartInstance) chartInstance.destroy();
+        return;
+      }
+
+      const rowF = pivotConfig.rows[0] || 'Overall';
+      const rKeys = Array.from(new Set(filtered.map(r => String(r[rowF] ?? 'Overall')))).sort();
+      const vConf = pivotConfig.values[0];
+
+      const colors = ['#1B365D', '#2D68C4', '#10B981', '#F59E0B', '#8B5CF6', '#06B6D4'];
+      const dataPoints = rKeys.map(k => {
+        const set = filtered.filter(r => String(r[rowF] ?? 'Overall') === k);
+        return computeAggregation(set, vConf);
+      });
+
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: rKeys,
+          datasets: [{
+            label: `${vConf.agg}(${vConf.field})`,
+            data: dataPoints,
+            backgroundColor: (type === 'pie' || type === 'doughnut') ? colors : colors[0],
+            borderColor: (type === 'pie' || type === 'doughnut') ? '#fff' : colors[0]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 } } }
+          }
+        }
+      });
+    }
+
+    function exportPivotToCSV() {
+      const table = document.querySelector('#pivotTableOutput table');
+      if (!table) return;
+      let csv = [];
+      table.querySelectorAll('tr').forEach(row => {
+        let cols = [];
+        row.querySelectorAll('th, td').forEach(c => cols.push(`"${c.innerText.replace(/"/g, '""')}"`));
+        csv.push(cols.join(','));
+      });
+      const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'mitec_pivot_matrix.csv';
+      link.click();
+    }
+
+    function copyTableToClipboard() {
+      const table = document.querySelector('#pivotTableOutput table');
+      if (!table) return;
+      let tsv = [];
+      table.querySelectorAll('tr').forEach(row => {
+        let cols = [];
+        row.querySelectorAll('th, td').forEach(c => cols.push(c.innerText.replace(/\t/g, ' ')));
+        tsv.push(cols.join('\t'));
+      });
+      const area = document.createElement('textarea');
+      area.value = tsv.join('\n');
+      document.body.appendChild(area);
+      area.select();
+      try {
+        document.execCommand('copy');
+        showToast('Copied Matrix (Excel TSV)');
+      } catch (e) {
+        showToast('Copy failed');
+      }
+      document.body.removeChild(area);
+    }
+  </script>
+</body>
+</html>

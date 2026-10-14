@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #000000;
+    background-color: #f5f5f5;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 0;
+    margin: 10mm auto;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  /* Header Letterhead Styling */
+  .header-bar {
+    background-color: #8DC63F; /* Qube signature lime green */
+    height: 45px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 35px;
+    box-sizing: border-box;
+  }
+  .logo-text {
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: bold;
+    letter-spacing: -1px;
+    font-family: Arial, sans-serif;
+  }
+  .logo-symbol {
+    font-size: 14px;
+    vertical-align: super;
+  }
+
+  /* Main Letter Content */
+  .content {
+    padding: 35px 50px;
+    flex-grow: 1;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  
+  .confidential-header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+  }
+
+  .ref-date {
+    margin-bottom: 25px;
+  }
+
+  .addressee {
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .salutation {
+    margin-bottom: 20px;
+  }
+
+  .subject {
+    font-weight: bold;
+    text-decoration: underline;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .details-table {
+    margin: 20px 0 25px 40px;
+    border-collapse: collapse;
+  }
+  .details-table td {
+    padding: 3px 10px 3px 0;
+    vertical-align: top;
+    font-size: 13px;
+  }
+  .details-table td.label {
+    font-weight: bold;
+    width: 140px;
+  }
+  .details-table td.colon {
+    width: 20px;
+    text-align: center;
+  }
+  .details-table td.value {
+    font-weight: bold;
+  }
+
+  .paragraph {
+    margin-bottom: 18px;
+    text-align: justify;
+  }
+
+  .sign-off {
+    margin-top: 30px;
+  }
+
+  /* Footer Styling */
+  .footer {
+    padding: 15px 50px 25px 50px;
+    border-top: 1px solid #cccccc;
+    font-size: 10px;
+    color: #333333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-company {
+    font-weight: normal;
+  }
+  .footer-contacts a {
+    color: #333333;
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <!-- Top Letterhead Bar -->
+  <div>
+    <div class="header-bar">
+      <span class="logo-text">qube<span class="logo-symbol">®</span></span>
+    </div>
+
+    <!-- Letter Body -->
+    <div class="content">
+      <div class="confidential-header">PRIVATE & CONFIDENTIAL</div>
+
+      <div class="ref-date">
+        QUBE/MITEC/HR/L/EMP_VERF/[MMYY]/[NO]<br>
+        [Date]
+      </div>
+
+      <div class="addressee">TO WHOM IT MAY CONCERN.</div>
+
+      <div class="salutation">Dear Sir / Madam,</div>
+
+      <div class="subject">EMPLOYMENT VERIFICATION LETTER</div>
+
+      <div class="paragraph">
+        This letter is to verify that the employee with the details provided below is employed by Qube Integrated Malaysia Sdn. Bhd. stationed at [Location]: -
+      </div>
+
+      <table class="details-table">
+        <tr>
+          <td class="label">Name</td>
+          <td class="colon">:</td>
+          <td class="value">[Employee Full Name]</td>
+        </tr>
+        <tr>
+          <td class="label">NRIC No.</td>
+          <td class="colon">:</td>
+          <td class="value">[NRIC / Passport Number]</td>
+        </tr>
+        <tr>
+          <td class="label">Position</td>
+          <td class="colon">:</td>
+          <td class="value">[Job Title / Position]</td>
+        </tr>
+        <tr>
+          <td class="label">Employee Type</td>
+          <td class="colon">:</td>
+          <td class="value">[Employment Status]</td>
+        </tr>
+      </table>
+
+      <div class="paragraph">
+        This letter is issued upon the request of the staff for whatever purposes it may serve him, without any liability on the part of the Company.
+      </div>
+
+      <div class="paragraph">
+        Should you require further details or assistance, please do not hesitate to reach the Human Resources Department at 03-6206 0332.
+      </div>
+
+      <div class="paragraph">Thank you.</div>
+
+      <div class="sign-off">
+        Sincerely,<br>
+        <strong>For and on behalf of Qube Integrated Malaysia Sdn Bhd</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-company">
+      <strong>Qube Integrated Malaysia Sdn. Bhd.</strong> <span style="font-size: 9px; color: #666;">(200601025257 (627717-A))</span>
+    </div>
+    <div class="footer-contacts">
+      &#9993; enquiry@qube.com.my &nbsp;&nbsp; &#127760; www.qube.com.my
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
