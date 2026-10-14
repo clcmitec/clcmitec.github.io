@@ -261,7 +261,7 @@
     .pill-pres { background: var(--pill-emerald-bg); color: var(--pill-emerald-text); border: 1px solid var(--pill-emerald-border); }
     .pill-noshow { background: var(--pill-orange-bg); color: var(--pill-orange-text); border: 1px solid var(--pill-orange-border); }
 
-    /* Worker Manager Filter & Table Styles (from Script B, adapted to Script A theme) */
+    /* Worker Manager Filter & Table Styles */
     .filter-panel-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
     .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .doc-type-filter-group { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-thin); }
@@ -273,10 +273,10 @@
     .wm-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .wm-header-title { font-size: 24px; font-weight: 900; color: var(--text-main); margin: 0 0 10px 0; text-transform: uppercase; }
     .wm-meta-line { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-    
+
     .btn-download-roster { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-thin); border-radius: 6px; padding: 8px 12px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700; transition: 0.15s; }
     .btn-download-roster:active { transform: scale(0.95); background: #e2e8f0; }
-    
+
     .wm-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; text-align: left; }
     .wm-table th { background: #f8fafc; padding: 12px 8px; font-weight: 800; color: var(--text-main); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
     .wm-table td { padding: 14px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
@@ -343,7 +343,7 @@
     .roster-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; text-align: left; }
     .roster-table th { background: var(--mgp-black); padding: 10px; font-weight: 800; color: #fff; text-transform: uppercase; font-size: 9px; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-thin); }
     .roster-table td { padding: 10px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
-    
+
     .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
     .pill-sub { background: var(--mgp-black); color: #ffffff; border: 1px solid var(--mgp-black); }
     .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
@@ -398,7 +398,7 @@
 
   <!-- HERO HEADER -->
   <header class="hero-header">
-    <h1>   🏁 Human Resources <span> Recruitment</span></h1>
+    <h1>🏁 Human Resources <span> Recruitment</span></h1>
   </header>
 
   <!-- NAVIGATION TAB BAR -->
@@ -463,7 +463,7 @@
       <div id="pivot-roster-root-container"></div>
     </div>
 
-    <!-- PAGE 3: STAFFING MANAGER (FROM SCRIPT B) -->
+    <!-- PAGE 3: STAFFING MANAGER -->
     <div id="page-3" class="app-page">
       <!-- Top Scorecard Container (Below Header) -->
       <div id="top-scorecard-root"></div>
@@ -581,7 +581,6 @@
           <select id="form-time" class="form-control" required>
             <option value="" disabled selected hidden>Scheduled Shift</option>
             <option value="0700">07:00</option>
-            <!-- (All options preserved...) -->
             <option value="0800">08:00</option>
             <option value="0900">09:00</option>
             <option value="1000">10:00</option>
@@ -643,7 +642,7 @@
         <ul>
           <li><a href="faq.html">Help Center</a></li>
           <li><a href="feedback.html">Contact Admin</a></li>
-          <li><a href="#">dashboard.html</a></li>
+          <li><a href="location.html">Locate US</a></li>
         </ul>
       </div>
     </div>
@@ -653,868 +652,970 @@
   </footer>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOQA9l1lpjs9eSOHwQmdZe4axc6OR6E9ohXmHQI3d9B-3apRtl6mFValUpepCorlqs/exec"; 
+  // DIRECT SUPABASE REST CONFIGURATION
+  const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
 
-    let activeAdminKey = null;
-    let cachedShifts = [];
-    let cachedBookings = [];
+  const supabaseHeaders = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": `Bearer ${SUPABASE_KEY}`,
+    "Content-Type": "application/json"
+  };
 
-    let currentActiveFilter = "ALL"; 
-    let calSelectedDateStr = null;   
-    let calSelectedShiftId = null;   
+  let activeAdminKey = null;
+  let cachedShifts = [];
+  let cachedBookings = [];
 
-    let editModeShift = false;
-    let editingShiftId = null;
+  let currentActiveFilter = "ALL"; 
+  let calSelectedDateStr = null;   
+  let calSelectedShiftId = null;   
 
-    let calDate = new Date();
-    let calMonth = calDate.getMonth();
-    let calYear = calDate.getFullYear();
+  let editModeShift = false;
+  let editingShiftId = null;
 
-    window.onload = () => {
-      let sessionKey = null;
-      try {
-        sessionKey = localStorage.getItem("mitec_admin_key") || localStorage.getItem("mcl_doc_no");
-      } catch (err) { console.warn("Storage restricted."); }
+  let calDate = new Date();
+  let calMonth = calDate.getMonth();
+  let calYear = calDate.getFullYear();
 
-      if (sessionKey) {
-        activeAdminKey = sessionKey;
-        document.getElementById('login-overlay').style.display = 'none';
-        loadAdminDataSuite();
-      } else {
-        document.getElementById('login-overlay').style.display = 'flex';
-        renderStatisticsPage();
-      }
-    };
+  window.onload = () => {
+    let sessionKey = null;
+    try {
+      sessionKey = localStorage.getItem("mitec_admin_key") || localStorage.getItem("mcl_doc_no");
+    } catch (err) { console.warn("Storage restricted."); }
 
-    function handleAdminLogin(event) {
-      event.preventDefault();
-      const enteredId = document.getElementById('login-id-input').value.trim();
-      if(!enteredId) return;
-      activeAdminKey = enteredId;
+    if (sessionKey) {
+      activeAdminKey = sessionKey;
       document.getElementById('login-overlay').style.display = 'none';
       loadAdminDataSuite();
+    } else {
+      document.getElementById('login-overlay').style.display = 'flex';
+      renderStatisticsPage();
     }
+  };
 
-    function handleAdminLogout() {
+  function handleAdminLogin(event) {
+    event.preventDefault();
+    const enteredId = document.getElementById('login-id-input').value.trim();
+    if(!enteredId) return;
+    activeAdminKey = enteredId;
+    document.getElementById('login-overlay').style.display = 'none';
+    loadAdminDataSuite();
+  }
+
+  function handleAdminLogout() {
+    try {
+      localStorage.removeItem("mitec_admin_key");
+      localStorage.removeItem("mcl_doc_no");
+    } catch(e) {}
+    window.location.reload();
+  }
+
+  function switchTab(tabIndex) {
+    for (let i = 1; i <= 3; i++) { 
+      document.getElementById(`tab-btn-${i}`).classList.toggle('active', i === tabIndex);
+      document.getElementById(`page-${i}`).classList.toggle('active', i === tabIndex);       
+    }     
+  }      
+
+  function isPassportHolder(userId) {
+    if (!userId) return false;
+    const cleanId = String(userId).trim().replace(/^'/, '');
+    return /^[a-zA-Z]/.test(cleanId);
+  }
+
+  function formatPhoneForDialing(phone) {       
+    if (!phone) return '';       
+    let cleaned = String(phone).replace(/[^0-9+]/g, '');       
+    if (!cleaned) return '';       
+    if (cleaned.startsWith('60')) return '+' + cleaned;       
+    if (!cleaned.startsWith('+') && !cleaned.startsWith('0')) return '+' + cleaned;       
+    return cleaned;     
+  }      
+
+  function formatAttendanceTime(timeVal) {       
+    if (!timeVal) return "";       
+    const str = String(timeVal).trim();       
+    if (str.includes("1899")) {         
+      try {           
+        const d = new Date(str);           
+        return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;         
+      } catch(e) { return str; }       
+    }       
+    if (str.includes("GMT")) {         
+      try {           
+        const d = new Date(str);           
+        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      } catch(e) { return str; }
+    }
+    let cleanDigits = str.replace(/[^0-9]/g, "");
+    if (cleanDigits.length === 4 && !str.includes(":")) {
+      return cleanDigits.substring(0, 2) + ":" + cleanDigits.substring(2, 4);
+    }
+    return str;
+  }
+
+  function formatFullTimestamp(timeVal) {
+    if (!timeVal) return "No Show";
+    let str = String(timeVal).trim();
+    if (str.toLowerCase() === "no show" || str === "0" || str === "-" || str === "") return "No Show";
+    if (str.includes("GMT")) {
       try {
-        localStorage.removeItem("mitec_admin_key");
-        localStorage.removeItem("mcl_doc_no");
+        let d = new Date(str);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+        }
       } catch(e) {}
-      window.location.reload();
+    }
+    return str; 
+  }
+
+  function getShiftDateObj(dateStr) {
+    try {
+      if (!dateStr) return new Date(0);
+      let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
+      let parts = clean.split('.');
+      if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    } catch(e) {}
+    return new Date(0);
+  }
+
+  function isFutureOrToday(dateStr) {
+    if (!dateStr) return false;
+    let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
+    let parts = clean.split('.');
+    if (parts.length !== 3) return false;
+    let checkDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    let today = new Date(); today.setHours(0, 0, 0, 0);
+    return checkDate >= today;
+  }
+
+  function isPastOrToday(dateStr) {
+    if (!dateStr) return false;
+    let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
+    let parts = clean.split('.');
+    if (parts.length !== 3) return false;
+    let checkDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    let today = new Date(); today.setHours(23, 59, 59, 999);
+    return checkDate <= today;
+  }
+
+  // DIRECT SUPABASE FETCH (SUB-100MS LATENCY)
+  async function loadAdminDataSuite() {
+    document.getElementById('sync-loader').style.display = 'flex';
+
+    try {
+      const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers: supabaseHeaders }).then(r => r.json());
+      const bookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*&limit=50000`, { headers: supabaseHeaders }).then(r => r.json());
+
+      const [shiftsRes, bookingsRes] = await Promise.all([shiftsPromise, bookingsPromise]);
+
+      try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
+
+      cachedShifts = (shiftsRes || []).map(s => ({
+        id: s.shift_id,
+        date: s.date ? s.date.split('-').reverse().join('.') : '',
+        dept: s.dept || '',
+        time: s.time || '',
+        slots: parseInt(s.slots) || 0,
+        totalSlots: parseInt(s.slots) || 0,
+        Slots: parseInt(s.slots) || 0,
+        notes: s.notes || '',
+        status: s.status || 'OPEN',
+        wa_link: s.wa_link || ''
+      }));
+
+      cachedBookings = (bookingsRes || []).map(b => ({
+        shift_id: b.shift_id || '',
+        user_id: String(b.doc_no || '').replace(/^'/, ''),
+        doc_no: b.doc_no || '',
+        worker_name: b.name || 'Casual Worker',
+        phone: b.phone || '',
+        date: b.date ? b.date.split('-').reverse().join('.') : '',
+        dept: b.dept || '',
+        time: b.time || '',
+        status: b.status || 'SUBMITTED',
+        attendance: b.attendance || ''
+      }));
+
+      document.getElementById("adminUserDisplayTag").textContent = "SUPER ADMIN";
+
+      updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
+      renderStatisticsPage(); 
+      renderPivotRostersPage();
+      populateWorkerManagerShifts();
+
+    } catch (err) {
+      alert("Database error: " + err.message);
+    } finally {
+      document.getElementById('sync-loader').style.display = 'none';
+    }
+  }
+
+  /* Tab 1: Statistics & Deployment */
+  function updateMatrixNumbers(targetDate, targetShiftId) {
+    let scopedShifts = cachedShifts;
+    let scopedBookings = cachedBookings;
+    let labelScope = "Global Matrix";
+    let badgeScope = "All Data";
+
+    if (targetShiftId) {
+      scopedShifts = cachedShifts.filter(s => s.id === targetShiftId);
+      scopedBookings = cachedBookings.filter(b => b.shift_id === targetShiftId);
+      labelScope = "Shift Matrix";
+      badgeScope = `Target Mode`;
+    } else if (targetDate) {
+      scopedShifts = cachedShifts.filter(s => s.date === targetDate);
+      scopedBookings = cachedBookings.filter(b => scopedShifts.some(s => s.id === b.shift_id));
+      labelScope = "Daily Matrix";
+      badgeScope = targetDate;
     }
 
-    function switchTab(tabIndex) {
-      for (let i = 1; i <= 3; i++) { 
-        document.getElementById(`tab-btn-${i}`).classList.toggle('active', i === tabIndex);
-        document.getElementById(`page-${i}`).classList.toggle('active', i === tabIndex);       
-      }     
-    }      
+    let totalCap = 0;
+    scopedShifts.forEach(s => { totalCap += Number(s.slots || s.totalSlots || s.Slots || 0); });
 
-    function isPassportHolder(userId) {
-      if (!userId) return false;
-      const cleanId = String(userId).trim();
-      return /^[a-zA-Z]/.test(cleanId);
-    }
+    const confirmedBookings = scopedBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
+    const totalConf = confirmedBookings.length;
+    const totalWait = scopedBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
 
-    function formatPhoneForDialing(phone) {       
-      if (!phone) return '';       
-      let cleaned = String(phone).replace(/[^0-9+]/g, '');       
-      if (!cleaned) return '';       
-      if (cleaned.startsWith('60')) return '+' + cleaned;       
-      if (!cleaned.startsWith('+') && !cleaned.startsWith('0')) return '+' + cleaned;       
-      return cleaned;     
-    }      
-
-    function formatAttendanceTime(timeVal) {       
-      if (!timeVal) return "";       
-      const str = String(timeVal).trim();       
-      if (str.includes("1899")) {         
-        try {           
-          const d = new Date(str);           
-          return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;         
-        } catch(e) { return str; }       
-      }       
-      if (str.includes("GMT")) {         
-        try {           
-          const d = new Date(str);           
-          return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-        } catch(e) { return str; }
+    let totalPres = 0;
+    confirmedBookings.forEach(b => {
+      let formattedStamp = formatFullTimestamp(b.attendance);
+      if (formattedStamp && formattedStamp !== "No Show") {
+        totalPres++;
       }
-      let cleanDigits = str.replace(/[^0-9]/g, "");
-      if (cleanDigits.length === 4 && !str.includes(":")) {
-        return cleanDigits.substring(0, 2) + ":" + cleanDigits.substring(2, 4);
-      }
-      return str;
+    });
+
+    document.getElementById('dash-txt-cap').textContent = totalCap;
+    document.getElementById('dash-txt-conf').textContent = totalConf;
+    document.getElementById('dash-txt-wait').textContent = totalWait;
+    document.getElementById('dash-txt-pres').textContent = `${totalPres} /${totalCap}`;        
+    document.getElementById("matrixFilterActiveLabel").innerHTML = `${labelScope} <span class="matrix-title-badge">${badgeScope}</span>`;
+  }
+
+  function setDashboardFilter(filterType) {
+    currentActiveFilter = filterType;
+    document.getElementById('tile-cap').classList.toggle('selected', filterType === 'ALL');
+    document.getElementById('tile-conf').classList.toggle('selected', filterType === 'CONF');
+    document.getElementById('tile-wait').classList.toggle('selected', filterType === 'WAIT');
+    document.getElementById('tile-pres').classList.toggle('selected', filterType === 'PRES');
+    renderStatisticsPage(); 
+  }
+
+  function renderStatisticsPage() {
+    const container = document.getElementById('stats-view-container');
+    if(!document.getElementById('cal-wrapper')) {
+      container.innerHTML = `
+        <div class="calendar-wrapper" id="cal-wrapper">
+            <div class="cal-header">
+                <button class="btn-cal-nav" onclick="changeCalMonth(-1)"><i class="ph ph-caret-left"></i></button>
+                <h3 id="cal-month-title"></h3>
+                <button class="btn-cal-nav" onclick="changeCalMonth(1)"><i class="ph ph-caret-right"></i></button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+        </div>
+        <div id="cal-details-list"></div>
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border-thin);">
+          <button class="btn-logout" onclick="handleAdminLogout()">Exit Session (Logout)</button>
+        </div>`;
+    }
+    renderCalendarGrid();
+    renderSelectedDateDetails();
+  }
+
+  function changeCalMonth(direction) {
+    calMonth += direction;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendarGrid();
+  }
+
+  function selectCalDate(dateStr) {
+    calSelectedDateStr = (calSelectedDateStr === dateStr) ? null : dateStr;
+    calSelectedShiftId = null; 
+    updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
+    renderCalendarGrid();
+    renderSelectedDateDetails();
+  }
+
+  function selectShiftCard(shiftId) {
+    calSelectedShiftId = (calSelectedShiftId === shiftId) ? null : shiftId;
+    if (calSelectedShiftId) openEditShift(shiftId);
+    updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
+    renderSelectedDateDetails();
+  }
+
+  function renderCalendarGrid() {
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    document.getElementById('cal-month-title').textContent = `${monthNames[calMonth]}${calYear}`;
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = `
+        <div class="cal-day-label">Su</div><div class="cal-day-label">Mo</div><div class="cal-day-label">Tu</div>
+        <div class="cal-day-label">We</div><div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div>`;
+
+    let firstDay = new Date(calYear, calMonth, 1).getDay();
+    let daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+    for(let i=0; i<firstDay; i++) { grid.innerHTML += `<div class="cal-cell empty"></div>`; }
+
+    for(let day=1; day<=daysInMonth; day++) {
+        let dateStr = `${String(day).padStart(2, '0')}.${String(calMonth + 1).padStart(2, '0')}.${calYear}`;
+        let shiftsToday = cachedShifts.filter(s => s.date === dateStr);
+        let cellClass = "cal-cell";
+        let indicatorHTML = "";
+
+        if (shiftsToday.length > 0) {
+            let totalMetric = 0;
+            let todayBookings = cachedBookings.filter(b => shiftsToday.some(s => s.id === b.shift_id));
+            let confirmedToday = todayBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
+
+            if (currentActiveFilter === 'ALL') {
+                 totalMetric = shiftsToday.reduce((sum, s) => sum + Number(s.slots || s.totalSlots || s.Slots || 0), 0);
+                 if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:#e2e8f0; color:var(--text-main);">Req ${totalMetric}</div>`;
+            } else if (currentActiveFilter === 'CONF') {
+                 totalMetric = confirmedToday.length;
+                 if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-teal-bg); color:var(--pill-teal-text);">+${totalMetric}</div>`;
+            } else if (currentActiveFilter === 'WAIT') {
+                 totalMetric = todayBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
+                 if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-amber-bg); color:var(--pill-amber-text);">+${totalMetric}</div>`;
+            } else if (currentActiveFilter === 'PRES') {
+                 totalMetric = confirmedToday.filter(b => formatFullTimestamp(b.attendance) && formatFullTimestamp(b.attendance) !== "No Show").length;
+                 if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-emerald-bg); color:var(--pill-emerald-text);">+${totalMetric}</div>`;
+            }
+            if (indicatorHTML !== "") cellClass += " has-shifts";
+        }
+        if (dateStr === calSelectedDateStr) cellClass += " selected";
+        grid.innerHTML += `<div class="${cellClass}" onclick="selectCalDate('${dateStr}')">${day}${indicatorHTML}</div>`;
+    }
+  }
+
+  function renderSelectedDateDetails() {
+    const listContainer = document.getElementById('cal-details-list');
+    if (!listContainer) return;
+    if (!calSelectedDateStr) {
+        listContainer.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">Select a date on the calendar to scan the operational matrix.</p>';
+        return;
     }
 
-    function formatFullTimestamp(timeVal) {
-      if (!timeVal) return "No Show";
-      let str = String(timeVal).trim();
-      if (str.toLowerCase() === "no show" || str === "0" || str === "-" || str === "") return "No Show";
-      if (str.includes("GMT")) {
-        try {
-          let d = new Date(str);
-          if (!isNaN(d.getTime())) {
-            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
-          }
-        } catch(e) {}
-      }
-      return str; 
-    }
+    const shiftsToday = cachedShifts.filter(s => s.date === calSelectedDateStr);
+    let detailsHTML = `<div class="section-label">Shift Details: ${calSelectedDateStr}</div>`;
 
-    function getShiftDateObj(dateStr) {
-      try {
-        let parts = dateStr.includes('.') ? dateStr.split('.') : dateStr.split('/');
-        if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
-      } catch(e) {}
-      return new Date(0);
-    }
+    if (shiftsToday.length === 0) {
+        detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts scheduled for this date.</p>`;
+    } else {
+        let visibleCards = 0;
+        shiftsToday.forEach(s => {
+            const shiftBookings = cachedBookings.filter(b => b.shift_id === s.id);
+            const confirmedBookings = shiftBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
+            const confirmedCount = confirmedBookings.length;
+            const waitlistCount = shiftBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
+            const cancelledCount = shiftBookings.filter(b => b.status === 'CANCELLED').length;
 
-    function isFutureOrToday(dateStr) {
-      if (!dateStr) return false;
-      let parts = dateStr.split('.');
-      if (parts.length !== 3) return false;
-      let checkDate = new Date(parts[2], parts[1] - 1, parts[0]);
-      let today = new Date(); today.setHours(0, 0, 0, 0);
-      return checkDate >= today;
-    }
+            let presCount = 0;
+            let noShowCount = 0;
 
-    function isPastOrToday(dateStr) {
-      if (!dateStr) return false;
-      let parts = dateStr.split('.');
-      if (parts.length !== 3) return false;
-      let checkDate = new Date(parts[2], parts[1] - 1, parts[0]);
-      let today = new Date(); today.setHours(23, 59, 59, 999);
-      return checkDate <= today;
-    }
+            confirmedBookings.forEach(b => {
+              let formattedStamp = formatFullTimestamp(b.attendance);
+              if (formattedStamp && formattedStamp !== "No Show") {
+                presCount++;
+              } else if (isPastOrToday(s.date)) {
+                noShowCount++;
+              }
+            });
 
-    function loadAdminDataSuite() {
-      document.getElementById('sync-loader').style.display = 'flex';
+            let shouldDisplay = true;
+            if (currentActiveFilter === "CONF" && confirmedCount === 0) shouldDisplay = false;
+            if (currentActiveFilter === "WAIT" && waitlistCount === 0) shouldDisplay = false;
+            if (currentActiveFilter === "PRES" && presCount === 0) shouldDisplay = false;
 
-      fetch(`${SCRIPT_URL}?action=getAdminMasterData&userDocNo=${activeAdminKey}`)
-        .then(r => r.json())
-        .then(res => {
-          if (res.ok && res.allShifts && res.allBookingsRaw) {
-            try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
+            if (shouldDisplay) {
+                visibleCards++;
+                let displayTime = formatAttendanceTime(s.time);
+                let maxCapacitySlots = s.slots || s.totalSlots || s.Slots || 0;
+                let isSelectedClass = (calSelectedShiftId === s.id) ? "selected-card" : "";
 
-            cachedShifts = (res.allShifts || []).map(s => ({ ...s, totalSlots: s.slots, Slots: s.slots }));
-            cachedBookings = res.allBookingsRaw;
-
-            if (res.adminName) document.getElementById("adminUserDisplayTag").textContent = res.adminName.toUpperCase();
-
-            updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
-            renderStatisticsPage(); 
-            renderPivotRostersPage();
-            populateWorkerManagerShifts();
-
-            document.getElementById('sync-loader').style.display = 'none';
-          } else {
-            alert("Handshake Refused!");
-            document.getElementById('sync-loader').style.display = 'none';
-            document.getElementById('login-overlay').style.display = 'flex';
-          }
-        }).catch(() => {
-          document.getElementById('sync-loader').style.display = 'none';
-          document.getElementById('login-overlay').style.display = 'flex';
+                detailsHTML += `
+                  <div class="stat-row-card ${isSelectedClass}" onclick="selectShiftCard('${s.id}')">
+                    <div class="stat-info">
+                      <h3><span>${s.dept}</span></h3>
+                      <p>
+                        <span class="meta-data-line"><i class="ph ph-clock"></i> ${displayTime}</span>
+                        <span class="meta-data-line"><i class="ph ph-user-list"></i> Capacity: <b>${maxCapacitySlots} Slots</b></span>
+                      </p>
+                    </div>
+                    <div class="metrics-pill-pack">
+                      <span class="mini-badge" style="background:#e2e8f0; color:#1e293b; border: 1px solid ${currentActiveFilter === 'ALL' ? 'var(--mgp-red)' : 'transparent'}">Cap: ${maxCapacitySlots}</span>
+                      <span class="mini-badge pill-sub" style="border-width: ${currentActiveFilter === 'CONF' ? '2px' : '1px'}">Conf: ${confirmedCount}</span>
+                      <span class="mini-badge pill-pres" style="border-width: ${currentActiveFilter === 'PRES' ? '2px' : '1px'}">Pres: ${presCount}</span>
+                      <span class="mini-badge pill-noshow">NoShow: ${noShowCount}</span>
+                      <span class="mini-badge pill-wait" style="border-width: ${currentActiveFilter === 'WAIT' ? '2px' : '1px'}">Wait: ${waitlistCount}</span>
+                      <span class="mini-badge pill-cancelled">Drop: ${cancelledCount}</span>
+                    </div>
+                  </div>`;
+            }
         });
+        if (visibleCards === 0) detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts match filters.</p>`;
+    }
+    if (isFutureOrToday(calSelectedDateStr)) {
+        detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #ffffff; color: var(--text-main); border: 2px dashed var(--mgp-red);" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px; color: var(--mgp-red);"></i> Deploy New Shift Here</button>`;
+    }
+    listContainer.innerHTML = detailsHTML;
+  }
+
+  function openCreateShift() {
+    editModeShift = false; editingShiftId = null;
+    document.getElementById('shift-creation-form').reset();
+    document.getElementById('form-shift-id').disabled = false;
+    document.getElementById('shift-id-hint').textContent = "Shift ID sequence auto-assignment applied.";
+    document.getElementById('shift-drawer-title').textContent = "Deploy New Shift";
+    document.getElementById('btn-submit-shift-action').innerHTML = "<i class='ph ph-paper-plane-right'></i> Append & Deploy";
+
+    if (calSelectedDateStr) {
+        let parts = calSelectedDateStr.split('.');
+        document.getElementById('form-date').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
     }
 
-    /* Tab 1: Statistics & Deployment (Preserved) */
-    function updateMatrixNumbers(targetDate, targetShiftId) {
-      let scopedShifts = cachedShifts;
-      let scopedBookings = cachedBookings;
-      let labelScope = "Global Matrix";
-      let badgeScope = "All Data";
-
-      if (targetShiftId) {
-        scopedShifts = cachedShifts.filter(s => s.id === targetShiftId);
-        scopedBookings = cachedBookings.filter(b => b.shift_id === targetShiftId);
-        labelScope = "Shift Matrix";
-        badgeScope = `Target Mode`;
-      } else if (targetDate) {
-        scopedShifts = cachedShifts.filter(s => s.date === targetDate);
-        scopedBookings = cachedBookings.filter(b => scopedShifts.some(s => s.id === b.shift_id));
-        labelScope = "Daily Matrix";
-        badgeScope = targetDate;
-      }
-
-      let totalCap = 0;
-      scopedShifts.forEach(s => { totalCap += Number(s.slots || s.totalSlots || s.Slots || 0); });
-
-      const confirmedBookings = scopedBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
-      const totalConf = confirmedBookings.length;
-      const totalWait = scopedBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
-
-      let totalPres = 0;
-      confirmedBookings.forEach(b => {
-        let formattedStamp = formatFullTimestamp(b.attendance);
-        if (formattedStamp && formattedStamp !== "No Show") {
-          totalPres++;
+    let nextShiftNumber = 1;
+    if (cachedShifts.length > 0) {
+      let maxFoundNumber = 0;
+      cachedShifts.forEach(shift => {
+        if (shift.id && String(shift.id).toUpperCase().startsWith("S")) {
+          let numericPart = parseInt(String(shift.id).substring(1), 10);
+          if (!isNaN(numericPart) && numericPart > maxFoundNumber) maxFoundNumber = numericPart;
         }
       });
-
-      document.getElementById('dash-txt-cap').textContent = totalCap;
-      document.getElementById('dash-txt-conf').textContent = totalConf;
-      document.getElementById('dash-txt-wait').textContent = totalWait;
-      document.getElementById('dash-txt-pres').textContent = `${totalPres} /${totalCap}`;        
-      document.getElementById("matrixFilterActiveLabel").innerHTML = `${labelScope} <span class="matrix-title-badge">${badgeScope}</span>`;
+      nextShiftNumber = maxFoundNumber + 1;
     }
+    document.getElementById('form-shift-id').value = "S" + String(nextShiftNumber).padStart(3, '0');
+    document.getElementById('shift-drawer').style.display = 'flex';
+  }
 
-    function setDashboardFilter(filterType) {
-      currentActiveFilter = filterType;
-      document.getElementById('tile-cap').classList.toggle('selected', filterType === 'ALL');
-      document.getElementById('tile-conf').classList.toggle('selected', filterType === 'CONF');
-      document.getElementById('tile-wait').classList.toggle('selected', filterType === 'WAIT');
-      document.getElementById('tile-pres').classList.toggle('selected', filterType === 'PRES');
-      renderStatisticsPage(); 
-    }
+  function openEditShift(shiftId) {
+    editModeShift = true; editingShiftId = shiftId;
+    let shift = cachedShifts.find(s => s.id === shiftId);
+    if(!shift) return;
 
-    function renderStatisticsPage() {
-      const container = document.getElementById('stats-view-container');
-      if(!document.getElementById('cal-wrapper')) {
-        container.innerHTML = `
-          <div class="calendar-wrapper" id="cal-wrapper">
-              <div class="cal-header">
-                  <button class="btn-cal-nav" onclick="changeCalMonth(-1)"><i class="ph ph-caret-left"></i></button>
-                  <h3 id="cal-month-title"></h3>
-                  <button class="btn-cal-nav" onclick="changeCalMonth(1)"><i class="ph ph-caret-right"></i></button>
-              </div>
-              <div class="cal-grid" id="cal-grid"></div>
-          </div>
-          <div id="cal-details-list"></div>
-          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border-thin);">
-            <button class="btn-logout" onclick="handleAdminLogout()">Exit Session (Logout)</button>
-          </div>`;
-      }
-      renderCalendarGrid();
-      renderSelectedDateDetails();
-    }
+    document.getElementById('shift-drawer-title').textContent = "Edit Shift Parameters";
+    document.getElementById('btn-submit-shift-action').innerHTML = "<i class='ph ph-floppy-disk'></i> Overwrite & Update";
+    document.getElementById('form-shift-id').value = shift.id;
+    document.getElementById('form-shift-id').disabled = true;
 
-    function changeCalMonth(direction) {
-      calMonth += direction;
-      if (calMonth > 11) { calMonth = 0; calYear++; }
-      if (calMonth < 0) { calMonth = 11; calYear--; }
-      renderCalendarGrid();
-    }
+    let parts = shift.date.split('.');
+    if (parts.length === 3) document.getElementById('form-date').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+    document.getElementById('form-dept').value = shift.dept;
 
-    function selectCalDate(dateStr) {
-      calSelectedDateStr = (calSelectedDateStr === dateStr) ? null : dateStr;
-      calSelectedShiftId = null; 
-      updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
-      renderCalendarGrid();
-      renderSelectedDateDetails();
-    }
+    let vTime = formatAttendanceTime(shift.time).replace(":", "");
+    let timeSelect = document.getElementById('form-time');
+    if (Array.from(timeSelect.options).some(opt => opt.value === vTime)) timeSelect.value = vTime;
 
-    function selectShiftCard(shiftId) {
-      calSelectedShiftId = (calSelectedShiftId === shiftId) ? null : shiftId;
-      if (calSelectedShiftId) openEditShift(shiftId);
-      updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
-      renderSelectedDateDetails();
-    }
+    document.getElementById('form-slots').value = shift.slots || shift.totalSlots;
+    document.getElementById('form-notes').value = shift.notes || "";
+    document.getElementById('shift-drawer').style.display = 'flex';
+  }
 
-    function renderCalendarGrid() {
-      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      document.getElementById('cal-month-title').textContent = `${monthNames[calMonth]}${calYear}`;
-      const grid = document.getElementById('cal-grid');
-      grid.innerHTML = `
-          <div class="cal-day-label">Su</div><div class="cal-day-label">Mo</div><div class="cal-day-label">Tu</div>
-          <div class="cal-day-label">We</div><div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div>`;
+  function closeShiftDrawer() { document.getElementById('shift-drawer').style.display = 'none'; }
 
-      let firstDay = new Date(calYear, calMonth, 1).getDay();
-      let daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  // DIRECT SUPABASE POST FOR SHIFT CREATION / OVERWRITE
+  async function handleFormSubmission(event) {
+    event.preventDefault();
+    const idField = document.getElementById('form-shift-id');
+    const sId = idField.value.trim();
+    const rawDate = document.getElementById('form-date').value.trim(); // YYYY-MM-DD
+    const sDept = document.getElementById('form-dept').value.trim();
+    const sTime = formatAttendanceTime(document.getElementById('form-time').value.trim());
+    const sSlots = parseInt(document.getElementById('form-slots').value.trim()) || 0;
+    const sNotes = document.getElementById('form-notes').value.trim();
 
-      for(let i=0; i<firstDay; i++) { grid.innerHTML += `<div class="cal-cell empty"></div>`; }
+    closeShiftDrawer();
+    document.getElementById('sync-loader').style.display = 'flex';
 
-      for(let day=1; day<=daysInMonth; day++) {
-          let dateStr = `${String(day).padStart(2, '0')}.${String(calMonth + 1).padStart(2, '0')}.${calYear}`;
-          let shiftsToday = cachedShifts.filter(s => s.date === dateStr);
-          let cellClass = "cal-cell";
-          let indicatorHTML = "";
+    const payload = [{
+      shift_id: sId,
+      date: rawDate,
+      dept: sDept,
+      time: sTime,
+      slots: sSlots,
+      notes: sNotes,
+      status: "OPEN",
+      updated_at: new Date().toISOString()
+    }];
 
-          if (shiftsToday.length > 0) {
-              let totalMetric = 0;
-              let todayBookings = cachedBookings.filter(b => shiftsToday.some(s => s.id === b.shift_id));
-              let confirmedToday = todayBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
-
-              if (currentActiveFilter === 'ALL') {
-                   totalMetric = shiftsToday.reduce((sum, s) => sum + Number(s.slots || s.totalSlots || s.Slots || 0), 0);
-                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:#e2e8f0; color:var(--text-main);">Req ${totalMetric}</div>`;
-              } else if (currentActiveFilter === 'CONF') {
-                   totalMetric = confirmedToday.length;
-                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-teal-bg); color:var(--pill-teal-text);">+${totalMetric}</div>`;
-              } else if (currentActiveFilter === 'WAIT') {
-                   totalMetric = todayBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
-                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-amber-bg); color:var(--pill-amber-text);">+${totalMetric}</div>`;
-              } else if (currentActiveFilter === 'PRES') {
-                   totalMetric = confirmedToday.filter(b => formatFullTimestamp(b.attendance) && formatFullTimestamp(b.attendance) !== "No Show").length;
-                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-emerald-bg); color:var(--pill-emerald-text);">+${totalMetric}</div>`;
-              }
-              if (indicatorHTML !== "") cellClass += " has-shifts";
-          }
-          if (dateStr === calSelectedDateStr) cellClass += " selected";
-          grid.innerHTML += `<div class="${cellClass}" onclick="selectCalDate('${dateStr}')">${day}${indicatorHTML}</div>`;
-      }
-    }
-
-    function renderSelectedDateDetails() {
-      const listContainer = document.getElementById('cal-details-list');
-      if (!listContainer) return;
-      if (!calSelectedDateStr) {
-          listContainer.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">Select a date on the calendar to scan the operational matrix.</p>';
-          return;
-      }
-
-      const shiftsToday = cachedShifts.filter(s => s.date === calSelectedDateStr);
-      let detailsHTML = `<div class="section-label">Shift Details: ${calSelectedDateStr}</div>`;
-
-      if (shiftsToday.length === 0) {
-          detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts scheduled for this date.</p>`;
-      } else {
-          let visibleCards = 0;
-          shiftsToday.forEach(s => {
-              const shiftBookings = cachedBookings.filter(b => b.shift_id === s.id);
-              const confirmedBookings = shiftBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
-              const confirmedCount = confirmedBookings.length;
-              const waitlistCount = shiftBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
-              const cancelledCount = shiftBookings.filter(b => b.status === 'CANCELLED').length;
-
-              let presCount = 0;
-              let noShowCount = 0;
-
-              confirmedBookings.forEach(b => {
-                let formattedStamp = formatFullTimestamp(b.attendance);
-                if (formattedStamp && formattedStamp !== "No Show") {
-                  presCount++;
-                } else if (isPastOrToday(s.date)) {
-                  noShowCount++;
-                }
-              });
-
-              let shouldDisplay = true;
-              if (currentActiveFilter === "CONF" && confirmedCount === 0) shouldDisplay = false;
-              if (currentActiveFilter === "WAIT" && waitlistCount === 0) shouldDisplay = false;
-              if (currentActiveFilter === "PRES" && presCount === 0) shouldDisplay = false;
-
-              if (shouldDisplay) {
-                  visibleCards++;
-                  let displayTime = formatAttendanceTime(s.time);
-                  let maxCapacitySlots = s.slots || s.totalSlots || s.Slots || 0;
-                  let isSelectedClass = (calSelectedShiftId === s.id) ? "selected-card" : "";
-
-                  detailsHTML += `
-                    <div class="stat-row-card ${isSelectedClass}" onclick="selectShiftCard('${s.id}')">
-                      <div class="stat-info">
-                        <h3><span>${s.dept}</span></h3>
-                        <p>
-                          <span class="meta-data-line"><i class="ph ph-clock"></i> ${displayTime}</span>
-                          <span class="meta-data-line"><i class="ph ph-user-list"></i> Capacity: <b>${maxCapacitySlots} Slots</b></span>
-                        </p>
-                      </div>
-                      <div class="metrics-pill-pack">
-                        <span class="mini-badge" style="background:#e2e8f0; color:#1e293b; border: 1px solid ${currentActiveFilter === 'ALL' ? 'var(--mgp-red)' : 'transparent'}">Cap: ${maxCapacitySlots}</span>
-                        <span class="mini-badge pill-sub" style="border-width: ${currentActiveFilter === 'CONF' ? '2px' : '1px'}">Conf: ${confirmedCount}</span>
-                        <span class="mini-badge pill-pres" style="border-width: ${currentActiveFilter === 'PRES' ? '2px' : '1px'}">Pres: ${presCount}</span>
-                        <span class="mini-badge pill-noshow">NoShow: ${noShowCount}</span>
-                        <span class="mini-badge pill-wait" style="border-width: ${currentActiveFilter === 'WAIT' ? '2px' : '1px'}">Wait: ${waitlistCount}</span>
-                        <span class="mini-badge pill-cancelled">Drop: ${cancelledCount}</span>
-                      </div>
-                    </div>`;
-              }
-          });
-          if (visibleCards === 0) detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts match filters.</p>`;
-      }
-      if (isFutureOrToday(calSelectedDateStr)) {
-          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #ffffff; color: var(--text-main); border: 2px dashed var(--mgp-red);" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px; color: var(--mgp-red);"></i> Deploy New Shift Here</button>`;
-      }
-      listContainer.innerHTML = detailsHTML;
-    }
-
-    function openCreateShift() {
-      editModeShift = false; editingShiftId = null;
-      document.getElementById('shift-creation-form').reset();
-      document.getElementById('form-shift-id').disabled = false;
-      document.getElementById('shift-id-hint').textContent = "Shift ID sequence auto-assignment applied.";
-      document.getElementById('shift-drawer-title').textContent = "Deploy New Shift";
-      document.getElementById('btn-submit-shift-action').innerHTML = "<i class='ph ph-paper-plane-right'></i> Append & Deploy";
-
-      if (calSelectedDateStr) {
-          let parts = calSelectedDateStr.split('.');
-          document.getElementById('form-date').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
-
-      let nextShiftNumber = 1;
-      if (cachedShifts.length > 0) {
-        let maxFoundNumber = 0;
-        cachedShifts.forEach(shift => {
-          if (shift.id && String(shift.id).toUpperCase().startsWith("S")) {
-            let numericPart = parseInt(String(shift.id).substring(1), 10);
-            if (!isNaN(numericPart) && numericPart > maxFoundNumber) maxFoundNumber = numericPart;
-          }
-        });
-        nextShiftNumber = maxFoundNumber + 1;
-      }
-      document.getElementById('form-shift-id').value = "S" + String(nextShiftNumber).padStart(3, '0');
-      document.getElementById('shift-drawer').style.display = 'flex';
-    }
-
-    function openEditShift(shiftId) {
-      editModeShift = true; editingShiftId = shiftId;
-      let shift = cachedShifts.find(s => s.id === shiftId);
-      if(!shift) return;
-
-      document.getElementById('shift-drawer-title').textContent = "Edit Shift Parameters";
-      document.getElementById('btn-submit-shift-action').innerHTML = "<i class='ph ph-floppy-disk'></i> Overwrite & Update";
-      document.getElementById('form-shift-id').value = shift.id;
-      document.getElementById('form-shift-id').disabled = true;
-
-      let parts = shift.date.split('.');
-      if (parts.length === 3) document.getElementById('form-date').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
-      document.getElementById('form-dept').value = shift.dept;
-
-      let vTime = formatAttendanceTime(shift.time).replace(":", "");
-      let timeSelect = document.getElementById('form-time');
-      if (Array.from(timeSelect.options).some(opt => opt.value === vTime)) timeSelect.value = vTime;
-
-      document.getElementById('form-slots').value = shift.slots || shift.totalSlots;
-      document.getElementById('form-notes').value = shift.notes || "";
-      document.getElementById('shift-drawer').style.display = 'flex';
-    }
-
-    function closeShiftDrawer() { document.getElementById('shift-drawer').style.display = 'none'; }
-
-    function handleFormSubmission(event) {
-      event.preventDefault();
-      const idField = document.getElementById('form-shift-id');
-      const sId = idField.value.trim();
-      const sDate = document.getElementById('form-date').value.trim().split('-').reverse().join('.');
-      const sDept = document.getElementById('form-dept').value.trim();
-      const sTime = formatAttendanceTime(document.getElementById('form-time').value.trim());
-      const sSlots = document.getElementById('form-slots').value.trim();
-      const sNotes = document.getElementById('form-notes').value.trim();
-      const actionType = editModeShift ? "updateShift" : "createShift";
-
-      closeShiftDrawer();
-      document.getElementById('sync-loader').style.display = 'flex';
-
-      fetch(`${SCRIPT_URL}?action=${actionType}&userDocNo=${activeAdminKey}&shiftId=${sId}&date=${sDate}&dept=${sDept}&time=${sTime}&slots=${sSlots}&notes=${encodeURIComponent(sNotes)}`)
-        .then(r => r.json())
-        .then(res => {
-          if (res.ok) {
-            document.getElementById('shift-creation-form').reset();
-            loadAdminDataSuite();
-          } else { alert("Error: " + res.error); document.getElementById('sync-loader').style.display = 'none'; }
-        }).catch(() => { document.getElementById('sync-loader').style.display = 'none'; });
-    }
-
-
-    /* Tab 2: Pivot Rosters (Preserved) */
-    function renderPivotRostersPage() {
-      const container = document.getElementById('pivot-roster-root-container');
-      container.innerHTML = '';
-
-      if(!cachedShifts || cachedShifts.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">No pivot matrices discoverable.</p>';
-        return;
-      }
-
-      let today = new Date(); today.setHours(0,0,0,0);
-      let pivotData = { "TODAY": {}, "UPCOMING": {}, "PAST": {} };
-
-      cachedShifts.forEach(s => {
-        let sDateObj = getShiftDateObj(s.date);
-        let category = "UPCOMING";
-        if (sDateObj.getTime() === today.getTime()) category = "TODAY";
-        else if (sDateObj < today) category = "PAST";
-
-        if (!pivotData[category][s.date]) pivotData[category][s.date] = {};
-        if (!pivotData[category][s.date][s.dept]) pivotData[category][s.date][s.dept] = [];
-
-        pivotData[category][s.date][s.dept].push(s);
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/shift_master?on_conflict=shift_id`, {
+        method: "POST",
+        headers: {
+          ...supabaseHeaders,
+          "Prefer": "resolution=merge-duplicates"
+        },
+        body: JSON.stringify(payload)
       });
 
-      const catOrder = ["TODAY", "UPCOMING", "PAST"];
+      if (res.ok) {
+        document.getElementById('shift-creation-form').reset();
+        await loadAdminDataSuite();
+      } else {
+        const err = await res.json();
+        alert("Shift deployment failed: " + (err.message || "Database error"));
+        document.getElementById('sync-loader').style.display = 'none';
+      }
+    } catch (err) {
+      alert("Network Error: " + err.message);
+      document.getElementById('sync-loader').style.display = 'none';
+    }
+  }
 
-      catOrder.forEach(cat => {
-        let dateGroup = pivotData[cat];
-        let dateKeys = Object.keys(dateGroup);
-        if (dateKeys.length === 0) return;
 
-        dateKeys.sort((a, b) => cat === "PAST" ? getShiftDateObj(b) - getShiftDateObj(a) : getShiftDateObj(a) - getShiftDateObj(b));
+  /* Tab 2: Pivot Rosters */
+  function renderPivotRostersPage() {
+    const container = document.getElementById('pivot-roster-root-container');
+    container.innerHTML = '';
 
-        let catOpenState = (cat === "TODAY") ? "open" : "";
+    if(!cachedShifts || cachedShifts.length === 0) {
+      container.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">No pivot matrices discoverable.</p>';
+      return;
+    }
 
-        let catMarkup = `
-          <details class="pivot-cat-card" ${catOpenState}>
-            <summary class="pivot-summary pivot-cat-title">
-              <span>${cat} Overview</span>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span class="matrix-title-badge">${dateKeys.length} Active Dates</span>
-                <i class="ph ph-caret-down pivot-chevron"></i>
-              </div>
+    let today = new Date(); today.setHours(0,0,0,0);
+    let pivotData = { "TODAY": {}, "UPCOMING": {}, "PAST": {} };
+
+    cachedShifts.forEach(s => {
+      let sDateObj = getShiftDateObj(s.date);
+      let category = "UPCOMING";
+      if (sDateObj.getTime() === today.getTime()) category = "TODAY";
+      else if (sDateObj < today) category = "PAST";
+
+      if (!pivotData[category][s.date]) pivotData[category][s.date] = {};
+      if (!pivotData[category][s.date][s.dept]) pivotData[category][s.date][s.dept] = [];
+
+      pivotData[category][s.date][s.dept].push(s);
+    });
+
+    const catOrder = ["TODAY", "UPCOMING", "PAST"];
+
+    catOrder.forEach(cat => {
+      let dateGroup = pivotData[cat];
+      let dateKeys = Object.keys(dateGroup);
+      if (dateKeys.length === 0) return;
+
+      dateKeys.sort((a, b) => cat === "PAST" ? getShiftDateObj(b) - getShiftDateObj(a) : getShiftDateObj(a) - getShiftDateObj(b));
+
+      let catOpenState = (cat === "TODAY") ? "open" : "";
+
+      let catMarkup = `
+        <details class="pivot-cat-card" ${catOpenState}>
+          <summary class="pivot-summary pivot-cat-title">
+            <span>${cat} Overview</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="matrix-title-badge">${dateKeys.length} Active Dates</span>
+              <i class="ph ph-caret-down pivot-chevron"></i>
+            </div>
+          </summary>
+          <div style="margin-top:10px;">`;
+
+      dateKeys.forEach(dateKey => {
+        catMarkup += `
+          <details class="pivot-date-block" ${catOpenState}>
+            <summary class="pivot-summary pivot-date-title">
+              <span><i class="ph ph-calendar-blank"></i> ${dateKey}</span>
+              <i class="ph ph-caret-down pivot-chevron"></i>
             </summary>
-            <div style="margin-top:10px;">`;
+            <div style="margin-top:6px;">`;
 
-        dateKeys.forEach(dateKey => {
+        let depts = dateGroup[dateKey];
+        Object.keys(depts).forEach(deptKey => {
           catMarkup += `
-            <details class="pivot-date-block" ${catOpenState}>
-              <summary class="pivot-summary pivot-date-title">
-                <span><i class="ph ph-calendar-blank"></i> ${dateKey}</span>
+            <details class="pivot-dept-block" ${catOpenState}>
+              <summary class="pivot-summary pivot-dept-title">
+                <span>${deptKey} Department</span>
                 <i class="ph ph-caret-down pivot-chevron"></i>
               </summary>
-              <div style="margin-top:6px;">`;
+              <div style="margin-top:4px;">`;
 
-          let depts = dateGroup[dateKey];
-          Object.keys(depts).forEach(deptKey => {
+          let shifts = depts[deptKey];
+          shifts.sort((a, b) => String(a.time).localeCompare(String(b.time)));
+
+          shifts.forEach(s => {
+            let displayTime = formatAttendanceTime(s.time);
+            let confirmedApplicants = cachedBookings.filter(b => b.shift_id === s.id && (b.status === 'SUBMITTED' || b.status === 'CONFIRMED'));
+            let capacity = s.slots || s.totalSlots || s.Slots || 0;
+
             catMarkup += `
-              <details class="pivot-dept-block" ${catOpenState}>
-                <summary class="pivot-summary pivot-dept-title">
-                  <span>${deptKey} Department</span>
-                  <i class="ph ph-caret-down pivot-chevron"></i>
+              <details class="pivot-shift-item" style="padding:0;" ${catOpenState}>
+                <summary class="pivot-summary pivot-shift-header" style="padding:12px;">
+                  <span>⏱️ Reporting Hours: <b>${displayTime}</b></span>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="color:var(--text-muted); font-weight:normal;">Allocated: <b>${confirmedApplicants.length} /${capacity}</b></span>
+                    <i class="ph ph-caret-down pivot-chevron"></i>
+                  </div>
                 </summary>
-                <div style="margin-top:4px;">`;
+                <div style="padding:0 12px 12px 12px; margin-top:-4px;">`;
 
-            let shifts = depts[deptKey];
-            shifts.sort((a, b) => String(a.time).localeCompare(String(b.time)));
-
-            shifts.forEach(s => {
-              let displayTime = formatAttendanceTime(s.time);
-              let confirmedApplicants = cachedBookings.filter(b => b.shift_id === s.id && (b.status === 'SUBMITTED' || b.status === 'CONFIRMED'));
-              let capacity = s.slots || s.totalSlots || s.Slots || 0;
-
+            if (confirmedApplicants.length === 0) {
+              catMarkup += `<p style="font-size:11px; color:var(--text-muted); font-style:italic; margin:4px 0 0 4px;">No active confirmed workers on roster.</p>`;
+            } else {
               catMarkup += `
-                <details class="pivot-shift-item" style="padding:0;" ${catOpenState}>
-                  <summary class="pivot-summary pivot-shift-header" style="padding:12px;">
-                    <span>⏱️ Reporting Hours: <b>${displayTime}</b></span>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                      <span style="color:var(--text-muted); font-weight:normal;">Allocated: <b>${confirmedApplicants.length} /${capacity}</b></span>
-                      <i class="ph ph-caret-down pivot-chevron"></i>
-                    </div>
-                  </summary>
-                  <div style="padding:0 12px 12px 12px; margin-top:-4px;">`;
+                <table class="roster-table" style="font-size:11px; margin-top:4px; background:#fff; border:1px solid var(--border-thin); border-radius:6px;">
+                  <thead>
+                    <tr style="background:#f8fafc;">
+                      <th style="padding:6px 8px; color:var(--mgp-black);">Casual Labourer</th>
+                      <th style="width:110px; text-align:center; padding:6px 8px; color:var(--mgp-black);">Attendance</th>
+                    </tr>
+                  </thead>
+                  <tbody>`;
 
-              if (confirmedApplicants.length === 0) {
-                catMarkup += `<p style="font-size:11px; color:var(--text-muted); font-style:italic; margin:4px 0 0 4px;">No active confirmed workers on roster.</p>`;
-              } else {
-                catMarkup += `
-                  <table class="roster-table" style="font-size:11px; margin-top:4px; background:#fff; border:1px solid var(--border-thin); border-radius:6px;">
-                    <thead>
-                      <tr style="background:#f8fafc;">
-                        <th style="padding:6px 8px; color:var(--mgp-black);">Casual Labourer</th>
-                        <th style="width:110px; text-align:center; padding:6px 8px; color:var(--mgp-black);">Attendance</th>
-                      </tr>
-                    </thead>
-                    <tbody>`;
-
-                confirmedApplicants.forEach(w => {
-                  let attStamp = w.attendance || "";
-                  let attDisplay = "";
-                  if (attStamp.toLowerCase() === "no show" || attStamp === "" || attStamp === "-" || attStamp === "0") {
-                    if (cat === "UPCOMING") {
-                      attDisplay = ``;
-                    } else {
-                      attDisplay = `<span style="color:var(--accent-warn); font-weight:800;">No Show</span>`;
-                    }
+              confirmedApplicants.forEach(w => {
+                let attStamp = w.attendance || "";
+                let attDisplay = "";
+                if (attStamp.toLowerCase() === "no show" || attStamp === "" || attStamp === "-" || attStamp === "0") {
+                  if (cat === "UPCOMING") {
+                    attDisplay = ``;
                   } else {
-                    attDisplay = `<span style="color:var(--text-main); font-weight:700; font-family:monospace;">${formatFullTimestamp(attStamp)}</span>`;
+                    attDisplay = `<span style="color:var(--accent-warn); font-weight:800;">No Show</span>`;
                   }
+                } else {
+                  attDisplay = `<span style="color:var(--text-main); font-weight:700; font-family:monospace;">${formatFullTimestamp(attStamp)}</span>`;
+                }
 
-                  catMarkup += `
-                    <tr>
-                      <td style="padding:6px 8px;">
-                        <div style="font-weight:700; color:var(--text-main);">${w.worker_name}</div>
-                        <div style="font-size:9px; color:var(--text-muted);">ID: ${w.user_id}</div>
-                      </td>
-                      <td style="text-align:center; padding:6px 8px;">${attDisplay}</td>
-                    </tr>`;
-                });
-                catMarkup += `</tbody></table>`;
-              }
-              catMarkup += `</div></details>`; 
-            });
+                catMarkup += `
+                  <tr>
+                    <td style="padding:6px 8px;">
+                      <div style="font-weight:700; color:var(--text-main);">${w.worker_name}</div>
+                      <div style="font-size:9px; color:var(--text-muted);">ID: ${w.user_id || w.doc_no}</div>
+                    </td>
+                    <td style="text-align:center; padding:6px 8px;">${attDisplay}</td>
+                  </tr>`;
+              });
+              catMarkup += `</tbody></table>`;
+            }
             catMarkup += `</div></details>`; 
           });
           catMarkup += `</div></details>`; 
         });
         catMarkup += `</div></details>`; 
-        container.innerHTML += catMarkup;
       });
+      catMarkup += `</div></details>`; 
+      container.innerHTML += catMarkup;
+    });
+  }
+
+
+  /* Tab 3: Worker Manager / Staffing Manager */
+  function populateWorkerManagerShifts() {
+    const selectEl = document.getElementById('wm-shift-select');
+    if (!selectEl) return;
+
+    let today = new Date(); today.setHours(0,0,0,0);
+    const upcomingShifts = cachedShifts.filter(s => getShiftDateObj(s.date) >= today);
+
+    if (upcomingShifts.length === 0) {
+      selectEl.innerHTML = '<option value="">No upcoming shifts found</option>';
+      document.getElementById('worker-manager-root').innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No upcoming shift parameters registered.</p>';
+      return;
     }
 
+    upcomingShifts.sort((a, b) => getShiftDateObj(a.date) - getShiftDateObj(b.date));
 
-    /* Tab 3: Worker Manager / Staffing Manager (Imported from Script B) */
-    function populateWorkerManagerShifts() {
-      const selectEl = document.getElementById('wm-shift-select');
-      if (!selectEl) return;
+    let currentSelection = selectEl.value;
+    selectEl.innerHTML = upcomingShifts.map(s => `
+      <option value="${s.id}">[${s.dept}] ${s.date} (${formatAttendanceTime(s.time)}) — ID: ${s.id}</option>
+    `).join('');
 
-      let today = new Date(); today.setHours(0,0,0,0);
-      const upcomingShifts = cachedShifts.filter(s => getShiftDateObj(s.date) >= today);
-
-      if (upcomingShifts.length === 0) {
-        selectEl.innerHTML = '<option value="">No upcoming shifts found</option>';
-        document.getElementById('worker-manager-root').innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No upcoming shift parameters registered.</p>';
-        return;
-      }
-
-      upcomingShifts.sort((a, b) => getShiftDateObj(a.date) - getShiftDateObj(b.date));
-
-      let currentSelection = selectEl.value;
-      selectEl.innerHTML = upcomingShifts.map(s => `
-        <option value="${s.id}">[${s.dept}] ${s.date} (${formatAttendanceTime(s.time)}) — ID: ${s.id}</option>
-      `).join('');
-
-      if (currentSelection && upcomingShifts.some(s => s.id === currentSelection)) {
-        selectEl.value = currentSelection;
-      } else {
-        selectEl.value = upcomingShifts[0].id;
-      }
-
-      renderWorkerManagerTable();
+    if (currentSelection && upcomingShifts.some(s => s.id === currentSelection)) {
+      selectEl.value = currentSelection;
+    } else {
+      selectEl.value = upcomingShifts[0].id;
     }
 
-    function renderWorkerManagerTable() {
-      const selectEl = document.getElementById('wm-shift-select');
-      const filterEl = document.getElementById('wm-status-filter');
-      const rootEl = document.getElementById('worker-manager-root');
-      const topScorecardEl = document.getElementById('top-scorecard-root');
-      if (!selectEl || !rootEl) return;
+    renderWorkerManagerTable();
+  }
 
-      const shiftId = selectEl.value;
-      const statusFilter = filterEl ? filterEl.value : 'ALL';
+  function renderWorkerManagerTable() {
+    const selectEl = document.getElementById('wm-shift-select');
+    const filterEl = document.getElementById('wm-status-filter');
+    const rootEl = document.getElementById('worker-manager-root');
+    const topScorecardEl = document.getElementById('top-scorecard-root');
+    if (!selectEl || !rootEl) return;
 
-      const showIC = document.getElementById('wm-doc-ic') ? document.getElementById('wm-doc-ic').checked : true;
-      const showPassport = document.getElementById('wm-doc-passport') ? document.getElementById('wm-doc-passport').checked : true;
+    const shiftId = selectEl.value;
+    const statusFilter = filterEl ? filterEl.value : 'ALL';
 
-      const shift = cachedShifts.find(s => s.id === shiftId);
+    const showIC = document.getElementById('wm-doc-ic') ? document.getElementById('wm-doc-ic').checked : true;
+    const showPassport = document.getElementById('wm-doc-passport') ? document.getElementById('wm-doc-passport').checked : true;
 
-      if (!shift) {
-        rootEl.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">Please select a shift above.</p>';
-        if (topScorecardEl) topScorecardEl.innerHTML = '';
-        return;
-      }
+    const shift = cachedShifts.find(s => s.id === shiftId);
 
-      // Filter: All active non-cancelled bookings for this shift
-      const shiftBookings = cachedBookings.filter(b => 
-        b.shift_id === shift.id && 
-        String(b.status).toUpperCase() !== 'CANCELLED'
-      );
+    if (!shift) {
+      rootEl.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">Please select a shift above.</p>';
+      if (topScorecardEl) topScorecardEl.innerHTML = '';
+      return;
+    }
 
-      // Scorecard Calculations (Totals for whole shift regardless of view filters)
-      const totalApproved = shiftBookings.filter(b => {
-        const status = String(b.status).toUpperCase();
-        return status === 'SUBMITTED' || status === 'CONFIRMED';
-      }).length;
+    // Filter: All active non-cancelled bookings for this shift
+    const shiftBookings = cachedBookings.filter(b => 
+      b.shift_id === shift.id && 
+      String(b.status).toUpperCase() !== 'CANCELLED'
+    );
 
-      const totalWaitlist = shiftBookings.filter(b => {
-        const status = String(b.status).toUpperCase();
-        return status === 'WAITLIST' || status === 'WAITING LIST';
-      }).length;
+    // Scorecard Calculations
+    const totalApproved = shiftBookings.filter(b => {
+      const status = String(b.status).toUpperCase();
+      return status === 'SUBMITTED' || status === 'CONFIRMED';
+    }).length;
 
-      const totalCL = totalApproved + totalWaitlist;
-      const totalSlots = shift.slots || shift.totalSlots || shift.Slots || 0;
+    const totalWaitlist = shiftBookings.filter(b => {
+      const status = String(b.status).toUpperCase();
+      return status === 'WAITLIST' || status === 'WAITING LIST';
+    }).length;
 
-      // Render Scorecard
-      if (topScorecardEl) {
-        topScorecardEl.innerHTML = `
-          <div class="wm-scorecard-grid">
-            <div class="wm-stat-card">
-              <span class="wm-stat-label">Total CL Approved</span>
-              <span class="wm-stat-value">${totalApproved}</span>
-            </div>
-            <div class="wm-stat-card">
-              <span class="wm-stat-label">Total Waiting List</span>
-              <span class="wm-stat-value">${totalWaitlist}</span>
-            </div>
-            <div class="wm-stat-card">
-              <span class="wm-stat-label">Total CL</span>
-              <span class="wm-stat-value">${totalCL}</span>
-            </div>
-          </div>`;
-      }
+    const totalCL = totalApproved + totalWaitlist;
+    const totalSlots = shift.slots || shift.totalSlots || shift.Slots || 0;
 
-      // Filter rows based on Status + Document Type Checkboxes
-      let displayedBookings = shiftBookings.filter(b => {
-        const isConfirmed = (String(b.status).toUpperCase() === 'SUBMITTED' || String(b.status).toUpperCase() === 'CONFIRMED');
-        if (statusFilter === 'CONFIRMED' && !isConfirmed) return false;
-        if (statusFilter === 'WAITLIST' && isConfirmed) return false;
-
-        const isPassport = isPassportHolder(b.user_id);
-        if (isPassport && !showPassport) return false;
-        if (!isPassport && !showIC) return false;
-
-        return true;
-      });
-
-      let html = `
-        <div class="wm-card">
-          <div class="wm-card-header">
-            <div>
-              <h2 class="wm-header-title" style="margin: 0 0 6px 0;">${shift.dept}</h2>
-              <div class="wm-meta-line"><i class="ph ph-fingerprint"></i> Shift ID: <b>${shift.id}</b></div>
-              <div class="wm-meta-line"><i class="ph ph-calendar"></i> Date: <b>${shift.date} (${formatAttendanceTime(shift.time)})</b></div>
-              <div class="wm-meta-line"><i class="ph ph-users-three"></i> Capacity: <b>${totalSlots} Slots</b></div>
-            </div>
-            <button class="btn-download-roster" onclick="downloadRosterCSV('${shift.id}')" title="Download Roster">
-              <i class="ph ph-download-simple"></i>
-            </button>
+    // Render Scorecard
+    if (topScorecardEl) {
+      topScorecardEl.innerHTML = `
+        <div class="wm-scorecard-grid">
+          <div class="wm-stat-card">
+            <span class="wm-stat-label">Total CL Approved</span>
+            <span class="wm-stat-value">${totalApproved}</span>
           </div>
-
-          <div style="overflow-x:auto; margin-top:15px;">
-            <table class="wm-table">
-              <thead>
-                <tr>
-                  <th>Casual Labour Name</th>
-                  <th style="text-align:center; width:135px;">Status</th>
-                  <th style="text-align:center; width:100px;">Action</th>
-                </tr>
-              </thead>
-              <tbody>`;
-
-      if (displayedBookings.length === 0) {
-        html += `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No casual workers found matching current filters.</td></tr>`;
-      } else {
-        const defaultRacerSilhouette = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><rect width='100%' height='100%' fill='%231a1a1a'/><path d='M50 22c-12 0-22 10-22 22 0 9 5.5 16.7 13.3 20.1C25 69 15 80 15 95h70c0-15-10-26-26.3-30.9C66.5 60.7 72 53 72 44c0-12-10-22-22-22z' fill='%23444444'/><path d='M50 28c-8.8 0-16 7.2-16 16 0 8.8 7.2 16 16 16s16-7.2 16-16c0-8.8-7.2-16-16-16z' fill='%23555555'/></svg>`;
-
-        displayedBookings.forEach(w => {
-          const isConfirmed = (String(w.status).toUpperCase() === 'SUBMITTED' || String(w.status).toUpperCase() === 'CONFIRMED');
-          const selectClass = isConfirmed ? "status-confirmed" : "status-waitlist";
-
-          const photoUrl = w.photo_url || w.photo || defaultRacerSilhouette;
-          const dialablePhone = formatPhoneForDialing(w.phone);
-          const callLink = dialablePhone ? `tel:${dialablePhone}` : `javascript:alert('No phone number on record');`;
-          const docTypeLabel = isPassportHolder(w.user_id) ? "Passport" : "MyKad";
-
-          html += `
-            <tr>
-              <td>
-                <div class="worker-profile-cell">
-                  <div class="worker-avatar-frame" style="width: 36px; height: 42px;">
-                    <img src="${photoUrl}" class="worker-avatar" alt="Photo" onerror="this.onerror=null; this.src='${defaultRacerSilhouette}';" />
-                  </div>
-                  <div>
-                    <div class="view-drawable-name" style="font-size:11px; font-weight:800; text-transform:uppercase; line-height:1.2; cursor:pointer;" onclick="openWorkerProfileDrawer('${w.user_id}', '${w.worker_name.replace(/'/g, "\\'")}')">${w.worker_name}</div>
-                    <div style="font-size:9px; color:var(--text-muted); margin-top:2px; font-family:monospace; font-weight:600;">${docTypeLabel}: ${w.user_id}</div>
-                  </div>
-                </div>
-              </td>
-              <td style="text-align:center;">
-                <div class="wm-status-select-wrapper">
-                  <select class="wm-status-select ${selectClass}" onchange="toggleWorkerStatus('${shift.id}', '${w.user_id}', '${shift.date}', '${shift.dept}', '${shift.time}', this.value === 'WAITLIST' ? 'true' : 'false')">
-                    <option value="CONFIRMED" ${isConfirmed ? 'selected' : ''}>CONFIRMED</option>
-                    <option value="WAITLIST" ${!isConfirmed ? 'selected' : ''}>WAITLIST</option>
-                  </select>
-                  <i class="ph ph-caret-down wm-status-chevron"></i>
-                </div>
-              </td>
-              <td style="text-align:center;">
-                <a href="${callLink}" class="btn-call-action">
-                  <i class="ph ph-phone"></i> CALL
-                </a>
-              </td>
-            </tr>`;
-        });
-      }
-
-      html += `</tbody></table></div></div>`;
-      rootEl.innerHTML = html;
+          <div class="wm-stat-card">
+            <span class="wm-stat-label">Total Waiting List</span>
+            <span class="wm-stat-value">${totalWaitlist}</span>
+          </div>
+          <div class="wm-stat-card">
+            <span class="wm-stat-label">Total CL</span>
+            <span class="wm-stat-value">${totalCL}</span>
+          </div>
+        </div>`;
     }
 
-    function downloadRosterCSV(shiftId) {
-      const shift = cachedShifts.find(s => s.id === shiftId);
-      const bookings = cachedBookings.filter(b => 
-        b.shift_id === shiftId && 
-        String(b.status).toUpperCase() !== 'CANCELLED'
-      );
+    // Filter rows based on Status + Document Type Checkboxes
+    let displayedBookings = shiftBookings.filter(b => {
+      const targetUserId = b.user_id || b.doc_no;
+      const isConfirmed = (String(b.status).toUpperCase() === 'SUBMITTED' || String(b.status).toUpperCase() === 'CONFIRMED');
+      if (statusFilter === 'CONFIRMED' && !isConfirmed) return false;
+      if (statusFilter === 'WAITLIST' && isConfirmed) return false;
 
-      if (!bookings || bookings.length === 0) {
-        alert("No casual workers available to download.");
-        return;
-      }
+      const isPassport = isPassportHolder(targetUserId);
+      if (isPassport && !showPassport) return false;
+      if (!isPassport && !showIC) return false;
 
-      let csvContent = "\uFEFF Worker Name,MyKad/Passport ID,Doc Type,Status,Phone\n";
-      bookings.forEach(b => {
-        const docType = isPassportHolder(b.user_id) ? "Passport" : "MyKad";
-        csvContent += `"${b.worker_name}","${b.user_id}","${docType}","${b.status}","${b.phone || ''}"\n`;
-      });
+      return true;
+    });
 
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Roster_${shiftId}_${shift ? shift.dept : ''}.csv`);
+    let html = `
+      <div class="wm-card">
+        <div class="wm-card-header">
+          <div>
+            <h2 class="wm-header-title" style="margin: 0 0 6px 0;">${shift.dept}</h2>
+            <div class="wm-meta-line"><i class="ph ph-fingerprint"></i> Shift ID: <b>${shift.id}</b></div>
+            <div class="wm-meta-line"><i class="ph ph-calendar"></i> Date: <b>${shift.date} (${formatAttendanceTime(shift.time)})</b></div>
+            <div class="wm-meta-line"><i class="ph ph-users-three"></i> Capacity: <b>${totalSlots} Slots</b></div>
+          </div>
+          <button class="btn-download-roster" onclick="downloadRosterCSV('${shift.id}')" title="Download Roster">
+            <i class="ph ph-download-simple"></i>
+          </button>
+        </div>
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
+        <div style="overflow-x:auto; margin-top:15px;">
+          <table class="wm-table">
+            <thead>
+              <tr>
+                <th>Casual Labour Name</th>
+                <th style="text-align:center; width:135px;">Status</th>
+                <th style="text-align:center; width:100px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>`;
 
-    function toggleWorkerStatus(shiftId, workerId, date, dept, time, targetToWaitlist) {
-      const promptMsg = targetToWaitlist === 'true' 
-        ? `Demote Worker ID: ${workerId} back to Standby Waitlist?` 
-        : `Promote & Confirm registration for Worker ID: ${workerId}?`;
+    if (displayedBookings.length === 0) {
+      html += `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No casual workers found matching current filters.</td></tr>`;
+    } else {
+      const defaultRacerSilhouette = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><rect width='100%' height='100%' fill='%231a1a1a'/><path d='M50 22c-12 0-22 10-22 22 0 9 5.5 16.7 13.3 20.1C25 69 15 80 15 95h70c0-15-10-26-26.3-30.9C66.5 60.7 72 53 72 44c0-12-10-22-22-22z' fill='%23444444'/><path d='M50 28c-8.8 0-16 7.2-16 16 0 8.8 7.2 16 16 16s16-7.2 16-16c0-8.8-7.2-16-16-16z' fill='%23555555'/></svg>`;
 
-      if (!confirm(promptMsg)) return;
+      displayedBookings.forEach(w => {
+        const targetUserId = w.user_id || w.doc_no;
+        const targetWorkerName = w.worker_name || w.name || "Casual Worker";
+        const isConfirmed = (String(w.status).toUpperCase() === 'SUBMITTED' || String(w.status).toUpperCase() === 'CONFIRMED');
+        const selectClass = isConfirmed ? "status-confirmed" : "status-waitlist";
 
-      document.getElementById('sync-loader').querySelector('.loader-text').textContent = "Synchronizing Status Transaction...";
-      document.getElementById('sync-loader').style.display = 'flex';
+        const photoUrl = w.photo_url || w.photo || defaultRacerSilhouette;
+        const dialablePhone = formatPhoneForDialing(w.phone);
+        const callLink = dialablePhone ? `tel:${dialablePhone}` : `javascript:alert('No phone number on record');`;
+        const docTypeLabel = isPassportHolder(targetUserId) ? "Passport" : "MyKad";
 
-      // Maintains compatibility with Script A's original update API
-      fetch(`${SCRIPT_URL}?action=updateStatus&shiftId=${shiftId}&date=${date}&dept=${dept}&time=${time}&userDocNo=${workerId}&isWaitlist=${targetToWaitlist}`)
-        .then(() => {
-          alert("Database matrix successfully updated!");
-          loadAdminDataSuite();
-        }).catch(() => {
-          alert("An error occurred while transmitting transaction variables.");
-          loadAdminDataSuite();
-        });
-    }
-
-    /* Shared Profile Drawer Method */
-    function openWorkerProfileDrawer(workerId, workerName) {
-      document.getElementById('wp-drawer-name').textContent = workerName;
-      let totalConfirmed = 0, noShows = 0, profileRowsMarkup = "";
-
-      const historySubset = cachedBookings.filter(b => String(b.user_id).trim() === String(workerId).trim());
-      historySubset.sort((a, b) => getShiftDateObj(b.date) - getShiftDateObj(a.date));
-
-      historySubset.forEach(b => {
-        const rawStatus = String(b.status).toUpperCase();
-        const attendanceStr = String(b.attendance || "").trim().toLowerCase();
-        
-        if (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED') {
-          totalConfirmed++;
-          if (attendanceStr === 'no show' || attendanceStr === "" || attendanceStr === "0") noShows++;
-        }
-
-        let matchingShift = cachedShifts.find(s => String(s.id).toUpperCase() === String(b.shift_id).toUpperCase());
-        let finalDisplayDate = b.date || (matchingShift ? matchingShift.date : "N/A");
-        let finalDisplayDept = b.dept || (matchingShift ? matchingShift.dept : "N/A");
-
-        let statusPill = (rawStatus === 'CANCELLED') ? '<span class="status-pill pill-cancelled">Cancelled</span>' : ((rawStatus === 'WAITLIST' || rawStatus === 'WAITING LIST') ? '<span class="status-pill pill-wait">Waitlist</span>' : '<span class="status-pill pill-sub">Confirmed</span>');
-        let attendanceDisplay = (rawStatus === 'CANCELLED' || rawStatus === 'WAITLIST' || rawStatus === 'WAITING LIST') ? `<span style="color:var(--text-muted); font-weight:700;">-</span>` : ((attendanceStr === "no show" || attendanceStr === "" || attendanceStr === "0") ? `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>` : `<span style="color:var(--text-main); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`);
-
-        profileRowsMarkup += `
+        html += `
           <tr>
             <td>
-              <div style="font-weight:700; color:var(--text-main);">${finalDisplayDate}</div>
-              <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-top:2px;">${finalDisplayDept}</div>
+              <div class="worker-profile-cell">
+                <div class="worker-avatar-frame" style="width: 36px; height: 42px;">
+                  <img src="${photoUrl}" class="worker-avatar" alt="Photo" onerror="this.onerror=null; this.src='${defaultRacerSilhouette}';" />
+                </div>
+                <div>
+                  <div class="view-drawable-name" style="font-size:11px; font-weight:800; text-transform:uppercase; line-height:1.2; cursor:pointer;" onclick="openWorkerProfileDrawer('${targetUserId}', '${targetWorkerName.replace(/'/g, "\\'")}')">${targetWorkerName}</div>
+                  <div style="font-size:9px; color:var(--text-muted); margin-top:2px; font-family:monospace; font-weight:600;">${docTypeLabel}: ${targetUserId}</div>
+                </div>
+              </div>
             </td>
-            <td style="text-align:center;">${statusPill}</td>
-            <td style="text-align:center;">${attendanceDisplay}</td>
+            <td style="text-align:center;">
+              <div class="wm-status-select-wrapper">
+                <select class="wm-status-select ${selectClass}" onchange="toggleWorkerStatus('${shift.id}', '${targetUserId}', '${shift.date}', '${shift.dept}', '${shift.time}', this.value === 'WAITLIST' ? 'true' : 'false')">
+                  <option value="CONFIRMED" ${isConfirmed ? 'selected' : ''}>CONFIRMED</option>
+                  <option value="WAITLIST" ${!isConfirmed ? 'selected' : ''}>WAITLIST</option>
+                </select>
+                <i class="ph ph-caret-down wm-status-chevron"></i>
+              </div>
+            </td>
+            <td style="text-align:center;">
+              <a href="${callLink}" class="btn-call-action">
+                <i class="ph ph-phone"></i> CALL
+              </a>
+            </td>
           </tr>`;
       });
-
-      const docTypeStr = isPassportHolder(workerId) ? "Passport" : "MyKad";
-      document.getElementById('wp-drawer-meta').innerHTML = `
-        <span><i class="ph ph-identification-card"></i> ${docTypeStr} ID: <b>${workerId}</b></span>
-        <span><i class="ph ph-shield-warning"></i> Matrix Analytics: <b>${noShows} No-Shows</b> out of <b>${totalConfirmed} Confirmed</b></span>`;
-      
-      document.getElementById('wp-drawer-table-body').innerHTML = profileRowsMarkup || `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">No confirmed attendance records found.</td></tr>`;
-
-      document.getElementById('worker-profile-drawer').style.display = 'flex';
     }
 
-    function closeWorkerProfileDrawer() { document.getElementById('worker-profile-drawer').style.display = 'none'; }
-  </script>
+    html += `</tbody></table></div></div>`;
+    rootEl.innerHTML = html;
+  }
+
+  function downloadRosterCSV(shiftId) {
+    const shift = cachedShifts.find(s => s.id === shiftId);
+    const bookings = cachedBookings.filter(b => 
+      b.shift_id === shiftId && 
+      String(b.status).toUpperCase() !== 'CANCELLED'
+    );
+
+    if (!bookings || bookings.length === 0) {
+      alert("No casual workers available to download.");
+      return;
+    }
+
+    let csvContent = "\uFEFF Worker Name,MyKad/Passport ID,Doc Type,Status,Phone\n";
+    bookings.forEach(b => {
+      const targetUserId = b.user_id || b.doc_no;
+      const targetWorkerName = b.worker_name || b.name || "Casual Worker";
+      const docType = isPassportHolder(targetUserId) ? "Passport" : "MyKad";
+      csvContent += `"${targetWorkerName}","${targetUserId}","${docType}","${b.status}","${b.phone || ''}"\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Roster_${shiftId}_${shift ? shift.dept : ''}.csv`);
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // DIRECT SUPABASE PATCH FOR STATUS TOGGLE
+  async function toggleWorkerStatus(shiftId, workerId, date, dept, time, targetToWaitlist) {
+    const isWaitlist = (targetToWaitlist === 'true' || targetToWaitlist === true);
+    const newStatus = isWaitlist ? "WAITLIST" : "CONFIRMED";
+    const promptMsg = isWaitlist 
+      ? `Demote Worker ID: ${workerId} back to Standby Waitlist?` 
+      : `Promote & Confirm registration for Worker ID: ${workerId}?`;
+
+    if (!confirm(promptMsg)) return;
+
+    document.getElementById('sync-loader').querySelector('.loader-text').textContent = "Updating Supabase Record...";
+    document.getElementById('sync-loader').style.display = 'flex';
+
+    const docNoWithoutQuote = String(workerId).replace(/^'/, '');
+    const docNoWithQuote = `'${docNoWithoutQuote}`;
+
+    try {
+      const url = `${SUPABASE_URL}/rest/v1/booking_record?shift_id=eq.${encodeURIComponent(shiftId)}&doc_no=in.("${encodeURIComponent(docNoWithoutQuote)}","${encodeURIComponent(docNoWithQuote)}")`;
+      const res = await fetch(url, {
+        method: "PATCH",
+        headers: supabaseHeaders,
+        body: JSON.stringify({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+      });
+
+      if (res.ok) {
+        await loadAdminDataSuite();
+      } else {
+        const err = await res.json();
+        alert("Update failed: " + (err.message || "Database error"));
+        document.getElementById('sync-loader').style.display = 'none';
+      }
+    } catch (err) {
+      alert("Network Error: " + err.message);
+      document.getElementById('sync-loader').style.display = 'none';
+    }
+  }
+
+  /* Profile Drawer Method (Confirmed Only + Past No-Show Filter) */
+  function openWorkerProfileDrawer(workerId, workerName) {
+    document.getElementById('wp-drawer-name').textContent = workerName;
+    let totalConfirmed = 0, noShows = 0, profileRowsMarkup = "";
+
+    const today = new Date(); 
+    today.setHours(0, 0, 0, 0);
+
+    // Filter ONLY active confirmed/submitted bookings for this worker
+    const confirmedHistory = cachedBookings.filter(b => {
+      const targetUserId = b.user_id || b.doc_no;
+      const isWorker = String(targetUserId).trim().replace(/^'/, '') === String(workerId).trim().replace(/^'/, '');
+      const st = String(b.status).toUpperCase();
+      return isWorker && (st === 'CONFIRMED' || st === 'SUBMITTED');
+    });
+
+    confirmedHistory.sort((a, b) => getShiftDateObj(b.date) - getShiftDateObj(a.date));
+
+    confirmedHistory.forEach(b => {
+      totalConfirmed++;
+      const attendanceStr = String(b.attendance || "").trim().toLowerCase();
+
+      let matchingShift = cachedShifts.find(s => String(s.id).toUpperCase() === String(b.shift_id).toUpperCase());
+      let finalDisplayDate = b.date || (matchingShift ? matchingShift.date : "N/A");
+      let finalDisplayDept = b.dept || (matchingShift ? matchingShift.dept : "N/A");
+
+      const shiftDateObj = getShiftDateObj(finalDisplayDate);
+      const isPastShift = shiftDateObj < today;
+
+      let attendanceDisplay = "";
+
+      if (attendanceStr !== "" && attendanceStr !== "-" && attendanceStr !== "0" && attendanceStr !== "no show") {
+        // Valid clock-in recorded
+        attendanceDisplay = `<span style="color:var(--text-main); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`;
+      } else if (isPastShift) {
+        // Past event without clock-in -> NO SHOW
+        noShows++;
+        attendanceDisplay = `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>`;
+      } else {
+        // Future or today's upcoming event -> Pending
+        attendanceDisplay = `<span style="color:var(--text-muted); font-weight:600;">-</span>`;
+      }
+
+      profileRowsMarkup += `
+        <tr>
+          <td>
+            <div style="font-weight:700; color:var(--text-main);">${finalDisplayDate}</div>
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-top:2px;">${finalDisplayDept}</div>
+          </td>
+          <td style="text-align:center;"><span class="status-pill pill-sub">Confirmed</span></td>
+          <td style="text-align:center;">${attendanceDisplay}</td>
+        </tr>`;
+    });
+
+    const docTypeStr = isPassportHolder(workerId) ? "Passport" : "MyKad";
+    document.getElementById('wp-drawer-meta').innerHTML = `
+      <span><i class="ph ph-identification-card"></i> ${docTypeStr} ID: <b>${workerId}</b></span>
+      <span><i class="ph ph-shield-warning"></i> Matrix Analytics: <b>${noShows} No-Shows</b> out of <b>${totalConfirmed} Confirmed</b></span>`;
+
+    document.getElementById('wp-drawer-table-body').innerHTML = profileRowsMarkup || `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">No confirmed attendance records found.</td></tr>`;
+
+    document.getElementById('worker-profile-drawer').style.display = 'flex';
+  }
+
+  function closeWorkerProfileDrawer() { document.getElementById('worker-profile-drawer').style.display = 'none'; }
+</script>
+
 </body>
 </html>
