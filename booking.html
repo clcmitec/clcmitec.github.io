@@ -12,7 +12,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>MITEC — Shift Booking Portal</title>
-  
+
   <!-- Fonts (Inter + Caveat for Worker Name) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
 
   <!-- Phosphor Icons (Deferred) -->
   <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
-  
+
   <!-- Bootstrap 5.3 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -76,7 +76,7 @@
       -webkit-font-smoothing: antialiased; 
       font-family: var(--font-sans); 
     }
-    
+
     body { 
       background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #e2e8f0 100%);
       color: var(--foreground); 
@@ -576,7 +576,7 @@
 
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       const rawName = record.full_name || record.name_mykad || "MITEC Casual Labour";
-      
+
       // DISPLAY WORKER NAME IN PROPER CASE
       document.getElementById("userNameDisplay").textContent = toTitleCase(rawName);
       if (record.photo_link) document.getElementById("userAvatar").src = record.photo_link;
@@ -611,7 +611,7 @@
     async function refreshData(docNo, showOverlay = true) {
       if (activeController) activeController.abort(); 
       activeController = new AbortController();
-      
+
       if (showOverlay) showLoader("Syncing Master Timelines...");
 
       try {
@@ -624,10 +624,12 @@
         const rawDoc = String(docNo).trim().replace(/^'/, '');
         const docWithQuote = `'${rawDoc}`;
 
-        // 1. Concurrent requests to Supabase
+        // 1. Concurrent requests to Supabase with JOIN to shift_master
         const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers, signal: activeController.signal }).then(r => r.json());
-        const userBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?doc_no=in.("${encodeURIComponent(rawDoc)}","${encodeURIComponent(docWithQuote)}")&select=*`, { headers, signal: activeController.signal }).then(r => r.json());
         
+        // Relational JOIN: select shift_master(date, dept, time, wa_link) along with booking_record columns
+        const userBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*,shift_master(date,dept,time,wa_link)&doc_no=in.("${encodeURIComponent(rawDoc)}","${encodeURIComponent(docWithQuote)}")`, { headers, signal: activeController.signal }).then(r => r.json());
+
         // Fetch all active bookings (selecting shift_id & status, up to maximum range)
         const allBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=shift_id,status&limit=50000`, { headers, signal: activeController.signal }).then(r => r.json());
 
@@ -665,15 +667,21 @@
           };
         });
 
-        cachedBookings = (userBookingsRes || []).map(b => ({
-          shift_id: b.shift_id || '',
-          date: b.date ? b.date.split('-').reverse().join('.') : '',
-          dept: b.dept || '',
-          time: b.time || '',
-          status: b.status || '',
-          attendance: b.attendance || '',
-          wa_link: getWaLinkForShift(cachedShifts, b.shift_id)
-        }));
+        // Map bookings dynamically fetching date, dept, time, and wa_link from shift_master via Foreign Key
+        cachedBookings = (userBookingsRes || []).map(b => {
+          const shiftData = b.shift_master || {};
+          const rawShiftDate = shiftData.date || b.date || '';
+          
+          return {
+            shift_id: b.shift_id || '',
+            date: rawShiftDate ? rawShiftDate.split('-').reverse().join('.') : '',
+            dept: shiftData.dept || b.dept || '',
+            time: shiftData.time || b.time || '',
+            status: b.status || '',
+            attendance: b.attendance || '',
+            wa_link: shiftData.wa_link || getWaLinkForShift(cachedShifts, b.shift_id)
+          };
+        });
 
         sessionStorage.setItem(`mcl_portal_cache_${rawDoc}`, JSON.stringify({
           allShifts: cachedShifts,
@@ -699,7 +707,7 @@
     function renderDepartmentChips(shifts) {
       const filterContainer = document.getElementById('filter-container');
       const depts = [...new Set(shifts.map(s => s.dept))];
-      
+
       if (depts.length === 0) {
         filterContainer.style.display = 'none';
         return;
@@ -707,7 +715,7 @@
 
       filterContainer.style.display = 'flex';
       let chipsHtml = `<button class="btn btn-sm filter-chip-btn ${activeFilterDept === 'ALL' ? 'active-chip' : 'inactive-chip'}" onclick="applyDeptFilter('ALL')">ALL</button>`;
-      
+
       depts.forEach(d => {
         chipsHtml += `<button class="btn btn-sm filter-chip-btn ${activeFilterDept === d ? 'active-chip' : 'inactive-chip'}" onclick="applyDeptFilter('${d}')">${d}</button>`;
       });
@@ -830,7 +838,7 @@
         upcomingShifts.filter(s => s.date === date).forEach(s => {
           const isFull = s.slotsLeft <= 0;
           const isLockedByPolicy = hasBookingToday;
-          
+
           const hasSpotlight = s.notes && String(s.notes).trim() !== "";
 
           let badgeMarkup = `<span class="badge-shadcn-left">${s.slotsLeft} LEFT</span>`;
@@ -1040,7 +1048,7 @@
     // DIRECT SUPABASE WRITE WITH AUTOMATIC MYKAD CONFIRMATION & PREPENDED APOSTROPHE
     async function handleBooking(id, date, dept, time, waitlist, element) {
       if (isRequestInProgress) return;
-      
+
       // Direct exact string from profile
       const rawDocNo = String(localStorage.getItem("mcl_doc_no") || "").trim();
       if (!rawDocNo) { alert("Session invalid. Please log in again."); return; }
@@ -1074,23 +1082,18 @@
       const cleanDate = String(date).trim().replace(/\//g, '.'); // DD.MM.YYYY
       const rawTime = String(time).trim();
       const hourPart = rawTime.includes(':') ? rawTime.split(':')[0] : rawTime.substring(0, 2);
-      
+
       // Construct shift_timevalue & booking_id formulas using docNo (including leading apostrophe)
       const shiftTimevalue = `${cleanDate}${dept}${hourPart}${docNo}`;
       const cleanTime = rawTime.replace(/[^0-9]/g, "");
       const bookingId = `${cleanDate}${dept}${cleanTime}${docNo}`;
 
-      const dateParts = cleanDate.split('.');
-      const isoDate = dateParts.length === 3 ? `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}` : date;
-
+      // Payload omits date, dept, and time so booking_record relies on shift_id foreign key
       const payload = [{
         booking_id: bookingId,
         timestamp: new Date().toISOString(),
         shift_id: id,
         doc_no: docNo, // Always starts with (') e.g. "'060715120474"
-        date: isoDate,
-        dept: dept,
-        time: time,
         status: status,
         shift_timevalue: shiftTimevalue,
         document_type: docType,
