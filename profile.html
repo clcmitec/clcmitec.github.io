@@ -214,20 +214,24 @@
     </a>
   </nav>
 
-  <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyq0EucoCN7Y1O1k2mik8Ne7bZbPDfPonyJ9ac73UkzpBMCxsBBhVJ__0ZAC-Fr6OT5/exec";
+      <script>
+    // 🔗 DIRECT SUPABASE CONFIGURATION
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+    const SUPABASE_TABLE = "casual_labour_profile";
 
+    // Field Mapping: HTML Element ID -> Supabase Column Key
     const fieldMap = {
       profileName: "name_mykad",
       profileEmail: "email",
-      profileDocNo: "mykad_passport_no",
+      profileDocNo: "doc_no",
       profilePhone: "phone",
       profileDocType: "doc_type",
       profileGender: "gender",
       profileAlamat: "alamat",
       profileStatusKahwin: "status_perkahwinan",
       profileBank: "bank",
-      profileAccountNo: "account_no",
+      profileAccountNo: "Column 19", // Supabase schema column for Account Number
       profileWaris: "nama_waris",
       profileHubungan: "hubungan",
       profileEmergencyNo: "emergency_no"
@@ -236,48 +240,94 @@
     function fillProfile(record) {
       if (!record) return;
 
+      // Populate text fields
       Object.keys(fieldMap).forEach(id => {
         const el = document.getElementById(id);
         const dataKey = fieldMap[id];
-        if (el) el.textContent = record[dataKey] || "-";
+        if (el) {
+          const val = record[dataKey];
+          el.textContent = val ? String(val).toUpperCase() : "-";
+        }
       });
 
-      if (record.name_mykad) document.getElementById("profileName").textContent = record.name_mykad.toUpperCase();
-
-      const photoUrl = record.photo_link || "";
-      if (photoUrl) {
-        document.getElementById("profilePhotoPreview").src = photoUrl;
+      // Format Email
+      const emailEl = document.getElementById("profileEmail");
+      if (emailEl && record.email) {
+        emailEl.textContent = record.email.toLowerCase();
       }
 
+      // Hero Profile Photo Preview (Direct thumbnail from Supabase)
+      const photoUrl = record.photo_link || "";
+      const photoPreview = document.getElementById("profilePhotoPreview");
+      if (photoPreview) {
+        photoPreview.src = photoUrl || "https://via.placeholder.com/150?text=No+Photo";
+      }
+
+      // File Verification Links
       const icUrl = record.ic_link || "";
-      document.getElementById("profileIcLink").innerHTML = icUrl ? `<a href="${icUrl}" target="_blank" class="file-link">View Document</a>` : "-";
-      document.getElementById("profilePhotoLink").innerHTML = photoUrl ? `<a href="${photoUrl}" target="_blank" class="file-link">View Image</a>` : "-";
+      const icEl = document.getElementById("profileIcLink");
+      if (icEl) {
+        icEl.innerHTML = icUrl ? `<a href="${icUrl}" target="_blank" rel="noopener" class="file-link">View Document</a>` : "-";
+      }
+
+      const photoLinkEl = document.getElementById("profilePhotoLink");
+      if (photoLinkEl) {
+        photoLinkEl.innerHTML = photoUrl ? `<a href="${photoUrl}" target="_blank" rel="noopener" class="file-link">View Image</a>` : "-";
+      }
     }
 
     async function loadData() {
       const docNo = localStorage.getItem("mcl_doc_no");
       const cachedData = localStorage.getItem("mitecWorkerRecord");
 
+      // 1. Instant rendering from local cache
       if (cachedData) {
-        fillProfile(JSON.parse(cachedData));
+        try {
+          fillProfile(JSON.parse(cachedData));
+        } catch (e) {
+          console.warn("Invalid local cache session.");
+        }
       }
 
-      if (docNo) {
-        try {
-          const res = await fetch(`${APPS_SCRIPT_URL}?action=get_full_profile&doc_no=${encodeURIComponent(docNo)}`);
-          const data = await res.json();
-          if (data.ok && data.record) {
-            fillProfile(data.record);
-            localStorage.setItem("mitecWorkerRecord", JSON.stringify(data.record));
-          }
-        } catch (e) { console.error("Sync failed"); }
-      } else {
+      // 2. Redirect if unauthenticated
+      if (!docNo) {
         window.location.href = "index.html";
+        return;
+      }
+
+      // 3. Sync live profile data from Supabase
+      try {
+        const fetchUrl = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?doc_no=eq.${encodeURIComponent(docNo)}&select=*`;
+        const res = await fetch(fetchUrl, {
+          method: "GET",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          }
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const freshRecord = data[0];
+            fillProfile(freshRecord);
+            localStorage.setItem("mitecWorkerRecord", JSON.stringify(freshRecord));
+          }
+        }
+      } catch (e) {
+        console.error("Supabase live sync failed, using cached offline record.", e);
       }
     }
 
-    function logout() { localStorage.clear(); window.location.href = "index.html"; }
+    function logout() {
+      localStorage.removeItem("mcl_doc_no");
+      localStorage.removeItem("mitecWorkerRecord");
+      window.location.href = "index.html";
+    }
+
     window.addEventListener("DOMContentLoaded", loadData);
   </script>
+
+
 </body>
 </html>
