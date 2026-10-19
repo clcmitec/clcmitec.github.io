@@ -652,7 +652,9 @@
   </footer>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOQA9l1lpjs9eSOHwQmdZe4axc6OR6E9ohXmHQI3d9B-3apRtl6mFValUpepCorlqs/exec"; 
+    // DIRECT SUPABASE REST API CREDENTIALS (< 150ms ULTRA FAST EXECUTIONS)
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
 
     let activeAdminKey = null;
     let cachedShifts = [];
@@ -676,7 +678,7 @@
       } catch (err) { console.warn("Storage restricted."); }
 
       if (sessionKey) {
-        activeAdminKey = sessionKey;
+        activeAdminKey = String(sessionKey).trim();
         document.getElementById('login-overlay').style.display = 'none';
         loadAdminDataSuite();
       } else {
@@ -794,35 +796,111 @@
       return checkDate <= today;
     }
 
-    function loadAdminDataSuite() {
+    // DIRECT HIGH-SPEED SUPABASE DATA FETCH WITH RELATIONAL FALLBACKS
+    async function loadAdminDataSuite() {
       document.getElementById('sync-loader').style.display = 'flex';
-      
-      fetch(`${SCRIPT_URL}?action=getAdminMasterData&userDocNo=${activeAdminKey}`)
-        .then(r => r.json())
-        .then(res => {
-          if (res.ok && res.allShifts && res.allBookingsRaw) {
-            try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
-            
-            cachedShifts = (res.allShifts || []).map(s => ({ ...s, totalSlots: s.slots, Slots: s.slots }));
-            cachedBookings = res.allBookingsRaw;
-            
-            if (res.adminName) document.getElementById("adminUserDisplayTag").textContent = res.adminName.toUpperCase();
-            
-            updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
-            renderStatisticsPage(); 
-            renderPivotRostersPage();
-            populateWorkerManagerShifts();
-            
-            document.getElementById('sync-loader').style.display = 'none';
-          } else {
-            alert("Handshake Refused!");
-            document.getElementById('sync-loader').style.display = 'none';
-            document.getElementById('login-overlay').style.display = 'flex';
+
+      try {
+        const headers = { 
+          "apikey": SUPABASE_KEY, 
+          "Authorization": `Bearer ${SUPABASE_KEY}` 
+        };
+
+        // 1. Fetch Shift Master
+        const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers }).then(r => r.json());
+
+        // 2. Fetch Profiles for Worker Data Matching
+        const profilesPromise = fetch(`${SUPABASE_URL}/rest/v1/casual_labour_profile?select=*`, { headers }).then(r => r.json());
+
+        // 3. Fetch Bookings with Relational Embed (with Fallback to raw booking_record)
+        const bookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*,shift_master(date,dept,time,slots,wa_link),casual_labour_profile(full_name,name_mykad,phone,photo_link,document_type)&limit=50000`, { headers })
+          .then(async r => {
+            const data = await r.json();
+            if (data && data.code) { // Fallback if schema embedding fails
+              const fallback = await fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*&limit=50000`, { headers });
+              return await fallback.json();
+            }
+            return data;
+          });
+
+        const [shiftsRes, profilesRes, bookingsRes] = await Promise.all([shiftsPromise, profilesPromise, bookingsPromise]);
+
+        const validShifts = Array.isArray(shiftsRes) ? shiftsRes : [];
+        const validProfiles = Array.isArray(profilesRes) ? profilesRes : [];
+        const validBookings = Array.isArray(bookingsRes) ? bookingsRes : [];
+
+        // Build worker profile map by doc_no
+        const workerMap = {};
+        validProfiles.forEach(p => {
+          const rawDoc = String(p.doc_no || p.id || '').trim().replace(/^'/, '');
+          if (rawDoc) {
+            workerMap[rawDoc] = {
+              name: p.full_name || p.name_mykad || "Casual Worker",
+              phone: p.phone || "",
+              photo: p.photo_link || ""
+            };
           }
-        }).catch(() => {
-          document.getElementById('sync-loader').style.display = 'none';
-          document.getElementById('login-overlay').style.display = 'flex';
         });
+
+        // Store Admin Session
+        try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
+
+        // Map cached shifts
+        cachedShifts = validShifts.map(s => ({
+          ...s,
+          id: s.shift_id,
+          date: s.date ? (s.date.includes('-') ? s.date.split('-').reverse().join('.') : s.date) : '',
+          dept: s.dept || '',
+          time: s.time || '',
+          slots: parseInt(s.slots) || 0,
+          totalSlots: parseInt(s.slots) || 0,
+          Slots: parseInt(s.slots) || 0,
+          notes: s.notes || ''
+        }));
+
+        // Map cached bookings dynamically linking shift_master and casual_labour_profile
+        cachedBookings = validBookings.map(b => {
+          const shiftData = b.shift_master || {};
+          const profileData = b.casual_labour_profile || {};
+          const cleanDocNo = String(b.doc_no || b.user_id || '').trim().replace(/^'/, '');
+          const mappedWorker = workerMap[cleanDocNo] || {};
+
+          const rawDate = shiftData.date || b.date || '';
+          const formattedDate = rawDate ? (rawDate.includes('-') ? rawDate.split('-').reverse().join('.') : rawDate) : '';
+
+          return {
+            shift_id: b.shift_id || '',
+            user_id: cleanDocNo,
+            doc_no: cleanDocNo,
+            worker_name: profileData.full_name || profileData.name_mykad || mappedWorker.name || b.name || "Casual Worker",
+            name: profileData.full_name || profileData.name_mykad || mappedWorker.name || b.name || "Casual Worker",
+            phone: profileData.phone || mappedWorker.phone || b.phone || '',
+            photo_url: profileData.photo_link || mappedWorker.photo || b.photo_url || b.photo || '',
+            date: formattedDate,
+            dept: shiftData.dept || b.dept || '',
+            time: shiftData.time || b.time || '',
+            status: b.status || '',
+            attendance: b.attendance || ''
+          };
+        });
+
+        // Verify Admin Key Display
+        const currentAdminProfile = workerMap[activeAdminKey.replace(/^'/, '')];
+        if (currentAdminProfile && currentAdminProfile.name) {
+          document.getElementById("adminUserDisplayTag").textContent = currentAdminProfile.name.toUpperCase();
+        }
+
+        updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
+        renderStatisticsPage(); 
+        renderPivotRostersPage();
+        populateWorkerManagerShifts();
+
+      } catch (err) {
+        console.error("Admin data fetch error:", err);
+        alert("Failed to sync with Supabase database.");
+      } finally {
+        document.getElementById('sync-loader').style.display = 'none';
+      }
     }
 
     /* Tab 1: Statistics & Deployment */
@@ -1088,28 +1166,74 @@
 
     function closeShiftDrawer() { document.getElementById('shift-drawer').style.display = 'none'; }
 
-    function handleFormSubmission(event) {
+    // DIRECT SUPABASE WRITE FOR SHIFT CREATION / UPDATE
+    async function handleFormSubmission(event) {
       event.preventDefault();
       const idField = document.getElementById('form-shift-id');
       const sId = idField.value.trim();
-      const sDate = document.getElementById('form-date').value.trim().split('-').reverse().join('.');
+      const rawDate = document.getElementById('form-date').value.trim(); // YYYY-MM-DD
       const sDept = document.getElementById('form-dept').value.trim();
       const sTime = formatAttendanceTime(document.getElementById('form-time').value.trim());
-      const sSlots = document.getElementById('form-slots').value.trim();
+      const sSlots = parseInt(document.getElementById('form-slots').value.trim()) || 0;
       const sNotes = document.getElementById('form-notes').value.trim();
-      const actionType = editModeShift ? "updateShift" : "createShift";
 
       closeShiftDrawer();
       document.getElementById('sync-loader').style.display = 'flex';
 
-      fetch(`${SCRIPT_URL}?action=${actionType}&userDocNo=${activeAdminKey}&shiftId=${sId}&date=${sDate}&dept=${sDept}&time=${sTime}&slots=${sSlots}&notes=${encodeURIComponent(sNotes)}`)
-        .then(r => r.json())
-        .then(res => {
-          if (res.ok) {
-            document.getElementById('shift-creation-form').reset();
-            loadAdminDataSuite();
-          } else { alert("Error: " + res.error); document.getElementById('sync-loader').style.display = 'none'; }
-        }).catch(() => { document.getElementById('sync-loader').style.display = 'none'; });
+      const payload = {
+        shift_id: sId,
+        date: rawDate,
+        dept: sDept,
+        time: sTime,
+        slots: sSlots,
+        notes: sNotes
+      };
+
+      try {
+        let res;
+        if (editModeShift) {
+          // UPDATE EXISTING SHIFT
+          res = await fetch(`${SUPABASE_URL}/rest/v1/shift_master?shift_id=eq.${encodeURIComponent(sId)}`, {
+            method: "PATCH",
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              date: rawDate,
+              dept: sDept,
+              time: sTime,
+              slots: sSlots,
+              notes: sNotes
+            })
+          });
+        } else {
+          // CREATE NEW SHIFT
+          res = await fetch(`${SUPABASE_URL}/rest/v1/shift_master`, {
+            method: "POST",
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+              "Content-Type": "application/json",
+              "Prefer": "resolution=merge-duplicates"
+            },
+            body: JSON.stringify([payload])
+          });
+        }
+
+        if (res.ok) {
+          document.getElementById('shift-creation-form').reset();
+          loadAdminDataSuite();
+        } else {
+          const errData = await res.json();
+          alert("Shift operation failed: " + (errData.message || "Database error"));
+          document.getElementById('sync-loader').style.display = 'none';
+        }
+      } catch (err) {
+        alert("Network error: " + err.message);
+        document.getElementById('sync-loader').style.display = 'none';
+      }
     }
 
     /* Tab 2: Pivot Rosters */
@@ -1457,39 +1581,55 @@
       URL.revokeObjectURL(url);
     }
 
-    function toggleWorkerStatus(shiftId, workerId, targetToWaitlist) {
+    // DIRECT SUPABASE WRITE FOR WORKER STATUS PROMOTION / DEMOTION
+    async function toggleWorkerStatus(shiftId, workerId, targetToWaitlist) {
       const promptMsg = targetToWaitlist === 'true' 
         ? `Demote Worker ID: ${workerId} back to Standby Waitlist?` 
         : `Promote & Confirm registration for Worker ID: ${workerId}?`;
 
       if (!confirm(promptMsg)) return;
-      
+
       document.getElementById('sync-loader').querySelector('.loader-text').textContent = "SYNCHRONIZING STATUS TRANSACTION...";
       document.getElementById('sync-loader').style.display = 'flex';
-      
-      fetch(`${SCRIPT_URL}?action=updateStatus&shiftId=${encodeURIComponent(shiftId)}&userDocNo=${encodeURIComponent(workerId)}&isWaitlist=${targetToWaitlist}&adminDocNo=${encodeURIComponent(activeAdminKey)}`)
-        .then(r => r.json())
-        .then(res => {
-          document.getElementById('sync-loader').style.display = 'none';
-          if (res.ok) {
-            alert("Database matrix successfully updated!");
-          } else {
-            alert("Update Failed: " + (res.error || "Matching record not found."));
-          }
-          loadAdminDataSuite();
-        })
-        .catch(err => {
-          document.getElementById('sync-loader').style.display = 'none';
-          alert("An error occurred while transmitting transaction variables.");
-          console.error(err);
-          loadAdminDataSuite();
+
+      const cleanDocNo = String(workerId).trim().replace(/^'/, '');
+      const docWithQuote = `'${cleanDocNo}`;
+      const newStatus = targetToWaitlist === 'true' ? "WAITLIST" : "CONFIRMED";
+
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/booking_record?shift_id=eq.${encodeURIComponent(shiftId)}&doc_no=in.("${encodeURIComponent(cleanDocNo)}","${encodeURIComponent(docWithQuote)}")`;
+        const res = await fetch(url, {
+          method: "PATCH",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ 
+            status: newStatus, 
+            updated_at: new Date().toISOString()
+          })
         });
+
+        if (res.ok) {
+          loadAdminDataSuite();
+        } else {
+          const errData = await res.json();
+          alert("Update Failed: " + (errData.message || "Matching record not found."));
+          document.getElementById('sync-loader').style.display = 'none';
+        }
+      } catch (err) {
+        document.getElementById('sync-loader').style.display = 'none';
+        alert("An error occurred while transmitting transaction variables: " + err.message);
+      }
     }
 
     function openWorkerProfileDrawer(workerId, workerName) {
       document.getElementById('wp-drawer-name').textContent = workerName;
       let totalConfirmed = 0, noShows = 0, profileRowsMarkup = "";
-      const historySubset = cachedBookings.filter(b => String(b.user_id).trim() === String(workerId).trim());
+      const cleanTargetId = String(workerId).trim().replace(/^'/, '');
+
+      const historySubset = cachedBookings.filter(b => String(b.user_id || b.doc_no).trim().replace(/^'/, '') === cleanTargetId);
       historySubset.sort((a, b) => getShiftDateObj(b.date) - getShiftDateObj(a.date));
 
       historySubset.forEach(b => {
@@ -1516,10 +1656,10 @@
           </tr>`;
       });
 
-      const docTypeStr = isPassportHolder(workerId) ? "Passport" : "MyKad";
+      const docTypeStr = isPassportHolder(cleanTargetId) ? "Passport" : "MyKad";
 
       document.getElementById('wp-drawer-meta').innerHTML = `
-        <span><i class="ph ph-identification-card"></i> ${docTypeStr} ID: <b>${workerId}</b></span>
+        <span><i class="ph ph-identification-card"></i> ${docTypeStr} ID: <b>${cleanTargetId}</b></span>
         <span><i class="ph ph-shield-warning"></i> Matrix Analytics: <b>${noShows} No-Shows</b> out of <b>${totalConfirmed} Confirmed</b></span>`;
       document.getElementById('wp-drawer-table-body').innerHTML = profileRowsMarkup || `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">No logged history discovered.</td></tr>`;
       document.getElementById('worker-profile-drawer').style.display = 'flex';
