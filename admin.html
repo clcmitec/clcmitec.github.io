@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QUBE — Booking Manager | Operations Console</title>
+  <title>MITEC — Booking Manager | Operations Console</title>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <!-- Google Tag -->
@@ -17,18 +17,18 @@
 
   <style>
     :root {
-      /* MotoGP Theme Palette */
-      --mgp-black: #111111;
-      --mgp-dark-nav: #1a1a1a;
-      --mgp-red: #C80502;
-      --mgp-red-hover: #a10402;
-      --mgp-lime: #8cc63f;
-      --bg-slate: #f4f5f7;
+      /* MITEC Navy Blue Theme Palette */
+      --mitec-black: #111111;
+      --mitec-dark-nav: #1B365D;
+      --mitec-blue: #1B365D;
+      --mitec-blue-hover: #2D68C4;
+      --mitec-accent: #0f4a82;
+      --bg-slate: #f4f6f9;
       --card-bg: #ffffff;
-      --text-main: #111111;
-      --text-muted: #666666;
+      --text-main: #1d1d1f;
+      --text-muted: #51525c;
       --text-light: #ffffff;
-      --border-thin: #e2e8f0;
+      --border-thin: #e1e4ea;
 
       /* Status Pill Color Palette */
       --pill-teal-bg: #f3f9e9;
@@ -51,9 +51,9 @@
       --pill-orange-text: #c2410c;
       --pill-orange-border: #ffedd5;
 
-      --accent-emerald: #8cc63f;
+      --accent-emerald: #1B365D;
       --accent-warn: #9b1c1c;
-      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
@@ -61,7 +61,7 @@
 
     /* Top Utility Bar */
     .top-bar {
-      background: var(--mgp-black);
+      background: var(--mitec-black);
       color: #888;
       font-size: 0.75rem;
       padding: 0.5rem 1.5rem;
@@ -74,7 +74,7 @@
       font-weight: 700;
     }
     .top-bar-left { display: flex; align-items: center; gap: 8px; color: #aaa; }
-    .top-bar-left .live-dot { width: 8px; height: 8px; background: var(--mgp-red); border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+    .top-bar-left .live-dot { width: 8px; height: 8px; background: var(--mitec-blue-hover); border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
     /* Sticky Main Navigation */
@@ -82,7 +82,7 @@
       position: sticky;
       top: 0;
       z-index: 1100;
-      background: var(--mgp-dark-nav);
+      background: var(--mitec-dark-nav);
       color: var(--text-light);
       padding: 0.75rem 1.5rem;
       display: flex;
@@ -91,8 +91,8 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
     .brand-container { display: flex; align-items: center; gap: 12px; }
-    .brand-img { height: 26px; width: auto; display: block; filter: brightness(0) invert(1); }
-    .brand-tag { font-size: 0.75rem; font-weight: 900; color: var(--mgp-red); text-transform: uppercase; letter-spacing: 1px; }
+    .brand-img { height: 28px; width: auto; display: block; filter: brightness(0) invert(1); }
+    .brand-tag { font-size: 0.75rem; font-weight: 900; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
 
     .user-profile-tag { 
       font-size: 10px; 
@@ -100,7 +100,7 @@
       color: #ffffff; 
       text-transform: uppercase; 
       letter-spacing: 0.5px; 
-      background: var(--mgp-red); 
+      background: var(--mitec-blue-hover); 
       padding: 4px 10px; 
       border-radius: 4px; 
       max-width: 200px; 
@@ -111,7 +111,7 @@
 
     /* Hero Header */
     .hero-header {
-      background: var(--mgp-black);
+      background: var(--mitec-black);
       color: var(--text-light);
       padding: 2rem 1.5rem 1.25rem 1.5rem;
       border-top: 1px solid #222;
@@ -126,12 +126,12 @@
       align-items: center;
       gap: 10px;
     }
-    .hero-header h1 span { color: var(--mgp-red); }
+    .hero-header h1 span { color: var(--mitec-blue-hover); }
 
-    /* Tab Bar (MotoGP Sub-Nav Tabs) */
+    /* Tab Bar (Sub-Nav Tabs) */
     .tab-bar { 
       display: flex; 
-      background: var(--mgp-black); 
+      background: var(--mitec-black); 
       border-bottom: 1px solid #2a2a2a; 
       position: sticky; 
       top: 51px; 
@@ -152,14 +152,14 @@
       transition: all 0.2s ease;
     }
     .tab-item:hover { color: #ffffff; }
-    .tab-item.active { color: #ffffff; border-bottom-color: var(--mgp-red); }
+    .tab-item.active { color: #ffffff; border-bottom-color: var(--mitec-blue-hover); }
 
     .container { max-width: 800px; margin: 0 auto; padding: 20px 15px; }
 
     /* Login Overlay */
-    #login-overlay { position: fixed; inset: 0; background: var(--mgp-black); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
+    #login-overlay { position: fixed; inset: 0; background: var(--mitec-black); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
     .login-card { background: #fff; width: 100%; max-width: 400px; border-radius: 12px; padding: 36px 28px; border: 1px solid var(--border-thin); box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; }
-    .login-logo { font-size: 48px; color: var(--mgp-red); margin-bottom: 12px; }
+    .login-logo { font-size: 48px; color: var(--mitec-blue); margin-bottom: 12px; }
 
     .app-page { display: none; }
     .app-page.active { display: block; }
@@ -195,7 +195,7 @@
     }
     .dash-tile:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
     .dash-tile:active { transform: scale(0.97); }
-    .dash-tile.selected { border-width: 2px; border-color: var(--mgp-red) !important; box-shadow: 0 4px 14px rgba(200, 5, 2, 0.2); }
+    .dash-tile.selected { border-width: 2px; border-color: var(--mitec-blue) !important; box-shadow: 0 4px 14px rgba(27, 54, 93, 0.2); }
 
     .dash-tile.tile-cap.selected { background: #ffffff; color: var(--text-main); }
     .dash-tile.tile-conf.selected { background: var(--pill-teal-bg); }
@@ -204,23 +204,23 @@
 
     .dash-tile span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.8px; }
     .dash-tile h2 { margin: 0; font-size: 24px; font-weight: 900; color: var(--text-main); transition: color 0.2s; letter-spacing: -0.5px; }
-    .matrix-title-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; background: var(--mgp-black); color: #ffffff; font-weight: 800; text-transform: uppercase; margin-left: 6px; vertical-align: middle; }
+    .matrix-title-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; background: var(--mitec-blue); color: #ffffff; font-weight: 800; text-transform: uppercase; margin-left: 6px; vertical-align: middle; }
 
     /* Calendar UI Elements */
     .calendar-wrapper { background: #fff; border: 1px solid var(--border-thin); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
     .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
     .cal-header h3 { margin: 0; font-size: 15px; font-weight: 900; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
-    .btn-cal-nav { background: var(--mgp-black); border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; color: #fff; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .btn-cal-nav:hover { background: var(--mgp-red); }
+    .btn-cal-nav { background: var(--mitec-blue); border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; color: #fff; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .btn-cal-nav:hover { background: var(--mitec-blue-hover); }
     .btn-cal-nav:active { transform: scale(0.9); }
 
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
-    .cal-day-label { font-size: 10px; font-weight: 900; color: var(--mgp-red); text-transform: uppercase; margin-bottom: 6px; }
+    .cal-day-label { font-size: 10px; font-weight: 900; color: var(--mitec-blue); text-transform: uppercase; margin-bottom: 6px; }
     .cal-cell { aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--text-main); cursor: pointer; border: 1px solid var(--border-thin); transition: 0.2s; position: relative; background: #fafafa; }
     .cal-cell:hover { background: #f0f0f0; border-color: #ccc; }
     .cal-cell.empty { background: transparent; border-color: transparent; cursor: default; }
     .cal-cell.has-shifts { background: #ffffff; border-color: #000; color: var(--text-main); }
-    .cal-cell.selected { background: var(--mgp-red) !important; color: #fff !important; border-color: var(--mgp-red) !important; box-shadow: 0 4px 12px rgba(200, 5, 2, 0.4); transform: scale(1.06); z-index: 2; }
+    .cal-cell.selected { background: var(--mitec-blue) !important; color: #fff !important; border-color: var(--mitec-blue) !important; box-shadow: 0 4px 12px rgba(27, 54, 93, 0.4); transform: scale(1.06); z-index: 2; }
 
     .cal-indicator { font-size: 8px; font-weight: 800; border-radius: 3px; padding: 1px 4px; margin-top: 3px; line-height: 1.2; text-transform: uppercase; }
     .cal-cell.selected .cal-indicator { background: rgba(0,0,0,0.25) !important; color: #fff !important; }
@@ -233,7 +233,7 @@
     .pivot-chevron { font-size: 13px; color: var(--text-muted); transition: transform 0.2s ease; display: inline-block; }
     details[open] > summary.pivot-summary .pivot-chevron { transform: rotate(180deg); }
 
-    .pivot-cat-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border-left: 5px solid var(--mgp-red); }
+    .pivot-cat-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border-left: 5px solid var(--mitec-blue); }
     .pivot-cat-title { font-size: 14px; font-weight: 900; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); padding-bottom: 10px; margin-bottom: 12px; }
 
     .pivot-date-block { margin-bottom: 10px; padding-left: 4px; border-bottom: 1px dashed var(--border-thin); padding-bottom: 10px; }
@@ -241,7 +241,7 @@
     .pivot-date-title { font-size: 13px; font-weight: 800; color: #475569; padding: 4px 0; }
 
     .pivot-dept-block { margin-left: 12px; border-left: 2px dashed #cbd5e1; padding-left: 12px; margin-top: 8px; margin-bottom: 8px; }
-    .pivot-dept-title { font-size: 12px; font-weight: 800; color: var(--mgp-red); text-transform: uppercase; padding: 2px 0; }
+    .pivot-dept-title { font-size: 12px; font-weight: 800; color: var(--mitec-blue); text-transform: uppercase; padding: 2px 0; }
 
     .pivot-shift-item { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 8px; padding: 0; margin-top: 8px; margin-bottom: 4px; }
     .pivot-shift-header { font-size: 12px; font-weight: 700; color: var(--text-main); display: flex; width: 100%; justify-content: space-between; align-items: center; }
@@ -250,7 +250,7 @@
     .stat-row-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s ease; }
     .stat-row-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
     .stat-row-card:active { transform: scale(0.98); }
-    .stat-row-card.selected-card { border: 2px solid var(--mgp-red); box-shadow: 0 4px 14px rgba(200, 5, 2, 0.2); }
+    .stat-row-card.selected-card { border: 2px solid var(--mitec-blue); box-shadow: 0 4px 14px rgba(27, 54, 93, 0.2); }
 
     .stat-info h3 { margin: 0; font-size: 16px; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
     .stat-info p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; display: flex; flex-direction: column; gap: 3px; }
@@ -267,7 +267,7 @@
     .doc-type-filter-group { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-thin); }
     .doc-type-options { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
     .checkbox-label { font-size: 12px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--mgp-red); cursor: pointer; }
+    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--mitec-blue); cursor: pointer; }
 
     .wm-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     .wm-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
@@ -284,7 +284,7 @@
     .wm-scorecard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0 16px 0; }
     .wm-stat-card { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 8px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; }
     .wm-stat-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.3px; line-height: 1.1; }
-    .wm-stat-value { font-size: 18px; font-weight: 900; color: var(--mgp-red); }
+    .wm-stat-value { font-size: 18px; font-weight: 900; color: var(--mitec-blue); }
 
     .worker-profile-cell { display: flex; align-items: center; gap: 12px; }
 
@@ -294,7 +294,7 @@
       background: linear-gradient(180deg, #2b2b2b 0%, #111111 100%);
       border-radius: 6px 6px 0 0;
       border: 1px solid #333;
-      border-bottom: 2px solid var(--mgp-red);
+      border-bottom: 2px solid var(--mitec-blue);
       flex-shrink: 0;
       overflow: hidden;
       display: flex;
@@ -314,7 +314,7 @@
 
     .wm-status-select-wrapper { position: relative; display: inline-block; width: 100%; max-width: 120px; }
     .wm-status-select { width: 100%; padding: 6px 20px 6px 8px; border-radius: 4px; font-size: 9px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
-    .wm-status-select.status-confirmed { background-color: var(--mgp-black); color: #ffffff; border: 1px solid var(--mgp-black); }
+    .wm-status-select.status-confirmed { background-color: var(--mitec-blue); color: #ffffff; border: 1px solid var(--mitec-blue); }
     .wm-status-select.status-waitlist { background-color: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
     .wm-status-select.status-cancelled { background-color: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); cursor: not-allowed; }
     .wm-status-chevron { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 10px; }
@@ -322,30 +322,30 @@
     .status-waitlist + .wm-status-chevron { color: var(--pill-amber-text); }
     .status-cancelled + .wm-status-chevron { color: var(--pill-red-text); }
 
-    .btn-call-action { background: #fff; color: var(--mgp-black); border: 1px solid var(--mgp-black); font-size: 10px; font-weight: 800; padding: 6px 14px; border-radius: 4px; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.15s; width: 100%; max-width: 90px; }
-    .btn-call-action:hover { background: var(--mgp-black); color: #fff; }
+    .btn-call-action { background: #fff; color: var(--mitec-blue); border: 1px solid var(--mitec-blue); font-size: 10px; font-weight: 800; padding: 6px 14px; border-radius: 4px; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.15s; width: 100%; max-width: 90px; }
+    .btn-call-action:hover { background: var(--mitec-blue); color: #fff; }
     .btn-call-action:active { transform: scale(0.96); }
 
     .view-drawable-name { color: var(--text-main); font-weight: 800; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
-    .view-drawable-name:hover { color: var(--mgp-red); text-decoration: underline; }
+    .view-drawable-name:hover { color: var(--mitec-blue-hover); text-decoration: underline; }
 
     /* Drawers Overlays Hierarchy */
     .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(2px); z-index: 2000; display: none; align-items: flex-end; }
     #worker-profile-drawer { z-index: 2500; }
 
-    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 26px 22px; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.25); border-top: 4px solid var(--mgp-red); }
+    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 26px 22px; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.25); border-top: 4px solid var(--mitec-blue); }
     .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
     .drawer-header h2 { font-size: 18px; margin: 0; color: var(--text-main); font-weight: 900; text-transform: uppercase; display: flex; flex-direction: column; gap: 4px; }
     .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; text-transform: none; }
     .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; transition: color 0.2s; }
-    .btn-close-drawer:hover { color: var(--mgp-red); }
+    .btn-close-drawer:hover { color: var(--mitec-blue-hover); }
 
     .roster-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; text-align: left; }
-    .roster-table th { background: var(--mgp-black); padding: 10px; font-weight: 800; color: #fff; text-transform: uppercase; font-size: 9px; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-thin); }
+    .roster-table th { background: var(--mitec-black); padding: 10px; font-weight: 800; color: #fff; text-transform: uppercase; font-size: 9px; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-thin); }
     .roster-table td { padding: 10px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
 
     .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
-    .pill-sub { background: var(--mgp-black); color: #ffffff; border: 1px solid var(--mgp-black); }
+    .pill-sub { background: var(--mitec-blue); color: #ffffff; border: 1px solid var(--mitec-blue); }
     .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
     .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
 
@@ -353,21 +353,21 @@
     .form-group label { display: block; font-size: 11px; font-weight: 900; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
 
     .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 6px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--text-main); background: #fff; appearance: auto; }
-    .form-control:focus { outline: none; border-color: var(--mgp-red); box-shadow: 0 0 0 3px rgba(200, 5, 2, 0.15); }
+    .form-control:focus { outline: none; border-color: var(--mitec-blue); box-shadow: 0 0 0 3px rgba(27, 54, 93, 0.15); }
     .form-control:disabled { background: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
     textarea.form-control { height: 80px; padding: 12px; resize: none; appearance: none; }
 
-    .btn-submit-shift { width: 100%; height: 48px; background: var(--mgp-red); color: #fff; font-size: 13px; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-    .btn-submit-shift:hover { background: var(--mgp-red-hover); }
+    .btn-submit-shift { width: 100%; height: 48px; background: var(--mitec-blue); color: #fff; font-size: 13px; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+    .btn-submit-shift:hover { background: var(--mitec-blue-hover); }
     .btn-submit-shift:active { transform: scale(0.98); }
-    .btn-logout { background: none; border: 1px solid var(--mgp-red); color: var(--mgp-red); font-weight: 800; font-size: 11px; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; letter-spacing: 0.5px; }
-    .btn-logout:hover { background: var(--mgp-red); color: #fff; }
+    .btn-logout { background: none; border: 1px solid var(--mitec-blue); color: var(--mitec-blue); font-weight: 800; font-size: 11px; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; letter-spacing: 0.5px; }
+    .btn-logout:hover { background: var(--mitec-blue); color: #fff; }
 
-    #sync-loader { position: fixed; inset: 0; background: var(--mgp-black); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #ffffff; letter-spacing: 1.5px; }
+    #sync-loader { position: fixed; inset: 0; background: var(--mitec-black); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #ffffff; letter-spacing: 1.5px; }
     .loader-text { margin-top: 16px; text-transform: uppercase; }
 
     /* Footer */
-    .footer { background: var(--mgp-black); color: #888; padding: 3rem 1.5rem 1.5rem 1.5rem; margin-top: 4rem; border-top: 4px solid var(--mgp-red); }
+    .footer { background: var(--mitec-black); color: #888; padding: 3rem 1.5rem 1.5rem 1.5rem; margin-top: 4rem; border-top: 4px solid var(--mitec-blue); }
     .footer-grid { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; }
     .footer-col h4 { color: #fff; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1rem; letter-spacing: 1px; font-weight: 900; }
     .footer-col ul { list-style: none; }
@@ -390,7 +390,7 @@
   <!-- HEADER / STICKY MAIN NAVIGATION -->
   <nav class="main-nav">
     <div class="brand-container">
-      <img class="brand-img" src="https://qube.com.my/img/logos/qube.png" alt="QUBE">
+      <img class="brand-img" src="https://mitec.com.my/static/img/logos/logo-footer.png" alt="MITEC">
       <span class="brand-tag"></span>
     </div>
     <div id="adminUserDisplayTag" class="user-profile-tag">SUPER ADMIN</div>
@@ -398,7 +398,7 @@
 
   <!-- HERO HEADER -->
   <header class="hero-header">
-    <h1>🏁 Human Resources <span> Recruitment</span></h1>
+    <h1>🏛️ Human Resources <span> Recruitment</span></h1>
   </header>
 
   <!-- NAVIGATION TAB BAR -->
@@ -426,7 +426,7 @@
 
   <!-- SYNC LOADER -->
   <div id="sync-loader">
-    <i class="ph ph-gear-six ph-spin" style="font-size: 44px; color: var(--mgp-red);"></i>
+    <i class="ph ph-gear-six ph-spin" style="font-size: 44px; color: var(--mitec-blue-hover);"></i>
     <div class="loader-text">Loading Management Portal...</div>
   </div>
 
@@ -647,7 +647,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; QUBE Integrated Malaysia Sdn Bhd .   All rights reserved 2026.
+      &copy; Malaysia International Trade and Exhibition Centre (MITEC). All rights reserved 2026.
     </div>
   </footer>
 
@@ -998,7 +998,7 @@
 
     function renderCalendarGrid() {
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      document.getElementById('cal-month-title').textContent = `${monthNames[calMonth]}${calYear}`;
+      document.getElementById('cal-month-title').textContent = `${monthNames[calMonth]} ${calYear}`;
       const grid = document.getElementById('cal-grid');
       grid.innerHTML = `
           <div class="cal-day-label">Su</div><div class="cal-day-label">Mo</div><div class="cal-day-label">Tu</div>
@@ -1095,7 +1095,7 @@
                         </p>
                       </div>
                       <div class="metrics-pill-pack">
-                        <span class="mini-badge" style="background:#e2e8f0; color:#1e293b; border: 1px solid ${currentActiveFilter === 'ALL' ? 'var(--mgp-red)' : 'transparent'}">Cap: ${maxCapacitySlots}</span>
+                        <span class="mini-badge" style="background:#e2e8f0; color:#1e293b; border: 1px solid ${currentActiveFilter === 'ALL' ? 'var(--mitec-blue)' : 'transparent'}">Cap: ${maxCapacitySlots}</span>
                         <span class="mini-badge pill-sub" style="border-width: ${currentActiveFilter === 'CONF' ? '2px' : '1px'}">Conf: ${confirmedCount}</span>
                         <span class="mini-badge pill-pres" style="border-width: ${currentActiveFilter === 'PRES' ? '2px' : '1px'}">Pres: ${presCount}</span>
                         <span class="mini-badge pill-noshow">NoShow: ${noShowCount}</span>
@@ -1108,7 +1108,7 @@
           if (visibleCards === 0) detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts match filters.</p>`;
       }
       if (isFutureOrToday(calSelectedDateStr)) {
-          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #ffffff; color: var(--text-main); border: 2px dashed var(--mgp-red);" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px; color: var(--mgp-red);"></i> Deploy New Shift Here</button>`;
+          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #ffffff; color: var(--text-main); border: 2px dashed var(--mitec-blue);" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px; color: var(--mitec-blue);"></i> Deploy New Shift Here</button>`;
       }
       listContainer.innerHTML = detailsHTML;
     }
@@ -1328,8 +1328,8 @@
                   <table class="roster-table" style="font-size:11px; margin-top:4px; background:#fff; border:1px solid var(--border-thin); border-radius:6px;">
                     <thead>
                       <tr style="background:#f8fafc;">
-                        <th style="padding:6px 8px; color:var(--mgp-black);">Casual Labourer</th>
-                        <th style="width:110px; text-align:center; padding:6px 8px; color:var(--mgp-black);">Attendance</th>
+                        <th style="padding:6px 8px; color:var(--mitec-black);">Casual Labourer</th>
+                        <th style="width:110px; text-align:center; padding:6px 8px; color:var(--mitec-black);">Attendance</th>
                       </tr>
                     </thead>
                     <tbody>`;
