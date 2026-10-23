@@ -1,26 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) - Deferred -->
-  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-W18GC0F7SG"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-W18GC0F7SG');
-  </script>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>MITEC — Shift Booking Portal</title>
-
-  <!-- Fonts (Inter + Caveat for Worker Name) -->
+  
+  <!-- Fonts (Inter) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Phosphor Icons (Deferred) -->
   <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
-
+  
   <!-- Bootstrap 5.3 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -50,33 +43,12 @@
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    .dark {
-      --background: #0f172a;
-      --foreground: #f8fafc;
-      --card: #1e293b;
-      --card-foreground: #f8fafc;
-      --popover: #1e293b;
-      --popover-foreground: #f8fafc;
-      --primary: #2563eb;
-      --primary-foreground: #ffffff;
-      --secondary: #334155;
-      --secondary-foreground: #f8fafc;
-      --muted: #334155;
-      --muted-foreground: #94a3b8;
-      --accent: #334155;
-      --accent-foreground: #f8fafc;
-      --destructive: #ef4444;
-      --border: rgba(255, 255, 255, 0.12);
-      --input: rgba(255, 255, 255, 0.15);
-      --ring: #60a5fa;
-    }
-
     * { 
       box-sizing: border-box; 
       -webkit-font-smoothing: antialiased; 
       font-family: var(--font-sans); 
     }
-
+    
     body { 
       background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #e2e8f0 100%);
       color: var(--foreground); 
@@ -149,15 +121,16 @@
       border: 2px solid rgba(255, 255, 255, 0.8); 
       object-fit: cover; 
       box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      background-color: #ffffff; /* Prevents transparent background on broken load */
     }
 
-    /* CAVEAT FONT STYLING FOR WORKER NAME */
+    /* STANDARD FONT STYLING FOR WORKER NAME (Removed Cursive) */
     #userNameDisplay {
-      font-family: 'Caveat', cursive !important;
-      font-size: 1.55rem !important;
+      font-family: var(--font-sans) !important;
+      font-size: 1.25rem !important;
       font-weight: 700 !important;
-      line-height: 1.1;
-      letter-spacing: 0.02em;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
       color: var(--primary-foreground);
     }
 
@@ -201,7 +174,7 @@
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
     }
 
-    /* DATE SECTION HEADERS - SIGNIFICANT SPACING */
+    /* DATE SECTION HEADERS */
     .date-label { 
       font-size: 12px; 
       font-weight: 700; 
@@ -328,7 +301,6 @@
       box-shadow: 0 2px 4px rgba(6, 62, 153, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
     }
 
-    /* SUBTLE MUTED WAITLIST BUTTON */
     .btn-shadcn-outline-waitlist {
       background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
       color: #4b6b94 !important;
@@ -363,15 +335,6 @@
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05), inset 0 1px 0 #ffffff;
       transition: all 0.15s ease !important;
     }
-    .btn-shadcn-filled-muted:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 5px 12px rgba(0,0,0,0.08), inset 0 1px 0 #ffffff !important;
-    }
-    .btn-shadcn-filled-muted:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 2px 3px rgba(0, 0, 0, 0.08) !important;
-    }
-
     .btn-shadcn-filled-cancel {
       background: linear-gradient(180deg, #fef2f2 0%, #fecaca 100%) !important;
       color: #991b1b !important;
@@ -383,11 +346,6 @@
       box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15), inset 0 1px 0 #ffffff;
       transition: all 0.15s ease !important;
     }
-    .btn-shadcn-filled-cancel:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 3px rgba(220, 38, 38, 0.2), inset 0 2px 3px rgba(0,0,0,0.1) !important;
-    }
-
     .btn-shadcn-filled-whatsapp {
       background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%) !important;
       color: #166534 !important;
@@ -398,10 +356,6 @@
       padding: 10px 16px !important;
       box-shadow: 0 4px 10px rgba(22, 101, 52, 0.15), inset 0 1px 0 #ffffff;
       transition: all 0.15s ease !important;
-    }
-    .btn-shadcn-filled-whatsapp:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 3px rgba(22, 101, 52, 0.2), inset 0 2px 3px rgba(0,0,0,0.1) !important;
     }
 
     /* BOTTOM NAV 3D ELEVATION */
@@ -492,9 +446,9 @@
   </header>
 
   <div class="portal-container">
-    <!-- 1. BLUE PROFILE CARD -->
+    <!-- 1. BLUE PROFILE CARD WITH ONERROR FALLBACK -->
     <div class="profile-card p-3 mb-3 d-flex align-items-center gap-3">
-      <img id="userAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23ffffff'/></svg>" alt="User Profile">
+      <img id="userAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23ffffff'/></svg>" alt="User Profile" onerror="this.style.display='none'">
       <div class="profile-info">
         <span class="d-block text-uppercase fw-semibold" style="letter-spacing: 0.08em; font-size: 10px; opacity: 0.85; color: var(--primary-foreground);">Authenticated User</span>
         <h2 id="userNameDisplay" class="mb-0">MITEC Casual Labour</h2>
@@ -532,7 +486,7 @@
 
   <!-- JS Logic -->
   <script>
-    const REQUIRED_APP_VERSION = "v2.3"; 
+    const REQUIRED_APP_VERSION = "v1.1"; 
 
     // DIRECT SUPABASE CREDENTIALS (< 150ms INSTANT READS & WRITES)
     const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
@@ -576,7 +530,7 @@
 
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       const rawName = record.full_name || record.name_mykad || "MITEC Casual Labour";
-
+      
       // DISPLAY WORKER NAME IN PROPER CASE
       document.getElementById("userNameDisplay").textContent = toTitleCase(rawName);
       if (record.photo_link) document.getElementById("userAvatar").src = record.photo_link;
@@ -611,7 +565,7 @@
     async function refreshData(docNo, showOverlay = true) {
       if (activeController) activeController.abort(); 
       activeController = new AbortController();
-
+      
       if (showOverlay) showLoader("Syncing Master Timelines...");
 
       try {
@@ -624,14 +578,12 @@
         const rawDoc = String(docNo).trim().replace(/^'/, '');
         const docWithQuote = `'${rawDoc}`;
 
-        // 1. Concurrent requests to Supabase with JOIN to shift_master
+        // 1. Concurrent requests to Supabase
         const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers, signal: activeController.signal }).then(r => r.json());
+        const userBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?doc_no=in.("${encodeURIComponent(rawDoc)}","${encodeURIComponent(docWithQuote)}")&select=*`, { headers, signal: activeController.signal }).then(r => r.json());
         
-        // Relational JOIN: select shift_master(date, dept, time, wa_link) along with booking_record columns
-        const userBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*,shift_master(date,dept,time,wa_link)&doc_no=in.("${encodeURIComponent(rawDoc)}","${encodeURIComponent(docWithQuote)}")`, { headers, signal: activeController.signal }).then(r => r.json());
-
-        // Fetch all active bookings (selecting shift_id & status, up to maximum range)
-        const allBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=shift_id,status&limit=50000`, { headers, signal: activeController.signal }).then(r => r.json());
+        // Fetch only ACTIVE bookings with high limit to ensure accurate counting without hitting the 1000 row max limit
+        const allBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=shift_id,status&status=neq.CANCELLED&limit=50000`, { headers, signal: activeController.signal }).then(r => r.json());
 
         const [shiftsRes, userBookingsRes, allBookingsRes] = await Promise.all([
           shiftsPromise, 
@@ -639,14 +591,18 @@
           allBookingsPromise
         ]);
 
-        // 2. Count non-cancelled bookings per shift_id (Case-insensitive)
+        // 2. Count non-cancelled bookings per shift_id reliably
         const bookingCounts = {};
-        (allBookingsRes || []).forEach(b => {
-          const st = String(b.status || '').trim().toUpperCase();
-          if (b.shift_id && st !== 'CANCELLED') {
-            bookingCounts[b.shift_id] = (bookingCounts[b.shift_id] || 0) + 1;
-          }
-        });
+        if (Array.isArray(allBookingsRes)) {
+          allBookingsRes.forEach(b => {
+            const st = String(b.status || '').trim().toUpperCase();
+            if (b.shift_id && st !== 'CANCELLED') {
+              bookingCounts[b.shift_id] = (bookingCounts[b.shift_id] || 0) + 1;
+            }
+          });
+        } else {
+          console.error("Failed to fetch all bookings correctly for slot counting:", allBookingsRes);
+        }
 
         // 3. Deduct active bookings from shift_master total slots
         cachedShifts = (shiftsRes || []).map(s => {
@@ -667,21 +623,15 @@
           };
         });
 
-        // Map bookings dynamically fetching date, dept, time, and wa_link from shift_master via Foreign Key
-        cachedBookings = (userBookingsRes || []).map(b => {
-          const shiftData = b.shift_master || {};
-          const rawShiftDate = shiftData.date || b.date || '';
-          
-          return {
-            shift_id: b.shift_id || '',
-            date: rawShiftDate ? rawShiftDate.split('-').reverse().join('.') : '',
-            dept: shiftData.dept || b.dept || '',
-            time: shiftData.time || b.time || '',
-            status: b.status || '',
-            attendance: b.attendance || '',
-            wa_link: shiftData.wa_link || getWaLinkForShift(cachedShifts, b.shift_id)
-          };
-        });
+        cachedBookings = (userBookingsRes || []).map(b => ({
+          shift_id: b.shift_id || '',
+          date: b.date ? b.date.split('-').reverse().join('.') : '',
+          dept: b.dept || '',
+          time: b.time || '',
+          status: b.status || '',
+          attendance: b.attendance || '',
+          wa_link: getWaLinkForShift(cachedShifts, b.shift_id)
+        }));
 
         sessionStorage.setItem(`mcl_portal_cache_${rawDoc}`, JSON.stringify({
           allShifts: cachedShifts,
@@ -707,7 +657,7 @@
     function renderDepartmentChips(shifts) {
       const filterContainer = document.getElementById('filter-container');
       const depts = [...new Set(shifts.map(s => s.dept))];
-
+      
       if (depts.length === 0) {
         filterContainer.style.display = 'none';
         return;
@@ -715,7 +665,7 @@
 
       filterContainer.style.display = 'flex';
       let chipsHtml = `<button class="btn btn-sm filter-chip-btn ${activeFilterDept === 'ALL' ? 'active-chip' : 'inactive-chip'}" onclick="applyDeptFilter('ALL')">ALL</button>`;
-
+      
       depts.forEach(d => {
         chipsHtml += `<button class="btn btn-sm filter-chip-btn ${activeFilterDept === d ? 'active-chip' : 'inactive-chip'}" onclick="applyDeptFilter('${d}')">${d}</button>`;
       });
@@ -838,7 +788,7 @@
         upcomingShifts.filter(s => s.date === date).forEach(s => {
           const isFull = s.slotsLeft <= 0;
           const isLockedByPolicy = hasBookingToday;
-
+          
           const hasSpotlight = s.notes && String(s.notes).trim() !== "";
 
           let badgeMarkup = `<span class="badge-shadcn-left">${s.slotsLeft} LEFT</span>`;
@@ -1045,18 +995,20 @@
       container.innerHTML = htmlBuffer;
     }
 
-    // DIRECT SUPABASE WRITE WITH AUTOMATIC PROFILE SAFEGUARD (CLEAN ID WITHOUT APOSTROPHE)
+    // DIRECT SUPABASE WRITE WITH AUTOMATIC MYKAD CONFIRMATION & PREPENDED APOSTROPHE
     async function handleBooking(id, date, dept, time, waitlist, element) {
       if (isRequestInProgress) return;
-
+      
+      // Direct exact string from profile
       const rawDocNo = String(localStorage.getItem("mcl_doc_no") || "").trim();
       if (!rawDocNo) { alert("Session invalid. Please log in again."); return; }
-      
-      const docNo = rawDocNo.replace(/^'/, ''); // Strip leading apostrophe completely
 
+      // Enforce mandatory leading apostrophe (') for storage/formatting compliance
+      const docNo = rawDocNo.startsWith("'") ? rawDocNo : `'${rawDocNo}`;
+
+      // Retrieve worker profile details from local storage
       const workerRecord = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       const docType = String(workerRecord.document_type || "MYKAD").trim().toUpperCase();
-      const rawFullName = workerRecord.full_name || workerRecord.name_mykad || "MITEC Casual Labour";
 
       if (!confirm(waitlist ? `Join waitlist for ${dept}?` : `Book shift for ${dept}?`)) return;
 
@@ -1064,62 +1016,46 @@
       if (element) { element.disabled = true; element.style.opacity = "0.4"; element.innerText = "Processing..."; }
       showLoader(waitlist ? "Securing Standby Placement..." : "Booking Selected Shift...");
 
+      // Match current shift capacity from cached shifts
       const targetShift = cachedShifts.find(s => s.id === id);
       const totalSlots = targetShift ? parseInt(targetShift.totalSlots || 0) : 0;
 
+      // AUTOMATIC STATUS LOGIC
       let status = "SUBMITTED";
       if (waitlist) {
         status = "WAITLIST";
       } else if (totalSlots <= 15) {
+        // Shifts with 15 or fewer slots: ONLY MYKAD holders automatically get CONFIRMED
         status = (docType === "MYKAD") ? "CONFIRMED" : "WAITLIST";
       }
 
-      const cleanDate = String(date).trim().replace(/\//g, '.'); 
+      const cleanDate = String(date).trim().replace(/\//g, '.'); // DD.MM.YYYY
       const rawTime = String(time).trim();
       const hourPart = rawTime.includes(':') ? rawTime.split(':')[0] : rawTime.substring(0, 2);
-
+      
+      // Construct shift_timevalue & booking_id formulas using docNo (including leading apostrophe)
       const shiftTimevalue = `${cleanDate}${dept}${hourPart}${docNo}`;
       const cleanTime = rawTime.replace(/[^0-9]/g, "");
       const bookingId = `${cleanDate}${dept}${cleanTime}${docNo}`;
 
+      const dateParts = cleanDate.split('.');
+      const isoDate = dateParts.length === 3 ? `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}` : date;
+
+      const payload = [{
+        booking_id: bookingId,
+        timestamp: new Date().toISOString(),
+        shift_id: id,
+        doc_no: docNo, // Always starts with (') e.g. "'060715120474"
+        date: isoDate,
+        dept: dept,
+        time: time,
+        status: status,
+        shift_timevalue: shiftTimevalue,
+        document_type: docType,
+        updated_at: new Date().toISOString()
+      }];
+
       try {
-        // --- STEP 1: AUTOMATIC PROFILE SAFEGUARD ---
-        const safeguardRes = await fetch(`${SUPABASE_URL}/rest/v1/casual_labour_profile?on_conflict=doc_no`, {
-          method: "POST",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "resolution=ignore-duplicates"
-          },
-          body: JSON.stringify([{
-            doc_no: docNo,
-            name_mykad: rawFullName,
-            document_type: docType
-          }])
-        });
-
-        if (!safeguardRes.ok) {
-           const err = await safeguardRes.json();
-           console.error("Safeguard error:", err);
-           if (err.message && err.message.includes("row-level security")) {
-               alert("SUPABASE SECURITY BLOCK: You must Disable RLS on the 'casual_labour_profile' table in your Supabase dashboard.");
-               throw new Error("RLS blocking profile creation.");
-           }
-        }
-
-        // --- STEP 2: INSERT THE BOOKING RECORD ---
-        const payload = [{
-          booking_id: bookingId,
-          timestamp: new Date().toISOString(),
-          shift_id: id,
-          doc_no: docNo,
-          status: status,
-          shift_timevalue: shiftTimevalue,
-          document_type: docType,
-          updated_at: new Date().toISOString()
-        }];
-
         const res = await fetch(`${SUPABASE_URL}/rest/v1/booking_record?on_conflict=booking_id`, {
           method: "POST",
           headers: {
@@ -1132,7 +1068,7 @@
         });
 
         if (res.ok) {
-          sessionStorage.removeItem(`mcl_portal_cache_${docNo}`);
+          sessionStorage.removeItem(`mcl_portal_cache_${rawDocNo.replace(/[']/g, '')}`);
           window.location.reload();
         } else {
           const errData = await res.json();
@@ -1140,7 +1076,7 @@
           if (element) { element.disabled = false; element.style.opacity = "1"; element.innerText = "Book Now"; }
         }
       } catch (err) {
-        if (!err.message.includes("RLS")) alert("Error: " + err.message);
+        alert("Network error: " + err.message);
         if (element) { element.disabled = false; element.style.opacity = "1"; element.innerText = "Book Now"; }
       } finally {
         document.getElementById('sync-loader').style.display = 'none';
