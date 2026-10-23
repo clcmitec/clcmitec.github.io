@@ -28,7 +28,7 @@
       --text-main: #1d1d1f;
       --text-muted: #51525c;
       --text-light: #ffffff;
-      --border-thin: #e1e4ea;
+      --border-thin: #cbd5e1;
 
       /* Status Pill Color Palette */
       --pill-teal-bg: #f3f9e9;
@@ -109,25 +109,6 @@
       text-overflow: ellipsis; 
     }
 
-    /* Hero Header */
-    .hero-header {
-      background: var(--mitec-black);
-      color: var(--text-light);
-      padding: 2rem 1.5rem 1.25rem 1.5rem;
-      border-top: 1px solid #222;
-    }
-    .hero-header h1 {
-      font-size: 1.8rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: -0.5px;
-      line-height: 1.1;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .hero-header h1 span { color: var(--mitec-blue-hover); }
-
     /* Tab Bar (Sub-Nav Tabs) */
     .tab-bar { 
       display: flex; 
@@ -154,7 +135,7 @@
     .tab-item:hover { color: #ffffff; }
     .tab-item.active { color: #ffffff; border-bottom-color: var(--mitec-blue-hover); }
 
-    .container { max-width: 800px; margin: 0 auto; padding: 20px 15px; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px 15px; }
 
     /* Login Overlay */
     #login-overlay { position: fixed; inset: 0; background: var(--mitec-black); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -177,7 +158,7 @@
     }
     .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border-thin); }
 
-    /* 4 Scorecard Dashboard Grid */
+    /* Scorecard Grid */
     .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0 20px 0; }
 
     .dash-tile { 
@@ -225,28 +206,59 @@
     .cal-indicator { font-size: 8px; font-weight: 800; border-radius: 3px; padding: 1px 4px; margin-top: 3px; line-height: 1.2; text-transform: uppercase; }
     .cal-cell.selected .cal-indicator { background: rgba(0,0,0,0.25) !important; color: #fff !important; }
 
-    /* Pivot Interactive Accordion Styles */
-    details.pivot-cat-card, details.pivot-date-block, details.pivot-dept-block, details.pivot-shift-item { display: block; width: 100%; }
-    summary.pivot-summary { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; outline: none; list-style: none; }
-    summary.pivot-summary::-webkit-details-marker { display: none; }
+    /* GOOGLE SHEETS / SPREADSHEET STYLE DATABASE TABLE (Tab 2) */
+    .db-console-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 6px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .db-filter-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; }
+    @media (max-width: 768px) { .db-filter-grid { grid-template-columns: 1fr; } }
 
-    .pivot-chevron { font-size: 13px; color: var(--text-muted); transition: transform 0.2s ease; display: inline-block; }
-    details[open] > summary.pivot-summary .pivot-chevron { transform: rotate(180deg); }
+    .db-checkbox-filters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 0 14px 0; border-top: 1px dashed var(--border-thin); margin-bottom: 10px; }
+    @media (max-width: 768px) { .db-checkbox-filters-row { grid-template-columns: 1fr; } }
+    .filter-box-group { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 6px; padding: 10px 12px; }
+    .filter-box-title { font-size: 10px; font-weight: 900; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .filter-checkboxes { display: flex; flex-wrap: wrap; gap: 14px; }
 
-    .pivot-cat-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border-left: 5px solid var(--mitec-blue); }
-    .pivot-cat-title { font-size: 14px; font-weight: 900; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); padding-bottom: 10px; margin-bottom: 12px; }
+    .db-table-wrapper { overflow-x: auto; max-height: 650px; overflow-y: auto; border: 1px solid var(--border-thin); background: #ffffff; }
+    
+    /* Spreadsheet Grid Styles */
+    .sheets-db-table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: var(--font-main); text-align: left; }
+    .sheets-db-table th { 
+      position: sticky; 
+      top: 0; 
+      background: #f1f5f9; 
+      color: #334155; 
+      padding: 8px 10px; 
+      font-weight: 800; 
+      text-transform: uppercase; 
+      font-size: 10px; 
+      letter-spacing: 0.5px; 
+      border: 1px solid #cbd5e1; 
+      z-index: 10;
+    }
+    .sheets-db-table td { 
+      padding: 6px 10px; 
+      border: 1px solid #e2e8f0; 
+      vertical-align: middle; 
+      white-space: nowrap;
+    }
+    .sheets-db-table tr:nth-child(even) { background-color: #f9fafb; }
+    .sheets-db-table tr:hover { background-color: #f1f5f9; }
 
-    .pivot-date-block { margin-bottom: 10px; padding-left: 4px; border-bottom: 1px dashed var(--border-thin); padding-bottom: 10px; }
-    .pivot-date-block:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .pivot-date-title { font-size: 13px; font-weight: 800; color: #475569; padding: 4px 0; }
+    .sheet-cell-id { font-family: monospace; font-weight: 700; color: var(--mitec-blue); font-size: 11px; }
+    .sheet-cell-name { font-weight: 700; color: var(--text-main); text-transform: uppercase; }
+    .sheet-cell-sub { font-size: 10px; color: var(--text-muted); font-family: monospace; }
 
-    .pivot-dept-block { margin-left: 12px; border-left: 2px dashed #cbd5e1; padding-left: 12px; margin-top: 8px; margin-bottom: 8px; }
-    .pivot-dept-title { font-size: 12px; font-weight: 800; color: var(--mitec-blue); text-transform: uppercase; padding: 2px 0; }
+    /* Status Badge Plain Text */
+    .status-text-badge { font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; letter-spacing: 0.5px; }
+    .status-text-badge.confirmed { background-color: var(--mitec-blue); color: #ffffff; }
+    .status-text-badge.waitlist { background-color: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
+    .status-text-badge.cancelled { background-color: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
 
-    .pivot-shift-item { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 8px; padding: 0; margin-top: 8px; margin-bottom: 4px; }
-    .pivot-shift-header { font-size: 12px; font-weight: 700; color: var(--text-main); display: flex; width: 100%; justify-content: space-between; align-items: center; }
+    /* Attendance Cells & Toggles */
+    .att-badge { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 3px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; font-family: monospace; }
+    .att-badge.present { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .att-badge.noshow { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
-    /* Cards & Roster Styling */
+    /* Stat Cards & Roster Styling */
     .stat-row-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s ease; }
     .stat-row-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
     .stat-row-card:active { transform: scale(0.98); }
@@ -286,11 +298,11 @@
     .wm-stat-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.3px; line-height: 1.1; }
     .wm-stat-value { font-size: 18px; font-weight: 900; color: var(--mitec-blue); }
 
+    /* Worker Profile Photo Frame (Tab 3) */
     .worker-profile-cell { display: flex; align-items: center; gap: 12px; }
-
     .worker-avatar-frame {
-      width: 48px;
-      height: 54px;
+      width: 42px;
+      height: 48px;
       background: linear-gradient(180deg, #2b2b2b 0%, #111111 100%);
       border-radius: 6px 6px 0 0;
       border: 1px solid #333;
@@ -300,10 +312,9 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       position: relative;
     }
-
     .worker-avatar { 
       width: 100%; 
       height: 100%; 
@@ -313,11 +324,11 @@
     }
 
     .wm-status-select-wrapper { position: relative; display: inline-block; width: 100%; max-width: 120px; }
-    .wm-status-select { width: 100%; padding: 6px 20px 6px 8px; border-radius: 4px; font-size: 9px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
+    .wm-status-select { width: 100%; padding: 4px 18px 4px 6px; border-radius: 3px; font-size: 9px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
     .wm-status-select.status-confirmed { background-color: var(--mitec-blue); color: #ffffff; border: 1px solid var(--mitec-blue); }
     .wm-status-select.status-waitlist { background-color: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
-    .wm-status-select.status-cancelled { background-color: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); cursor: not-allowed; }
-    .wm-status-chevron { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 10px; }
+    .wm-status-select.status-cancelled { background-color: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
+    .wm-status-chevron { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 9px; }
     .status-confirmed + .wm-status-chevron { color: #ffffff; }
     .status-waitlist + .wm-status-chevron { color: var(--pill-amber-text); }
     .status-cancelled + .wm-status-chevron { color: var(--pill-red-text); }
@@ -368,13 +379,13 @@
 
     /* Footer */
     .footer { background: var(--mitec-black); color: #888; padding: 3rem 1.5rem 1.5rem 1.5rem; margin-top: 4rem; border-top: 4px solid var(--mitec-blue); }
-    .footer-grid { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; }
+    .footer-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; }
     .footer-col h4 { color: #fff; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1rem; letter-spacing: 1px; font-weight: 900; }
     .footer-col ul { list-style: none; }
     .footer-col li { margin-bottom: 0.5rem; }
     .footer-col a { color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: color 0.2s; }
     .footer-col a:hover { color: #fff; }
-    .footer-bottom { max-width: 800px; margin: 2rem auto 0 auto; padding-top: 1.5rem; border-top: 1px solid #222; text-align: center; font-size: 0.75rem; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .footer-bottom { max-width: 1000px; margin: 2rem auto 0 auto; padding-top: 1.5rem; border-top: 1px solid #222; text-align: center; font-size: 0.75rem; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
   </style>
 </head>
 <body>
@@ -396,15 +407,10 @@
     <div id="adminUserDisplayTag" class="user-profile-tag">SUPER ADMIN</div>
   </nav>
 
-  <!-- HERO HEADER -->
-  <header class="hero-header">
-    <h1>🏛️ Human Resources <span> Recruitment</span></h1>
-  </header>
-
   <!-- NAVIGATION TAB BAR -->
   <nav class="tab-bar">
     <div id="tab-btn-1" class="tab-item active" onclick="switchTab(1)">Statistics & Deployment</div>
-    <div id="tab-btn-2" class="tab-item" onclick="switchTab(2)">Shift Schedule</div>
+    <div id="tab-btn-2" class="tab-item" onclick="switchTab(2)">Database Table</div>
     <div id="tab-btn-3" class="tab-item" onclick="switchTab(3)">Staffing Manager</div>
   </nav>
 
@@ -458,9 +464,50 @@
       <div id="stats-view-container"></div>
     </div>
 
-    <!-- PAGE 2: PIVOT ROSTERS -->
+    <!-- PAGE 2: DATABASE TABLE CONSOLE (No Dept, Plain Status Text, Checkbox Filters, Full Pagination Fetch) -->
     <div id="page-2" class="app-page">
-      <div id="pivot-roster-root-container"></div>
+      <div class="section-label">Supabase Spreadsheet Master Records <span id="db-total-badge" class="matrix-title-badge">0 Records</span></div>
+      
+      <div class="db-console-card">
+        <!-- Search & Department Filter -->
+        <div class="db-filter-grid">
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:10px;">Search Sheet Records</label>
+            <div style="position:relative;">
+              <input type="text" id="db-search-input" class="form-control" style="height:38px; font-size:12px; padding-left:32px;" placeholder="Search by name, MyKad/Passport, Shift ID..." oninput="renderDatabaseTableConsole()" />
+              <i class="ph ph-magnifying-glass" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px;"></i>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:10px;">Filter Department</label>
+            <select id="db-dept-filter" class="form-control" style="height:38px; font-size:11px; font-weight:700;" onchange="renderDatabaseTableConsole()">
+              <option value="ALL">ALL DEPARTMENTS</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Checkbox Filters Row (Status & Doc Type) -->
+        <div class="db-checkbox-filters-row">
+          <div class="filter-box-group">
+            <div class="filter-box-title">Status Filter</div>
+            <div class="filter-checkboxes">
+              <label class="checkbox-label"><input type="checkbox" id="chk-stat-conf" checked onchange="renderDatabaseTableConsole()"> Confirmed</label>
+              <label class="checkbox-label"><input type="checkbox" id="chk-stat-wait" checked onchange="renderDatabaseTableConsole()"> Waitlist</label>
+              <label class="checkbox-label"><input type="checkbox" id="chk-stat-canc" checked onchange="renderDatabaseTableConsole()"> Cancelled</label>
+            </div>
+          </div>
+          <div class="filter-box-group">
+            <div class="filter-box-title">Document Type Filter</div>
+            <div class="filter-checkboxes">
+              <label class="checkbox-label"><input type="checkbox" id="chk-doc-ic" checked onchange="renderDatabaseTableConsole()"> MyKad (IC)</label>
+              <label class="checkbox-label"><input type="checkbox" id="chk-doc-passport" checked onchange="renderDatabaseTableConsole()"> Passport</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spreadsheet Table Grid -->
+        <div id="database-table-root"></div>
+      </div>
     </div>
 
     <!-- PAGE 3: STAFFING MANAGER -->
@@ -625,7 +672,7 @@
         <h4>Navigation</h4>
         <ul>
           <li><a href="#" onclick="switchTab(1)">Statistics & Deployment</a></li>
-          <li><a href="#" onclick="switchTab(2)">Shift Schedule</a></li>
+          <li><a href="#" onclick="switchTab(2)">Database Table</a></li>
           <li><a href="#" onclick="switchTab(3)">Staffing Manager</a></li>
         </ul>
       </div>
@@ -709,6 +756,10 @@
         document.getElementById(`tab-btn-${i}`).classList.toggle('active', i === tabIndex);
         document.getElementById(`page-${i}`).classList.toggle('active', i === tabIndex);       
       }     
+      if (tabIndex === 2) {
+        populateDatabaseConsoleFilters();
+        renderDatabaseTableConsole();
+      }
       if (tabIndex === 3) {
         populateWorkerManagerShifts();
       }
@@ -796,7 +847,40 @@
       return checkDate <= today;
     }
 
-    // DIRECT HIGH-SPEED SUPABASE DATA FETCH WITH RELATIONAL FALLBACKS
+    // FULL PAGINATED BATCH FETCH USING LIMIT/OFFSET TO PULL ALL BOOKINGS
+    async function fetchAllBookings(headers) {
+      let allRecords = [];
+      let batchSize = 1000;
+      let start = 0;
+      let fetched = 0;
+
+      do {
+        const queryUrl = `${SUPABASE_URL}/rest/v1/booking_record?select=*,shift_master(date,dept,time,slots,wa_link),casual_labour_profile(full_name,name_mykad,phone,photo_link,document_type)&limit=${batchSize}&offset=${start}`;
+        const res = await fetch(queryUrl, { headers });
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.code) {
+          const fallbackUrl = `${SUPABASE_URL}/rest/v1/booking_record?select=*&limit=${batchSize}&offset=${start}`;
+          const fallbackRes = await fetch(fallbackUrl, { headers });
+          const fallbackData = await fallbackRes.json();
+          if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+            allRecords = allRecords.concat(fallbackData);
+            fetched = fallbackData.length;
+          } else {
+            break;
+          }
+        } else {
+          allRecords = allRecords.concat(data);
+          fetched = data.length;
+        }
+
+        start += batchSize;
+      } while (fetched === batchSize);
+
+      return allRecords;
+    }
+
+    // DIRECT HIGH-SPEED SUPABASE DATA FETCH WITH FULL PAGINATION
     async function loadAdminDataSuite() {
       document.getElementById('sync-loader').style.display = 'flex';
 
@@ -812,16 +896,8 @@
         // 2. Fetch Profiles for Worker Data Matching
         const profilesPromise = fetch(`${SUPABASE_URL}/rest/v1/casual_labour_profile?select=*`, { headers }).then(r => r.json());
 
-        // 3. Fetch Bookings with Relational Embed (with Fallback to raw booking_record)
-        const bookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*,shift_master(date,dept,time,slots,wa_link),casual_labour_profile(full_name,name_mykad,phone,photo_link,document_type)&limit=50000`, { headers })
-          .then(async r => {
-            const data = await r.json();
-            if (data && data.code) { // Fallback if schema embedding fails
-              const fallback = await fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*&limit=50000`, { headers });
-              return await fallback.json();
-            }
-            return data;
-          });
+        // 3. Fetch All Bookings via Paginated Fetcher
+        const bookingsPromise = fetchAllBookings(headers);
 
         const [shiftsRes, profilesRes, bookingsRes] = await Promise.all([shiftsPromise, profilesPromise, bookingsPromise]);
 
@@ -892,7 +968,8 @@
 
         updateMatrixNumbers(calSelectedDateStr, calSelectedShiftId);
         renderStatisticsPage(); 
-        renderPivotRostersPage();
+        populateDatabaseConsoleFilters();
+        renderDatabaseTableConsole();
         populateWorkerManagerShifts();
 
       } catch (err) {
@@ -925,9 +1002,12 @@
       let totalCap = 0;
       scopedShifts.forEach(s => { totalCap += Number(s.slots || s.totalSlots || s.Slots || 0); });
 
-      const confirmedBookings = scopedBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
+      const confirmedBookings = scopedBookings.filter(b => {
+        const st = String(b.status || '').toUpperCase();
+        return st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS';
+      });
       const totalConf = confirmedBookings.length;
-      const totalWait = scopedBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
+      const totalWait = scopedBookings.filter(b => String(b.status || '').toUpperCase().includes('WAIT')).length;
 
       let totalPres = 0;
       confirmedBookings.forEach(b => {
@@ -1018,7 +1098,10 @@
           if (shiftsToday.length > 0) {
               let totalMetric = 0;
               let todayBookings = cachedBookings.filter(b => shiftsToday.some(s => s.id === b.shift_id));
-              let confirmedToday = todayBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
+              let confirmedToday = todayBookings.filter(b => {
+                const st = String(b.status || '').toUpperCase();
+                return st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS';
+              });
 
               if (currentActiveFilter === 'ALL') {
                    totalMetric = shiftsToday.reduce((sum, s) => sum + Number(s.slots || s.totalSlots || s.Slots || 0), 0);
@@ -1027,7 +1110,7 @@
                    totalMetric = confirmedToday.length;
                    if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-teal-bg); color:var(--pill-teal-text);">+${totalMetric}</div>`;
               } else if (currentActiveFilter === 'WAIT') {
-                   totalMetric = todayBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
+                   totalMetric = todayBookings.filter(b => String(b.status || '').toUpperCase().includes('WAIT')).length;
                    if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-amber-bg); color:var(--pill-amber-text);">+${totalMetric}</div>`;
               } else if (currentActiveFilter === 'PRES') {
                    totalMetric = confirmedToday.filter(b => formatFullTimestamp(b.attendance) && formatFullTimestamp(b.attendance) !== "No Show").length;
@@ -1057,10 +1140,13 @@
           let visibleCards = 0;
           shiftsToday.forEach(s => {
               const shiftBookings = cachedBookings.filter(b => b.shift_id === s.id);
-              const confirmedBookings = shiftBookings.filter(b => b.status === 'SUBMITTED' || b.status === 'CONFIRMED');
+              const confirmedBookings = shiftBookings.filter(b => {
+                const st = String(b.status || '').toUpperCase();
+                return st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS';
+              });
               const confirmedCount = confirmedBookings.length;
-              const waitlistCount = shiftBookings.filter(b => b.status === 'WAITLIST' || b.status === 'WAITING LIST').length;
-              const cancelledCount = shiftBookings.filter(b => b.status === 'CANCELLED').length;
+              const waitlistCount = shiftBookings.filter(b => String(b.status || '').toUpperCase().includes('WAIT')).length;
+              const cancelledCount = shiftBookings.filter(b => String(b.status || '').toUpperCase() === 'CANCELLED').length;
 
               let presCount = 0;
               let noShowCount = 0;
@@ -1192,7 +1278,6 @@
       try {
         let res;
         if (editModeShift) {
-          // UPDATE EXISTING SHIFT
           res = await fetch(`${SUPABASE_URL}/rest/v1/shift_master?shift_id=eq.${encodeURIComponent(sId)}`, {
             method: "PATCH",
             headers: {
@@ -1209,7 +1294,6 @@
             })
           });
         } else {
-          // CREATE NEW SHIFT
           res = await fetch(`${SUPABASE_URL}/rest/v1/shift_master`, {
             method: "POST",
             headers: {
@@ -1236,140 +1320,143 @@
       }
     }
 
-    /* Tab 2: Pivot Rosters */
-    function renderPivotRostersPage() {
-      const container = document.getElementById('pivot-roster-root-container');
-      container.innerHTML = '';
+    /* Tab 2: Database Table Console (No Dept, Plain Status Text, Checkbox Filters) */
+    function populateDatabaseConsoleFilters() {
+      const deptSelect = document.getElementById('db-dept-filter');
+      if (!deptSelect) return;
 
-      if(!cachedShifts || cachedShifts.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">No pivot matrices discoverable.</p>';
-        return;
+      const uniqueDepts = [...new Set(cachedShifts.map(s => s.dept))].filter(Boolean).sort();
+      let currentVal = deptSelect.value;
+      
+      deptSelect.innerHTML = `<option value="ALL">ALL DEPARTMENTS</option>` + uniqueDepts.map(d => `<option value="${d}">${d}</option>`).join('');
+      if (uniqueDepts.includes(currentVal)) {
+        deptSelect.value = currentVal;
       }
-
-      let today = new Date(); today.setHours(0,0,0,0);
-      let pivotData = { "TODAY": {}, "UPCOMING": {}, "PAST": {} };
-
-      cachedShifts.forEach(s => {
-        let sDateObj = getShiftDateObj(s.date);
-        let category = "UPCOMING";
-        if (sDateObj.getTime() === today.getTime()) category = "TODAY";
-        else if (sDateObj < today) category = "PAST";
-
-        if (!pivotData[category][s.date]) pivotData[category][s.date] = {};
-        if (!pivotData[category][s.date][s.dept]) pivotData[category][s.date][s.dept] = [];
-
-        pivotData[category][s.date][s.dept].push(s);
-      });
-
-      const catOrder = ["TODAY", "UPCOMING", "PAST"];
-
-      catOrder.forEach(cat => {
-        let dateGroup = pivotData[cat];
-        let dateKeys = Object.keys(dateGroup);
-        if (dateKeys.length === 0) return;
-
-        dateKeys.sort((a, b) => cat === "PAST" ? getShiftDateObj(b) - getShiftDateObj(a) : getShiftDateObj(a) - getShiftDateObj(b));
-
-        let catOpenState = (cat === "TODAY") ? "open" : "";
-
-        let catMarkup = `
-          <details class="pivot-cat-card" ${catOpenState}>
-            <summary class="pivot-summary pivot-cat-title">
-              <span>${cat} Overview</span>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span class="matrix-title-badge">${dateKeys.length} Active Dates</span>
-                <i class="ph ph-caret-down pivot-chevron"></i>
-              </div>
-            </summary>
-            <div style="margin-top:10px;">`;
-
-        dateKeys.forEach(dateKey => {
-          catMarkup += `
-            <details class="pivot-date-block" ${catOpenState}>
-              <summary class="pivot-summary pivot-date-title">
-                <span><i class="ph ph-calendar-blank"></i> ${dateKey}</span>
-                <i class="ph ph-caret-down pivot-chevron"></i>
-              </summary>
-              <div style="margin-top:6px;">`;
-
-          let depts = dateGroup[dateKey];
-          Object.keys(depts).forEach(deptKey => {
-            catMarkup += `
-              <details class="pivot-dept-block" ${catOpenState}>
-                <summary class="pivot-summary pivot-dept-title">
-                  <span>${deptKey} Department</span>
-                  <i class="ph ph-caret-down pivot-chevron"></i>
-                </summary>
-                <div style="margin-top:4px;">`;
-
-            let shifts = depts[deptKey];
-            shifts.sort((a, b) => String(a.time).localeCompare(String(b.time)));
-
-            shifts.forEach(s => {
-              let displayTime = formatAttendanceTime(s.time);
-              let confirmedApplicants = cachedBookings.filter(b => b.shift_id === s.id && (b.status === 'SUBMITTED' || b.status === 'CONFIRMED'));
-              let capacity = s.slots || s.totalSlots || s.Slots || 0;
-
-              catMarkup += `
-                <details class="pivot-shift-item" style="padding:0;" ${catOpenState}>
-                  <summary class="pivot-summary pivot-shift-header" style="padding:12px;">
-                    <span>⏱️ Reporting Hours: <b>${displayTime}</b></span>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                      <span style="color:var(--text-muted); font-weight:normal;">Allocated: <b>${confirmedApplicants.length} /${capacity}</b></span>
-                      <i class="ph ph-caret-down pivot-chevron"></i>
-                    </div>
-                  </summary>
-                  <div style="padding:0 12px 12px 12px; margin-top:-4px;">`;
-
-              if (confirmedApplicants.length === 0) {
-                catMarkup += `<p style="font-size:11px; color:var(--text-muted); font-style:italic; margin:4px 0 0 4px;">No active confirmed workers on roster.</p>`;
-              } else {
-                catMarkup += `
-                  <table class="roster-table" style="font-size:11px; margin-top:4px; background:#fff; border:1px solid var(--border-thin); border-radius:6px;">
-                    <thead>
-                      <tr style="background:#f8fafc;">
-                        <th style="padding:6px 8px; color:var(--mitec-black);">Casual Labourer</th>
-                        <th style="width:110px; text-align:center; padding:6px 8px; color:var(--mitec-black);">Attendance</th>
-                      </tr>
-                    </thead>
-                    <tbody>`;
-
-                confirmedApplicants.forEach(w => {
-                  let attStamp = w.attendance || "";
-                  let attDisplay = "";
-                  if (attStamp.toLowerCase() === "no show" || attStamp === "" || attStamp === "-" || attStamp === "0") {
-                    if (cat === "UPCOMING") {
-                      attDisplay = ``;
-                    } else {
-                      attDisplay = `<span style="color:var(--accent-warn); font-weight:800;">No Show</span>`;
-                    }
-                  } else {
-                    attDisplay = `<span style="color:var(--text-main); font-weight:700; font-family:monospace;">${formatFullTimestamp(attStamp)}</span>`;
-                  }
-
-                  catMarkup += `
-                    <tr>
-                      <td style="padding:6px 8px;">
-                        <div class="view-drawable-name" onclick="openWorkerProfileDrawer('${w.user_id}', '${w.worker_name.replace(/'/g, "\\'")}')">${w.worker_name}</div>
-                        <div style="font-size:9px; color:var(--text-muted);">ID: ${w.user_id}</div>
-                      </td>
-                      <td style="text-align:center; padding:6px 8px;">${attDisplay}</td>
-                    </tr>`;
-                });
-                catMarkup += `</tbody></table>`;
-              }
-              catMarkup += `</div></details>`; 
-            });
-            catMarkup += `</div></details>`; 
-          });
-          catMarkup += `</div></details>`; 
-        });
-        catMarkup += `</div></details>`; 
-        container.innerHTML += catMarkup;
-      });
     }
 
-    /* Tab 3: Worker Manager / Staffing Manager */
+    function renderDatabaseTableConsole() {
+      const searchInput = document.getElementById('db-search-input');
+      const deptFilter = document.getElementById('db-dept-filter');
+      
+      const chkConf = document.getElementById('chk-stat-conf') ? document.getElementById('chk-stat-conf').checked : true;
+      const chkWait = document.getElementById('chk-stat-wait') ? document.getElementById('chk-stat-wait').checked : true;
+      const chkCanc = document.getElementById('chk-stat-canc') ? document.getElementById('chk-stat-canc').checked : true;
+
+      const chkIC = document.getElementById('chk-doc-ic') ? document.getElementById('chk-doc-ic').checked : true;
+      const chkPassport = document.getElementById('chk-doc-passport') ? document.getElementById('chk-doc-passport').checked : true;
+
+      const tableRoot = document.getElementById('database-table-root');
+      const totalBadge = document.getElementById('db-total-badge');
+
+      if (!tableRoot) return;
+
+      const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const selectedDept = deptFilter ? deptFilter.value : 'ALL';
+
+      let filtered = cachedBookings.filter(b => {
+        const workerName = String(b.worker_name || b.name || '').toLowerCase();
+        const userId = String(b.user_id || b.doc_no || '').toLowerCase();
+        const shiftId = String(b.shift_id || '').toLowerCase();
+        const shiftObj = cachedShifts.find(s => s.id === b.shift_id) || {};
+        const dept = String(b.dept || shiftObj.dept || '').toUpperCase();
+        const status = String(b.status || '').toUpperCase();
+        const isPassport = isPassportHolder(userId);
+
+        if (searchTerm && !workerName.includes(searchTerm) && !userId.includes(searchTerm) && !shiftId.includes(searchTerm)) {
+          return false;
+        }
+
+        if (selectedDept !== 'ALL' && dept !== selectedDept.toUpperCase()) {
+          return false;
+        }
+
+        // Status Tickbox Filtering
+        const isConfirmedStatus = (status === 'CONFIRMED' || status === 'SUBNS' || status === 'SUBMITTED');
+        const isWaitlistStatus = (status.includes('WAIT'));
+        const isCancelledStatus = (status === 'CANCELLED');
+
+        if (isConfirmedStatus && !chkConf) return false;
+        if (isWaitlistStatus && !chkWait) return false;
+        if (isCancelledStatus && !chkCanc) return false;
+        if (!isConfirmedStatus && !isWaitlistStatus && !isCancelledStatus && !chkConf) return false;
+
+        // Doc Type Tickbox Filtering
+        if (isPassport && !chkPassport) return false;
+        if (!isPassport && !chkIC) return false;
+
+        return true;
+      });
+
+      if (totalBadge) totalBadge.textContent = `${filtered.length} Records`;
+
+      let html = `
+        <div class="db-table-wrapper">
+          <table class="sheets-db-table">
+            <thead>
+              <tr>
+                <th style="width:40px; text-align:center;">#</th>
+                <th>Shift ID</th>
+                <th>Date / Time</th>
+                <th>Casual Labour Name</th>
+                <th>MyKad / Passport ID</th>
+                <th style="text-align:center;">Status</th>
+                <th style="text-align:center;">Attendance</th>
+              </tr>
+            </thead>
+            <tbody>`;
+
+      if (filtered.length === 0) {
+        html += `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No records found matching filters.</td></tr>`;
+      } else {
+        filtered.forEach((b, idx) => {
+          const targetUserId = b.user_id || b.doc_no;
+          const targetWorkerName = b.worker_name || b.name || "Casual Worker";
+          const rawStatus = String(b.status || '').toUpperCase();
+          const isConfirmed = (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED' || rawStatus === 'SUBNS');
+          const isCancelled = (rawStatus === 'CANCELLED');
+          
+          let statusTextClass = "confirmed";
+          let statusDisplayLabel = "CONFIRMED";
+          if (isCancelled) {
+            statusTextClass = "cancelled";
+            statusDisplayLabel = "CANCELLED";
+          } else if (!isConfirmed) {
+            statusTextClass = "waitlist";
+            statusDisplayLabel = "WAITLIST";
+          }
+
+          const shiftObj = cachedShifts.find(s => s.id === b.shift_id) || {};
+          const displayTime = formatAttendanceTime(b.time || shiftObj.time);
+          const displayDate = b.date || shiftObj.date || '';
+
+          let attStamp = b.attendance || "";
+          let isPresent = (attStamp && attStamp.toLowerCase() !== "no show" && attStamp !== "0" && attStamp !== "-");
+          let attBadgeHTML = isPresent 
+            ? `<span class="att-badge present"><i class="ph ph-check-circle"></i> ${formatFullTimestamp(attStamp)}</span>`
+            : `<span class="att-badge noshow"><i class="ph ph-x-circle"></i> No Show</span>`;
+
+          html += `
+            <tr>
+              <td style="text-align:center; font-family:monospace; color:#64748b; background:#f8fafc;">${idx + 1}</td>
+              <td class="sheet-cell-id">${b.shift_id}</td>
+              <td>${displayDate} <span class="sheet-cell-sub">(${displayTime})</span></td>
+              <td class="sheet-cell-name">
+                <span class="view-drawable-name" onclick="openWorkerProfileDrawer('${targetUserId}', '${targetWorkerName.replace(/'/g, "\\'")}')">${targetWorkerName}</span>
+              </td>
+              <td class="sheet-cell-sub">${targetUserId}</td>
+              <td style="text-align:center;">
+                <span class="status-text-badge ${statusTextClass}">${statusDisplayLabel}</span>
+              </td>
+              <td style="text-align:center;">${attBadgeHTML}</td>
+            </tr>`;
+        });
+      }
+
+      html += `</tbody></table></div>`;
+      tableRoot.innerHTML = html;
+    }
+
+    /* Tab 3: Worker Manager / Staffing Manager (With Profile Pictures) */
     function populateWorkerManagerShifts() {
       const selectEl = document.getElementById('wm-shift-select');
       if (!selectEl) return;
@@ -1420,27 +1507,24 @@
         return;
       }
 
-      // Filter: All active non-cancelled bookings for this shift
       const shiftBookings = cachedBookings.filter(b => 
         b.shift_id === shift.id && 
         String(b.status).toUpperCase() !== 'CANCELLED'
       );
 
-      // Scorecard Calculations
       const totalApproved = shiftBookings.filter(b => {
         const status = String(b.status).toUpperCase();
-        return status === 'SUBMITTED' || status === 'CONFIRMED';
+        return status === 'SUBMITTED' || status === 'CONFIRMED' || status === 'SUBNS';
       }).length;
 
       const totalWaitlist = shiftBookings.filter(b => {
         const status = String(b.status).toUpperCase();
-        return status === 'WAITLIST' || status === 'WAITING LIST';
+        return status.includes('WAIT');
       }).length;
 
       const totalCL = totalApproved + totalWaitlist;
       const totalSlots = shift.slots || shift.totalSlots || shift.Slots || 0;
 
-      // Render Scorecard
       if (topScorecardEl) {
         topScorecardEl.innerHTML = `
           <div class="wm-scorecard-grid">
@@ -1459,10 +1543,10 @@
           </div>`;
       }
 
-      // Filter rows based on Status + Document Type Checkboxes
       let displayedBookings = shiftBookings.filter(b => {
         const targetUserId = b.user_id || b.doc_no;
-        const isConfirmed = (String(b.status).toUpperCase() === 'SUBMITTED' || String(b.status).toUpperCase() === 'CONFIRMED');
+        const st = String(b.status).toUpperCase();
+        const isConfirmed = (st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS');
         if (statusFilter === 'CONFIRMED' && !isConfirmed) return false;
         if (statusFilter === 'WAITLIST' && isConfirmed) return false;
 
@@ -1506,7 +1590,8 @@
         displayedBookings.forEach(w => {
           const targetUserId = w.user_id || w.doc_no;
           const targetWorkerName = w.worker_name || w.name || "Casual Worker";
-          const isConfirmed = (String(w.status).toUpperCase() === 'SUBMITTED' || String(w.status).toUpperCase() === 'CONFIRMED');
+          const st = String(w.status).toUpperCase();
+          const isConfirmed = (st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS');
           const selectClass = isConfirmed ? "status-confirmed" : "status-waitlist";
 
           const photoUrl = w.photo_url || w.photo || defaultRacerSilhouette;
@@ -1518,7 +1603,7 @@
             <tr>
               <td>
                 <div class="worker-profile-cell">
-                  <div class="worker-avatar-frame" style="width: 36px; height: 42px;">
+                  <div class="worker-avatar-frame">
                     <img src="${photoUrl}" class="worker-avatar" alt="Photo" onerror="this.onerror=null; this.src='${defaultRacerSilhouette}';" />
                   </div>
                   <div>
@@ -1581,7 +1666,6 @@
       URL.revokeObjectURL(url);
     }
 
-    // DIRECT SUPABASE WRITE FOR WORKER STATUS PROMOTION / DEMOTION
     async function toggleWorkerStatus(shiftId, workerId, targetToWaitlist) {
       const promptMsg = targetToWaitlist === 'true' 
         ? `Demote Worker ID: ${workerId} back to Standby Waitlist?` 
@@ -1635,15 +1719,15 @@
       historySubset.forEach(b => {
         const rawStatus = String(b.status).toUpperCase();
         const attendanceStr = String(b.attendance || "").trim().toLowerCase();
-        if (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED') totalConfirmed++;
+        if (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED' || rawStatus === 'SUBNS') totalConfirmed++;
         if (attendanceStr === 'no show') noShows++;
 
         let matchingShift = cachedShifts.find(s => String(s.id).toUpperCase() === String(b.shift_id).toUpperCase());
         let finalDisplayDate = b.date || (matchingShift ? matchingShift.date : "N/A");
         let finalDisplayDept = b.dept || (matchingShift ? matchingShift.dept : "N/A");
 
-        let statusPill = (rawStatus === 'CANCELLED') ? '<span class="status-pill pill-cancelled">Cancelled</span>' : ((rawStatus === 'WAITLIST' || rawStatus === 'WAITING LIST') ? '<span class="status-pill pill-wait">Waitlist</span>' : '<span class="status-pill pill-sub">Confirmed</span>');
-        let attendanceDisplay = (rawStatus === 'CANCELLED' || rawStatus === 'WAITLIST' || rawStatus === 'WAITING LIST') ? `<span style="color:var(--text-muted); font-weight:700;">-</span>` : ((attendanceStr === "no show" || attendanceStr === "" || attendanceStr === "0") ? `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>` : `<span style="color:var(--text-main); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`);
+        let statusPill = (rawStatus === 'CANCELLED') ? '<span class="status-pill pill-cancelled">Cancelled</span>' : (rawStatus.includes('WAIT') ? '<span class="status-pill pill-wait">Waitlist</span>' : '<span class="status-pill pill-sub">Confirmed</span>');
+        let attendanceDisplay = (rawStatus === 'CANCELLED' || rawStatus.includes('WAIT')) ? `<span style="color:var(--text-muted); font-weight:700;">-</span>` : ((attendanceStr === "no show" || attendanceStr === "" || attendanceStr === "0") ? `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>` : `<span style="color:var(--text-main); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`);
 
         profileRowsMarkup += `
           <tr>
