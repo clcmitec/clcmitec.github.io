@@ -208,8 +208,9 @@
 
     /* GOOGLE SHEETS / SPREADSHEET STYLE DATABASE TABLE (Tab 2) */
     .db-console-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 6px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-    .db-filter-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; }
-    @media (max-width: 768px) { .db-filter-grid { grid-template-columns: 1fr; } }
+    .db-filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    @media (max-width: 900px) { .db-filter-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 500px) { .db-filter-grid { grid-template-columns: 1fr; } }
 
     .db-checkbox-filters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 0 14px 0; border-top: 1px dashed var(--border-thin); margin-bottom: 10px; }
     @media (max-width: 768px) { .db-checkbox-filters-row { grid-template-columns: 1fr; } }
@@ -464,12 +465,12 @@
       <div id="stats-view-container"></div>
     </div>
 
-    <!-- PAGE 2: DATABASE TABLE CONSOLE (No Dept, Plain Status Text, Checkbox Filters, Full Pagination Fetch) -->
+    <!-- PAGE 2: DATABASE TABLE CONSOLE (With Date Range Pickers) -->
     <div id="page-2" class="app-page">
       <div class="section-label">Supabase Spreadsheet Master Records <span id="db-total-badge" class="matrix-title-badge">0 Records</span></div>
       
       <div class="db-console-card">
-        <!-- Search & Department Filter -->
+        <!-- Search, Department & Date Range Filters -->
         <div class="db-filter-grid">
           <div class="form-group" style="margin-bottom:0;">
             <label style="font-size:10px;">Search Sheet Records</label>
@@ -483,6 +484,14 @@
             <select id="db-dept-filter" class="form-control" style="height:38px; font-size:11px; font-weight:700;" onchange="renderDatabaseTableConsole()">
               <option value="ALL">ALL DEPARTMENTS</option>
             </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:10px;">From Date</label>
+            <input type="date" id="db-from-date" class="form-control" style="height:38px; font-size:11px;" onchange="renderDatabaseTableConsole()" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:10px;">To Date</label>
+            <input type="date" id="db-to-date" class="form-control" style="height:38px; font-size:11px;" onchange="renderDatabaseTableConsole()" />
           </div>
         </div>
 
@@ -827,6 +836,16 @@
       return new Date(0);
     }
 
+    function parseRecordDateToYYYYMMDD(dateStr) {
+      if (!dateStr) return '';
+      let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
+      let parts = clean.split('.');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+      return '';
+    }
+
     function isFutureOrToday(dateStr) {
       if (!dateStr) return false;
       let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
@@ -890,13 +909,8 @@
           "Authorization": `Bearer ${SUPABASE_KEY}` 
         };
 
-        // 1. Fetch Shift Master
         const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers }).then(r => r.json());
-
-        // 2. Fetch Profiles for Worker Data Matching
         const profilesPromise = fetch(`${SUPABASE_URL}/rest/v1/casual_labour_profile?select=*`, { headers }).then(r => r.json());
-
-        // 3. Fetch All Bookings via Paginated Fetcher
         const bookingsPromise = fetchAllBookings(headers);
 
         const [shiftsRes, profilesRes, bookingsRes] = await Promise.all([shiftsPromise, profilesPromise, bookingsPromise]);
@@ -905,7 +919,6 @@
         const validProfiles = Array.isArray(profilesRes) ? profilesRes : [];
         const validBookings = Array.isArray(bookingsRes) ? bookingsRes : [];
 
-        // Build worker profile map by doc_no
         const workerMap = {};
         validProfiles.forEach(p => {
           const rawDoc = String(p.doc_no || p.id || '').trim().replace(/^'/, '');
@@ -918,10 +931,8 @@
           }
         });
 
-        // Store Admin Session
         try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
 
-        // Map cached shifts
         cachedShifts = validShifts.map(s => ({
           ...s,
           id: s.shift_id,
@@ -934,7 +945,6 @@
           notes: s.notes || ''
         }));
 
-        // Map cached bookings dynamically linking shift_master and casual_labour_profile
         cachedBookings = validBookings.map(b => {
           const shiftData = b.shift_master || {};
           const profileData = b.casual_labour_profile || {};
@@ -960,7 +970,6 @@
           };
         });
 
-        // Verify Admin Key Display
         const currentAdminProfile = workerMap[activeAdminKey.replace(/^'/, '')];
         if (currentAdminProfile && currentAdminProfile.name) {
           document.getElementById("adminUserDisplayTag").textContent = currentAdminProfile.name.toUpperCase();
@@ -1320,9 +1329,16 @@
       }
     }
 
-    /* Tab 2: Database Table Console (No Dept, Plain Status Text, Checkbox Filters) */
+    /* Tab 2: Database Table Console (With Date Pickers, Defaulting to Today) */
     function populateDatabaseConsoleFilters() {
       const deptSelect = document.getElementById('db-dept-filter');
+      const fromDateInput = document.getElementById('db-from-date');
+      const toDateInput = document.getElementById('db-to-date');
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (fromDateInput && !fromDateInput.value) fromDateInput.value = todayStr;
+      if (toDateInput && !toDateInput.value) toDateInput.value = todayStr;
+
       if (!deptSelect) return;
 
       const uniqueDepts = [...new Set(cachedShifts.map(s => s.dept))].filter(Boolean).sort();
@@ -1337,6 +1353,8 @@
     function renderDatabaseTableConsole() {
       const searchInput = document.getElementById('db-search-input');
       const deptFilter = document.getElementById('db-dept-filter');
+      const fromDateInput = document.getElementById('db-from-date');
+      const toDateInput = document.getElementById('db-to-date');
       
       const chkConf = document.getElementById('chk-stat-conf') ? document.getElementById('chk-stat-conf').checked : true;
       const chkWait = document.getElementById('chk-stat-wait') ? document.getElementById('chk-stat-wait').checked : true;
@@ -1352,6 +1370,8 @@
 
       const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
       const selectedDept = deptFilter ? deptFilter.value : 'ALL';
+      const fromVal = fromDateInput ? fromDateInput.value : '';
+      const toVal = toDateInput ? toDateInput.value : '';
 
       let filtered = cachedBookings.filter(b => {
         const workerName = String(b.worker_name || b.name || '').toLowerCase();
@@ -1369,6 +1389,12 @@
         if (selectedDept !== 'ALL' && dept !== selectedDept.toUpperCase()) {
           return false;
         }
+
+        // Date Range Filtering
+        const recordDateStr = b.date || shiftObj.date || '';
+        const recordYYYYMMDD = parseRecordDateToYYYYMMDD(recordDateStr);
+        if (fromVal && recordYYYYMMDD && recordYYYYMMDD < fromVal) return false;
+        if (toVal && recordYYYYMMDD && recordYYYYMMDD > toVal) return false;
 
         // Status Tickbox Filtering
         const isConfirmedStatus = (status === 'CONFIRMED' || status === 'SUBNS' || status === 'SUBMITTED');
