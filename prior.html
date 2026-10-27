@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>MITEC — Worker Access Manager</title>
+  <title>MITEC — Worker Access & Priority Manager</title>
 
   <!-- Fonts (Inter) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,7 +35,7 @@
     body { 
       background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #e2e8f0 100%);
       color: var(--foreground); 
-      padding-bottom: 60px; 
+      padding-bottom: 80px; 
       min-height: 100vh;
     }
 
@@ -65,6 +65,34 @@
     .back-action-arrow:hover { transform: translateY(-1px); }
 
     .portal-container { max-width: 650px; margin: 0 auto; padding: 16px; }
+
+    /* Custom Navigation Tabs styling */
+    .nav-tabs-custom {
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: var(--radius);
+      border: none;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+    .nav-tabs-custom .nav-link {
+      color: #475569;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      border-radius: calc(var(--radius) - 0.2rem);
+      padding: 8px 12px;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .nav-tabs-custom .nav-link:hover {
+      color: var(--primary);
+    }
+    .nav-tabs-custom .nav-link.active {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      color: var(--primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
 
     .admin-card {
       background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
@@ -130,18 +158,85 @@
   </header>
 
   <div class="portal-container">
-    <div class="admin-card mb-3">
-      <h1 class="h6 fw-bold mb-2">Access Control Whitelist & Ban List</h1>
-      <p class="text-muted small mb-3">Manage priority booking privileges or temporary booking bans for workers from a single consolidated table.</p>
-      
-      <div class="input-group">
-        <span class="input-group-text bg-white border-end-0"><i class="ph ph-magnifying-glass text-muted"></i></span>
-        <input type="text" id="searchInput" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search by name or document number..." onkeyup="filterWorkers()">
-      </div>
-    </div>
+    
+    <!-- NAVIGATION TABS -->
+    <ul class="nav nav-tabs nav-tabs-custom nav-justified" id="managerTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab1-btn" data-bs-toggle="tab" data-bs-target="#tab1-pane" type="button" role="tab"><i class="ph ph-users"></i> All Workers</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab2-btn" data-bs-toggle="tab" data-bs-target="#tab2-pane" type="button" role="tab"><i class="ph ph-star"></i> Priority List</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab3-btn" data-bs-toggle="tab" data-bs-target="#tab3-pane" type="button" role="tab"><i class="ph ph-prohibit"></i> Banned Workers</button>
+      </li>
+    </ul>
 
-    <div id="workersListContainer">
-      <p class="text-center text-muted py-5 small">Loading database...</p>
+    <!-- TAB CONTENTS -->
+    <div class="tab-content">
+      
+      <!-- TAB 1: ALL WORKERS WITH GLOBAL SEARCH & DOC TYPE FILTER -->
+      <div class="tab-pane fade show active" id="tab1-pane" role="tabpanel">
+        <div class="admin-card mb-3">
+          <h1 class="h6 fw-bold mb-2">Worker Directory</h1>
+          <p class="text-muted small mb-3">Alphabetical list of registered workers. Filter by document type or search names.</p>
+          
+          <div class="row g-2">
+            <div class="col-8">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="ph ph-magnifying-glass text-muted"></i></span>
+                <input type="text" id="searchInputTab1" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search name or ID..." onkeyup="renderTab1()">
+              </div>
+            </div>
+            <div class="col-4">
+              <select id="docTypeFilter" class="form-select shadow-none" style="font-size: 12px;" onchange="renderTab1()">
+                <option value="ALL">All Types</option>
+                <option value="MYKAD">MyKad</option>
+                <option value="PASSPORT">Passport</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab1Container">
+          <p class="text-center text-muted py-5 small">Loading workers...</p>
+        </div>
+      </div>
+
+      <!-- TAB 2: PRIORITY WORKERS -->
+      <div class="tab-pane fade" id="tab2-pane" role="tabpanel">
+        <div class="admin-card mb-3">
+          <h1 class="h6 fw-bold mb-2">Priority Whitelist</h1>
+          <p class="text-muted small mb-3">Workers with booking priority matching MyKad holders. Click revoke to remove status.</p>
+          
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0"><i class="ph ph-magnifying-glass text-muted"></i></span>
+            <input type="text" id="searchInputTab2" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search priority workers..." onkeyup="renderTab2()">
+          </div>
+        </div>
+
+        <div id="tab2Container">
+          <p class="text-center text-muted py-5 small">Loading priority list...</p>
+        </div>
+      </div>
+
+      <!-- TAB 3: BANNED WORKERS -->
+      <div class="tab-pane fade" id="tab3-pane" role="tabpanel">
+        <div class="admin-card mb-3">
+          <h1 class="h6 fw-bold mb-2">Temporarily Banned Workers</h1>
+          <p class="text-muted small mb-3">Workers currently suspended from booking shifts. Click unban to restore access.</p>
+          
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0"><i class="ph ph-magnifying-glass text-muted"></i></span>
+            <input type="text" id="searchInputTab3" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search banned workers..." onkeyup="renderTab3()">
+          </div>
+        </div>
+
+        <div id="tab3Container">
+          <p class="text-center text-muted py-5 small">Loading banned list...</p>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -150,7 +245,7 @@
     const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
 
     let allWorkers = [];
-    let accessMap = {}; // Maps doc_no -> { is_priority, is_banned }
+    let accessMap = {}; // Maps clean doc_no -> { is_priority, is_banned }
 
     window.onload = () => { fetchData(); };
 
@@ -167,6 +262,13 @@
 
         allWorkers = Array.isArray(profileRes) ? profileRes : [];
         
+        // Sort alphabetically by name
+        allWorkers.sort((a, b) => {
+          const nameA = String(a.full_name || a.name_mykad || '').toUpperCase();
+          const nameB = String(b.full_name || b.name_mykad || '').toUpperCase();
+          return nameA.localeCompare(nameB);
+        });
+
         accessMap = {};
         if (Array.isArray(accessRes)) {
           accessRes.forEach(row => {
@@ -178,22 +280,43 @@
           });
         }
 
-        renderWorkers(allWorkers);
+        renderAllTabs();
       } catch (err) {
         console.error("Error fetching database:", err);
-        document.getElementById('workersListContainer').innerHTML = '<p class="text-center text-danger small py-4">Failed to load profiles.</p>';
+        document.getElementById('tab1Container').innerHTML = '<p class="text-center text-danger small py-4">Failed to load profiles.</p>';
       }
     }
 
-    function renderWorkers(workers) {
-      const container = document.getElementById('workersListContainer');
-      if (workers.length === 0) {
-        container.innerHTML = '<p class="text-center text-muted py-4 small">No workers found.</p>';
+    function renderAllTabs() {
+      renderTab1();
+      renderTab2();
+      renderTab3();
+    }
+
+    // --- TAB 1 RENDERER ---
+    function renderTab1() {
+      const container = document.getElementById('tab1Container');
+      const query = document.getElementById('searchInputTab1').value.toLowerCase();
+      const typeFilter = document.getElementById('docTypeFilter').value;
+
+      const filtered = allWorkers.filter(w => {
+        const docNo = String(w.doc_no || w.mykad || '').trim();
+        const cleanDocNo = docNo.replace(/^'/, '').toUpperCase();
+        const name = String(w.full_name || w.name_mykad || '').toLowerCase();
+        const docType = String(w.document_type || (/^[a-zA-Z]/.test(cleanDocNo) ? 'PASSPORT' : 'MYKAD')).toUpperCase();
+
+        const matchesQuery = name.includes(query) || cleanDocNo.includes(query);
+        const matchesType = typeFilter === 'ALL' || docType === typeFilter;
+        return matchesQuery && matchesType;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted py-4 small">No workers found matching filters.</p>';
         return;
       }
 
       let html = '';
-      workers.forEach(w => {
+      filtered.forEach(w => {
         const docNo = String(w.doc_no || w.mykad || '').trim();
         const cleanDocNo = docNo.replace(/^'/, '').toUpperCase();
         const name = w.full_name || w.name_mykad || 'Unknown Worker';
@@ -202,11 +325,8 @@
         const workerAccess = accessMap[cleanDocNo] || { is_priority: false, is_banned: false };
 
         let statusBadge = '<span class="badge-standard">STANDARD</span>';
-        if (workerAccess.is_banned) {
-          statusBadge = '<span class="badge-banned">TEMP BANNED</span>';
-        } else if (workerAccess.is_priority) {
-          statusBadge = '<span class="badge-priority">PRIORITY</span>';
-        }
+        if (workerAccess.is_banned) statusBadge = '<span class="badge-banned">TEMP BANNED</span>';
+        else if (workerAccess.is_priority) statusBadge = '<span class="badge-priority">PRIORITY</span>';
 
         html += `
           <div class="admin-card d-flex align-items-center justify-content-between py-3 mb-2">
@@ -224,7 +344,6 @@
                 `<button class="btn btn-unban" onclick="updateAccess('${cleanDocNo}', '${name}', { is_banned: false })"><i class="ph ph-check-circle"></i> Unban</button>` :
                 `<button class="btn btn-ban" onclick="updateAccess('${cleanDocNo}', '${name}', { is_banned: true })"><i class="ph ph-prohibit"></i> Temp Ban</button>`
               }
-              
               ${!workerAccess.is_banned ? (workerAccess.is_priority ? 
                 `<button class="btn btn-revoke" onclick="updateAccess('${cleanDocNo}', '${name}', { is_priority: false })">Revoke Priority</button>` : 
                 `<button class="btn btn-grant" onclick="updateAccess('${cleanDocNo}', '${name}', { is_priority: true })">Grant Priority</button>`
@@ -232,26 +351,111 @@
             </div>
           </div>`;
       });
-
       container.innerHTML = html;
     }
 
-    function filterWorkers() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = allWorkers.filter(w => {
+    // --- TAB 2 RENDERER (PRIORITY ONLY) ---
+    function renderTab2() {
+      const container = document.getElementById('tab2Container');
+      const query = document.getElementById('searchInputTab2').value.toLowerCase();
+
+      const priorityWorkers = allWorkers.filter(w => {
+        const cleanDocNo = String(w.doc_no || w.mykad || '').trim().replace(/^'/, '').toUpperCase();
+        const workerAccess = accessMap[cleanDocNo];
+        return workerAccess && workerAccess.is_priority && !workerAccess.is_banned;
+      });
+
+      const filtered = priorityWorkers.filter(w => {
         const name = String(w.full_name || w.name_mykad || '').toLowerCase();
         const doc = String(w.doc_no || w.mykad || '').toLowerCase();
         return name.includes(query) || doc.includes(query);
       });
-      renderWorkers(filtered);
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted py-4 small">No priority workers found.</p>';
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(w => {
+        const docNo = String(w.doc_no || w.mykad || '').trim();
+        const cleanDocNo = docNo.replace(/^'/, '').toUpperCase();
+        const name = w.full_name || w.name_mykad || 'Unknown Worker';
+        const docType = String(w.document_type || (/^[a-zA-Z]/.test(cleanDocNo) ? 'PASSPORT' : 'MYKAD')).toUpperCase();
+
+        html += `
+          <div class="admin-card d-flex align-items-center justify-content-between py-3 mb-2">
+            <div>
+              <div class="fw-semibold text-dark mb-1" style="font-size: 13px;">${name}</div>
+              <div class="text-muted d-flex align-items-center gap-2 mb-2" style="font-size: 11px;">
+                <span><i class="ph ph-identification-card"></i> ${docNo}</span>
+                <span>•</span>
+                <span>${docType}</span>
+              </div>
+              <div><span class="badge-priority">PRIORITY ACTIVE</span></div>
+            </div>
+            <div>
+              <button class="btn btn-revoke" onclick="updateAccess('${cleanDocNo}', '${name}', { is_priority: false })">Revoke Priority</button>
+            </div>
+          </div>`;
+      });
+      container.innerHTML = html;
     }
 
+    // --- TAB 3 RENDERER (BANNED ONLY) ---
+    function renderTab3() {
+      const container = document.getElementById('tab3Container');
+      const query = document.getElementById('searchInputTab3').value.toLowerCase();
+
+      const bannedWorkers = allWorkers.filter(w => {
+        const cleanDocNo = String(w.doc_no || w.mykad || '').trim().replace(/^'/, '').toUpperCase();
+        const workerAccess = accessMap[cleanDocNo];
+        return workerAccess && workerAccess.is_banned;
+      });
+
+      const filtered = bannedWorkers.filter(w => {
+        const name = String(w.full_name || w.name_mykad || '').toLowerCase();
+        const doc = String(w.doc_no || w.mykad || '').toLowerCase();
+        return name.includes(query) || doc.includes(query);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted py-4 small">No banned workers found.</p>';
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(w => {
+        const docNo = String(w.doc_no || w.mykad || '').trim();
+        const cleanDocNo = docNo.replace(/^'/, '').toUpperCase();
+        const name = w.full_name || w.name_mykad || 'Unknown Worker';
+        const docType = String(w.document_type || (/^[a-zA-Z]/.test(cleanDocNo) ? 'PASSPORT' : 'MYKAD')).toUpperCase();
+
+        html += `
+          <div class="admin-card d-flex align-items-center justify-content-between py-3 mb-2">
+            <div>
+              <div class="fw-semibold text-dark mb-1" style="font-size: 13px;">${name}</div>
+              <div class="text-muted d-flex align-items-center gap-2 mb-2" style="font-size: 11px;">
+                <span><i class="ph ph-identification-card"></i> ${docNo}</span>
+                <span>•</span>
+                <span>${docType}</span>
+              </div>
+              <div><span class="badge-banned">TEMP BANNED</span></div>
+            </div>
+            <div>
+              <button class="btn btn-unban" onclick="updateAccess('${cleanDocNo}', '${name}', { is_banned: false })"><i class="ph ph-check-circle"></i> Unban</button>
+            </div>
+          </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    // --- UPDATE DATABASE & LOCAL MAP ---
     async function updateAccess(docNo, name, updates) {
       showLoader(true);
       const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" };
       const formattedDocNo = `'${docNo.replace(/^'/, '')}`;
 
-      // Get current state or defaults
       const current = accessMap[docNo] || { is_priority: false, is_banned: false };
       const newPriority = updates.hasOwnProperty('is_priority') ? updates.is_priority : current.is_priority;
       const newBanned = updates.hasOwnProperty('is_banned') ? updates.is_banned : current.is_banned;
@@ -273,7 +477,7 @@
 
         if (res.ok) {
           accessMap[docNo] = { is_priority: newPriority, is_banned: newBanned };
-          filterWorkers();
+          renderAllTabs();
         } else {
           alert("Operation failed.");
         }
