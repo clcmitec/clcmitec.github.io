@@ -3,18 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MITEC — Passport Shift Manager</title>
+  <title>MITEC — Staffing Manager Console (Passport Only)</title>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Google Tag -->
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-S3RRBZB4NJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-S3RRBZB4NJ');
+  </script>
+
   <style>
     :root {
-      --admin-dark: #092253;
-      --admin-gradient: linear-gradient(135deg, #092253 0%, #153269 100%);
-      --bg-slate: #f8fafc;
+      /* MITEC Navy Blue Theme Palette */
+      --mitec-black: #111111;
+      --mitec-dark-nav: #1e4385;
+      --mitec-blue: #1B365D;
+      --mitec-blue-hover: #2D68C4;
+      --mitec-accent: #0f4a82;
+      --bg-slate: #f4f6f9;
       --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-thin: #e2e8f0;
-      
+      --text-main: #1d1d1f;
+      --text-muted: #51525c;
+      --text-light: #ffffff;
+      --border-thin: #cbd5e1;
+
+      /* Status Pill Color Palette */
       --pill-amber-bg: #fffbeb;
       --pill-amber-text: #b45309;
       --pill-amber-border: #fef3c7;
@@ -23,110 +39,212 @@
       --pill-red-text: #9b1c1c;
       --pill-red-border: #fbd5d5;
 
-      --accent-warn: #9b1c1c;
-      --font-main: 'Trebuchet MS', sans-serif;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-    body { margin: 0; background-color: var(--bg-slate); font-family: var(--font-main); color: var(--text-main); padding-bottom: 90px; }
-    
-    .header { 
-      position: sticky; 
-      top: 0; 
-      z-index: 1100; 
-      background: #fff; 
-      border-bottom: 1px solid var(--border-thin); 
-      height: 60px; 
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
+    body { background-color: var(--bg-slate); font-family: var(--font-main); color: var(--text-main); line-height: 1.5; padding-bottom: 60px; }
+
+    /* Top Utility Bar */
+    .top-bar {
+      background: var(--mitec-black);
+      color: #888;
+      font-size: 0.75rem;
+      padding: 0.5rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #222;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .top-bar-left { display: flex; align-items: center; gap: 8px; color: #aaa; }
+    .top-bar-left .live-dot { width: 8px; height: 8px; background: var(--mitec-blue-hover); border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    /* Sticky Main Navigation */
+    .main-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1100;
+      background: var(--mitec-dark-nav);
+      color: var(--text-light);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .brand-container { display: flex; align-items: center; gap: 12px; }
+    .brand-img { height: 28px; width: auto; display: block; filter: brightness(0) invert(1); }
+
+    .user-profile-tag { 
+      font-size: 10px; 
+      font-weight: 800; 
+      color: #ffffff; 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px; 
+      background: var(--mitec-blue-hover); 
+      padding: 4px 10px; 
+      border-radius: 4px; 
+      max-width: 200px; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px 15px; }
+
+    /* Login Overlay */
+    #login-overlay { position: fixed; inset: 0; background: var(--mitec-black); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .login-card { background: #fff; width: 100%; max-width: 400px; border-radius: 12px; padding: 36px 28px; border: 1px solid var(--border-thin); box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; }
+    .login-logo { font-size: 48px; color: var(--mitec-blue); margin-bottom: 12px; }
+
+    .section-label { 
+      font-size: 11px; 
+      font-weight: 900; 
+      color: var(--text-main); 
+      margin: 20px 0 12px 2px; 
+      text-transform: uppercase; 
+      letter-spacing: 1.5px; 
       display: flex; 
       align-items: center; 
-      justify-content: space-between; 
-      padding: 0 16px; 
+      gap: 10px; 
     }
-    .brand-img { height: 20px; width: auto; display: block; }
-    .user-profile-tag { font-size: 11px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; letter-spacing: 0.5px; background: #e2e8f0; padding: 5px 12px; border-radius: 6px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
-    .container { max-width: 500px; margin: 0 auto; padding: 15px; }
-
-    #login-overlay { position: fixed; inset: 0; background: var(--bg-slate); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .login-card { background: #fff; width: 100%; max-width: 400px; border-radius: 16px; padding: 32px 24px; border: 1px solid var(--border-thin); box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
-    .login-logo { font-size: 44px; color: var(--admin-dark); margin-bottom: 12px; }
-
-    .section-label { font-size: 11px; font-weight: 800; color: var(--admin-dark); margin: 20px 0 12px 5px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
     .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border-thin); }
 
-    .filter-panel-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+    /* Filter Panel & Cards */
+    .filter-panel-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+    .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .doc-type-filter-group { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-thin); }
+    .doc-type-options { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
+    .checkbox-label { font-size: 12px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--mitec-blue); cursor: pointer; }
 
-    .wm-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .wm-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     .wm-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .wm-header-title { font-size: 22px; font-weight: 800; color: var(--admin-dark); margin: 0 0 10px 0; text-transform: uppercase; }
+    .wm-header-title { font-size: 24px; font-weight: 900; color: var(--text-main); margin: 0 0 10px 0; text-transform: uppercase; }
     .wm-meta-line { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
 
-    .btn-download-roster { background: #f1f5f9; color: var(--admin-dark); border: 1px solid var(--border-thin); border-radius: 8px; padding: 8px 12px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700; transition: 0.15s; }
+    .btn-download-roster { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-thin); border-radius: 6px; padding: 8px 12px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700; transition: 0.15s; }
     .btn-download-roster:active { transform: scale(0.95); background: #e2e8f0; }
 
-    .wm-scorecard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0 16px 0; }
-    .wm-stat-card { background: #f8fafc; border: 1px solid #103e98; border-radius: 10px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; }
-    .wm-stat-label { font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.3px; line-height: 1.1; }
-    .wm-stat-value { font-size: 18px; font-weight: 800; color: #103e98; }
-
     .wm-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; text-align: left; }
-    .wm-table th { background: #f8fafc; padding: 12px 8px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
+    .wm-table th { background: #f8fafc; padding: 12px 8px; font-weight: 800; color: var(--text-main); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
     .wm-table td { padding: 14px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
 
-    .worker-profile-cell { display: flex; align-items: center; gap: 10px; }
-    .worker-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background-color: #e2e8f0; flex-shrink: 0; border: 1px solid var(--border-thin); }
+    .wm-scorecard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0 16px 0; }
+    .wm-stat-card { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 8px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; }
+    .wm-stat-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.3px; line-height: 1.1; }
+    .wm-stat-value { font-size: 18px; font-weight: 900; color: var(--mitec-blue); }
 
-    .wm-status-select-wrapper { position: relative; display: inline-block; width: 100%; max-width: 135px; }
-    .wm-status-select { width: 100%; padding: 8px 24px 8px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
-    .wm-status-select.status-confirmed { background-color: var(--admin-dark); color: #ffffff; border: 1px solid var(--admin-dark); }
+    /* Worker Profile Photo Frame */
+    .worker-profile-cell { display: flex; align-items: center; gap: 12px; }
+    .worker-avatar-frame {
+      width: 42px;
+      height: 48px;
+      background: linear-gradient(180deg, #2b2b2b 0%, #111111 100%);
+      border-radius: 6px 6px 0 0;
+      border: 1px solid #333;
+      border-bottom: 2px solid var(--mitec-blue);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .worker-avatar { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      object-position: top center;
+      display: block;
+    }
+
+    .wm-status-select-wrapper { position: relative; display: inline-block; width: 100%; max-width: 120px; }
+    .wm-status-select { width: 100%; padding: 4px 18px 4px 6px; border-radius: 3px; font-size: 9px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
+    .wm-status-select.status-confirmed { background-color: var(--mitec-blue); color: #ffffff; border: 1px solid var(--mitec-blue); }
     .wm-status-select.status-waitlist { background-color: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
-    .wm-status-chevron { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 12px; }
+    .wm-status-select.status-cancelled { background-color: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
+    .wm-status-chevron { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 9px; }
     .status-confirmed + .wm-status-chevron { color: #ffffff; }
     .status-waitlist + .wm-status-chevron { color: var(--pill-amber-text); }
+    .status-cancelled + .wm-status-chevron { color: var(--pill-red-text); }
 
-    .btn-call-action { background: #fff; color: var(--admin-dark); border: 1.5px solid var(--admin-dark); font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.15s; width: 100%; max-width: 100px; }
-    .btn-call-action:active { background: #f1f5f9; transform: scale(0.96); }
+    .btn-call-action { background: #fff; color: var(--mitec-blue); border: 1px solid var(--mitec-blue); font-size: 10px; font-weight: 800; padding: 6px 14px; border-radius: 4px; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.15s; width: 100%; max-width: 90px; }
+    .btn-call-action:hover { background: var(--mitec-blue); color: #fff; }
+    .btn-call-action:active { transform: scale(0.96); }
 
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 2000; display: none; align-items: flex-end; }
-    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 24px 20px; overflow-y: auto; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
-    .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
-    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--admin-dark); font-weight: 800; display: flex; flex-direction: column; gap: 4px; }
-    .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
-    .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; }
-    
+    .view-drawable-name { color: var(--text-main); font-weight: 800; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
+    .view-drawable-name:hover { color: var(--mitec-blue-hover); text-decoration: underline; }
+
+    /* Drawer Overlay */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(2px); z-index: 2500; display: none; align-items: flex-end; }
+    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 26px 22px; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.25); border-top: 4px solid var(--mitec-blue); }
+    .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
+    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--text-main); font-weight: 900; text-transform: uppercase; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; text-transform: none; }
+    .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; transition: color 0.2s; }
+    .btn-close-drawer:hover { color: var(--mitec-blue-hover); }
+
     .roster-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; text-align: left; }
-    .roster-table th { background: #f8fafc; padding: 12px 10px; font-weight: 700; color: var(--admin-dark); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
-    .roster-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
-    .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
-    
-    .pill-sub { background: var(--admin-dark); color: #ffffff; border: 1px solid var(--admin-dark); }
-    .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
-    
-    .form-group { margin-bottom: 16px; text-align: left; }
-    .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--admin-dark); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 10px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--admin-dark); background: #fff; appearance: auto; }
-    .form-control:focus { outline: none; border-color: var(--admin-dark); box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.05); }
-    
-    .btn-submit-shift { width: 100%; height: 50px; background: var(--admin-dark); color: #fff; font-size: 14px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.15s; }
-    .btn-submit-shift:active { transform: scale(0.98); }
-    .btn-logout { background: none; border: 1px solid var(--pill-red-text); color: var(--pill-red-text); font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.15s; }
+    .roster-table th { background: var(--mitec-black); padding: 10px; font-weight: 800; color: #fff; text-transform: uppercase; font-size: 9px; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-thin); }
+    .roster-table td { padding: 10px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
 
-    #sync-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: var(--admin-dark); letter-spacing: 1px; }
-    .loader-text { margin-top: 12px; }
+    .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
+    .pill-sub { background: var(--mitec-blue); color: #ffffff; border: 1px solid var(--mitec-blue); }
+    .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
+    .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
+
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-group label { display: block; font-size: 11px; font-weight: 900; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+
+    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 6px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--text-main); background: #fff; appearance: auto; }
+    .form-control:focus { outline: none; border-color: var(--mitec-blue); box-shadow: 0 0 0 3px rgba(27, 54, 93, 0.15); }
+    .btn-submit-shift { width: 100%; height: 48px; background: var(--mitec-blue); color: #fff; font-size: 13px; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+    .btn-submit-shift:hover { background: var(--mitec-blue-hover); }
+
+    .btn-logout { background: none; border: 1px solid var(--mitec-blue); color: var(--mitec-blue); font-weight: 800; font-size: 11px; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 20px; transition: 0.2s; letter-spacing: 0.5px; }
+    .btn-logout:hover { background: var(--mitec-blue); color: #fff; }
+
+    #sync-loader { position: fixed; inset: 0; background: var(--mitec-black); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #ffffff; letter-spacing: 1.5px; }
+    .loader-text { margin-top: 16px; text-transform: uppercase; }
+
+    /* Footer */
+    .footer { background: var(--mitec-black); color: #888; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 4px solid var(--mitec-blue); text-align: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
   </style>
 </head>
 <body>
+
+  <!-- TOP UTILITY BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span class="live-dot"></span> Staffing Operations Portal (Passport Only)
+    </div>
+    <div>Live Data Sync • Active</div>
+  </div>
+
+  <!-- HEADER / STICKY MAIN NAVIGATION -->
+  <nav class="main-nav">
+    <div class="brand-container">
+      <img class="brand-img" src="https://mitec.com.my/static/img/logos/logo-footer.png" alt="MITEC">
+    </div>
+    <div id="adminUserDisplayTag" class="user-profile-tag">STAFFING ADMIN</div>
+  </nav>
 
   <!-- LOGIN OVERLAY -->
   <div id="login-overlay">
     <div class="login-card">
       <div class="login-logo"><i class="ph ph-shield-check"></i></div>
-      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--admin-dark);">Passport Shift Manager</h2>
-      <p style="margin: 0 0 24px 0; font-size: 13px; color: var(--text-muted);">Please provide administrative key.</p>
+      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--text-main); font-weight: 900; text-transform: uppercase;">Staffing Console</h2>
+      <p style="margin: 0 0 24px 0; font-size: 13px; color: var(--text-muted); font-weight: 600;">Please provide administrative credentials.</p>
       <form id="login-form" onsubmit="handleAdminLogin(event)">
         <div class="form-group">
-          <label>MyKad / Passport ID</label>
-          <input type="text" id="login-id-input" class="form-control" placeholder="Enter administrative ID Key" required />
+          <label>Passport ID Key</label>
+          <input type="text" id="login-id-input" class="form-control" placeholder="Enter administrative Passport ID" required />
         </div>
         <button type="submit" class="btn-submit-shift" style="margin-top: 5px;">Verify Handshake</button>
       </form>
@@ -135,36 +253,40 @@
 
   <!-- SYNC LOADER -->
   <div id="sync-loader">
-    <i class="ph ph-gear-six ph-spin" style="font-size: 40px; color: var(--admin-dark);"></i>
-    <div class="loader-text">LOADING PASSPORT SHIFT MANAGER...</div>
+    <i class="ph ph-gear-six ph-spin" style="font-size: 44px; color: var(--mitec-blue-hover);"></i>
+    <div class="loader-text">Loading Staffing Portal...</div>
   </div>
-
-  <!-- HEADER -->
-  <header class="header">
-    <img class="brand-img" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
-    <div id="adminUserDisplayTag" class="user-profile-tag">PASSPORT MANAGER</div>
-  </header>
 
   <div class="container">
     <!-- Top Scorecard Container -->
     <div id="top-scorecard-root"></div>
 
-    <div class="section-label">Passport Worker Manager</div>
+    <div class="section-label">Worker Manager (Passport Filter Active)</div>
 
-    <!-- Upcoming Shift Selector Card -->
+    <!-- Filter Panel: Shift & Status -->
     <div class="filter-panel-card">
-      <div class="form-group" style="margin-bottom:0;">
-        <label style="font-size:10px;">Select Upcoming Shift</label>
-        <select id="wm-shift-select" class="form-control" style="height:42px; font-weight:700;" onchange="renderWorkerManagerTable()">
-          <option value="">-- Loading Shifts --</option>
-        </select>
+      <div class="filter-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:10px;">Select Shift</label>
+          <select id="wm-shift-select" class="form-control" style="height:42px; font-weight:700;" onchange="renderWorkerManagerTable()">
+            <option value="">-- Loading Shifts --</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:10px;">Filter Status</label>
+          <select id="wm-status-filter" class="form-control" style="height:42px; font-weight:700;" onchange="renderWorkerManagerTable()">
+            <option value="ALL">ALL STATUSES</option>
+            <option value="CONFIRMED">CONFIRMED ONLY</option>
+            <option value="WAITLIST">WAITLIST ONLY</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <!-- Active Shift Card & Worker Roster Table -->
     <div id="worker-manager-root"></div>
 
-    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border-thin);">
+    <div style="text-align: center; margin-top: 30px;">
       <button class="btn-logout" onclick="handleAdminLogout()">Exit Session (Logout)</button>
     </div>
   </div>
@@ -194,16 +316,15 @@
     </div>
   </div>
 
+  <!-- FOOTER -->
+  <footer class="footer">
+    &copy; Malaysia International Trade and Exhibition Centre (MITEC). All rights reserved 2026.
+  </footer>
+
   <script>
-    // DIRECT SUPABASE REST CONFIGURATION
+    // DIRECT SUPABASE REST API CREDENTIALS
     const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
     const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
-
-    const supabaseHeaders = {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json"
-    };
 
     let activeAdminKey = null;
     let cachedShifts = [];
@@ -216,7 +337,7 @@
       } catch (err) { console.warn("Storage restricted."); }
 
       if (sessionKey) {
-        activeAdminKey = sessionKey;
+        activeAdminKey = String(sessionKey).trim();
         document.getElementById('login-overlay').style.display = 'none';
         loadAdminDataSuite();
       } else {
@@ -286,7 +407,7 @@
         try {
           let d = new Date(str);
           if (!isNaN(d.getTime())) {
-            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
           }
         } catch(e) {}
       }
@@ -303,51 +424,118 @@
       return new Date(0);
     }
 
-    // DIRECT SUPABASE FETCH (REST API)
+    async function fetchAllBookings(headers) {
+      let allRecords = [];
+      let batchSize = 1000;
+      let start = 0;
+      let fetched = 0;
+
+      do {
+        const queryUrl = `${SUPABASE_URL}/rest/v1/booking_record?select=*,shift_master(date,dept,time,slots,wa_link),casual_labour_profile(full_name,name_mykad,phone,photo_link,document_type)&limit=${batchSize}&offset=${start}`;
+        const res = await fetch(queryUrl, { headers });
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.code) {
+          const fallbackUrl = `${SUPABASE_URL}/rest/v1/booking_record?select=*&limit=${batchSize}&offset=${start}`;
+          const fallbackRes = await fetch(fallbackUrl, { headers });
+          const fallbackData = await fallbackRes.json();
+          if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+            allRecords = allRecords.concat(fallbackData);
+            fetched = fallbackData.length;
+          } else {
+            break;
+          }
+        } else {
+          allRecords = allRecords.concat(data);
+          fetched = data.length;
+        }
+
+        start += batchSize;
+      } while (fetched === batchSize);
+
+      return allRecords;
+    }
+
     async function loadAdminDataSuite() {
       document.getElementById('sync-loader').style.display = 'flex';
 
       try {
-        const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers: supabaseHeaders }).then(r => r.json());
-        const bookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*&limit=50000`, { headers: supabaseHeaders }).then(r => r.json());
+        const headers = { 
+          "apikey": SUPABASE_KEY, 
+          "Authorization": `Bearer ${SUPABASE_KEY}` 
+        };
 
-        const [shiftsRes, bookingsRes] = await Promise.all([shiftsPromise, bookingsPromise]);
+        const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers }).then(r => r.json());
+        const profilesPromise = fetch(`${SUPABASE_URL}/rest/v1/casual_labour_profile?select=*`, { headers }).then(r => r.json());
+        const bookingsPromise = fetchAllBookings(headers);
+
+        const [shiftsRes, profilesRes, bookingsRes] = await Promise.all([shiftsPromise, profilesPromise, bookingsPromise]);
+
+        const validShifts = Array.isArray(shiftsRes) ? shiftsRes : [];
+        const validProfiles = Array.isArray(profilesRes) ? profilesRes : [];
+        const validBookings = Array.isArray(bookingsRes) ? bookingsRes : [];
+
+        const workerMap = {};
+        validProfiles.forEach(p => {
+          const rawDoc = String(p.doc_no || p.id || '').trim().replace(/^'/, '');
+          if (rawDoc) {
+            workerMap[rawDoc] = {
+              name: p.full_name || p.name_mykad || "Casual Worker",
+              phone: p.phone || "",
+              photo: p.photo_link || ""
+            };
+          }
+        });
 
         try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
 
-        cachedShifts = (shiftsRes || []).map(s => ({
+        cachedShifts = validShifts.map(s => ({
+          ...s,
           id: s.shift_id,
-          date: s.date ? s.date.split('-').reverse().join('.') : '',
+          date: s.date ? (s.date.includes('-') ? s.date.split('-').reverse().join('.') : s.date) : '',
           dept: s.dept || '',
           time: s.time || '',
           slots: parseInt(s.slots) || 0,
           totalSlots: parseInt(s.slots) || 0,
           Slots: parseInt(s.slots) || 0,
-          notes: s.notes || '',
-          status: s.status || 'OPEN',
-          wa_link: s.wa_link || ''
+          notes: s.notes || ''
         }));
 
-        cachedBookings = (bookingsRes || []).map(b => ({
-          shift_id: b.shift_id || '',
-          user_id: String(b.doc_no || '').replace(/^'/, ''),
-          doc_no: b.doc_no || '',
-          worker_name: b.name || 'Casual Worker',
-          phone: b.phone || '',
-          date: b.date ? b.date.split('-').reverse().join('.') : '',
-          dept: b.dept || '',
-          time: b.time || '',
-          status: b.status || 'SUBMITTED',
-          attendance: b.attendance || ''
-        }));
+        cachedBookings = validBookings.map(b => {
+          const shiftData = b.shift_master || {};
+          const profileData = b.casual_labour_profile || {};
+          const cleanDocNo = String(b.doc_no || b.user_id || '').trim().replace(/^'/, '');
+          const mappedWorker = workerMap[cleanDocNo] || {};
 
-        const displayTag = document.getElementById("adminUserDisplayTag");
-        if (displayTag) displayTag.textContent = "PASSPORT MANAGER";
+          const rawDate = shiftData.date || b.date || '';
+          const formattedDate = rawDate ? (rawDate.includes('-') ? rawDate.split('-').reverse().join('.') : rawDate) : '';
+
+          return {
+            shift_id: b.shift_id || '',
+            user_id: cleanDocNo,
+            doc_no: cleanDocNo,
+            worker_name: profileData.full_name || profileData.name_mykad || mappedWorker.name || b.name || "Casual Worker",
+            name: profileData.full_name || profileData.name_mykad || mappedWorker.name || b.name || "Casual Worker",
+            phone: profileData.phone || mappedWorker.phone || b.phone || '',
+            photo_url: profileData.photo_link || mappedWorker.photo || b.photo_url || b.photo || '',
+            date: formattedDate,
+            dept: shiftData.dept || b.dept || '',
+            time: shiftData.time || b.time || '',
+            status: b.status || '',
+            attendance: b.attendance || ''
+          };
+        });
+
+        const currentAdminProfile = workerMap[activeAdminKey.replace(/^'/, '')];
+        if (currentAdminProfile && currentAdminProfile.name) {
+          document.getElementById("adminUserDisplayTag").textContent = currentAdminProfile.name.toUpperCase();
+        }
 
         populateWorkerManagerShifts();
 
       } catch (err) {
-        alert("Database error: " + err.message);
+        console.error("Admin data fetch error:", err);
+        alert("Failed to sync with Supabase database.");
       } finally {
         document.getElementById('sync-loader').style.display = 'none';
       }
@@ -384,11 +572,14 @@
 
     function renderWorkerManagerTable() {
       const selectEl = document.getElementById('wm-shift-select');
+      const filterEl = document.getElementById('wm-status-filter');
       const rootEl = document.getElementById('worker-manager-root');
       const topScorecardEl = document.getElementById('top-scorecard-root');
       if (!selectEl || !rootEl) return;
 
       const shiftId = selectEl.value;
+      const statusFilter = filterEl ? filterEl.value : 'ALL';
+
       const shift = cachedShifts.find(s => s.id === shiftId);
 
       if (!shift) {
@@ -397,28 +588,27 @@
         return;
       }
 
-      // Filter: ONLY Non-Malaysian (Passport) workers who are not cancelled
-      const shiftBookings = cachedBookings.filter(b => 
-        b.shift_id === shift.id && 
-        String(b.status).toUpperCase() !== 'CANCELLED' &&
-        isPassportHolder(b.user_id || b.doc_no)
-      );
+      // STRICT PASSPORT FILTER: Only include bookings where isPassportHolder(targetUserId) is true and status is not cancelled
+      const shiftBookings = cachedBookings.filter(b => {
+        const targetUserId = b.user_id || b.doc_no;
+        const isPassport = isPassportHolder(targetUserId);
+        const notCancelled = String(b.status).toUpperCase() !== 'CANCELLED';
+        return b.shift_id === shift.id && notCancelled && isPassport;
+      });
 
-      // Scorecard Calculations for Passport Workers
       const totalApproved = shiftBookings.filter(b => {
         const status = String(b.status).toUpperCase();
-        return status === 'SUBMITTED' || status === 'CONFIRMED';
+        return status === 'SUBMITTED' || status === 'CONFIRMED' || status === 'SUBNS';
       }).length;
 
       const totalWaitlist = shiftBookings.filter(b => {
         const status = String(b.status).toUpperCase();
-        return status === 'WAITLIST' || status === 'WAITING LIST';
+        return status.includes('WAIT');
       }).length;
 
       const totalCL = totalApproved + totalWaitlist;
       const totalSlots = shift.slots || shift.totalSlots || shift.Slots || 0;
 
-      // Render Scorecard
       if (topScorecardEl) {
         topScorecardEl.innerHTML = `
           <div class="wm-scorecard-grid">
@@ -427,7 +617,7 @@
               <span class="wm-stat-value">${totalApproved}</span>
             </div>
             <div class="wm-stat-card">
-              <span class="wm-stat-label">Total Passport Waitlist</span>
+              <span class="wm-stat-label">Total Passport Waiting List</span>
               <span class="wm-stat-value">${totalWaitlist}</span>
             </div>
             <div class="wm-stat-card">
@@ -436,6 +626,14 @@
             </div>
           </div>`;
       }
+
+      let displayedBookings = shiftBookings.filter(b => {
+        const st = String(b.status).toUpperCase();
+        const isConfirmed = (st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS');
+        if (statusFilter === 'CONFIRMED' && !isConfirmed) return false;
+        if (statusFilter === 'WAITLIST' && isConfirmed) return false;
+        return true;
+      });
 
       let html = `
         <div class="wm-card">
@@ -462,18 +660,19 @@
               </thead>
               <tbody>`;
 
-      if (shiftBookings.length === 0) {
-        html += `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No non-Malaysian workers assigned to this shift.</td></tr>`;
+      if (displayedBookings.length === 0) {
+        html += `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No passport-holding casual workers found for this shift.</td></tr>`;
       } else {
-        const defaultAvatar = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>`;
+        const defaultRacerSilhouette = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><rect width='100%' height='100%' fill='%231a1a1a'/><path d='M50 22c-12 0-22 10-22 22 0 9 5.5 16.7 13.3 20.1C25 69 15 80 15 95h70c0-15-10-26-26.3-30.9C66.5 60.7 72 53 72 44c0-12-10-22-22-22z' fill='%23444444'/><path d='M50 28c-8.8 0-16 7.2-16 16 0 8.8 7.2 16 16 16s16-7.2 16-16c0-8.8-7.2-16-16-16z' fill='%23555555'/></svg>`;
 
-        shiftBookings.forEach(w => {
+        displayedBookings.forEach(w => {
           const targetUserId = w.user_id || w.doc_no;
           const targetWorkerName = w.worker_name || w.name || "Casual Worker";
-          const isConfirmed = (String(w.status).toUpperCase() === 'SUBMITTED' || String(w.status).toUpperCase() === 'CONFIRMED');
+          const st = String(w.status).toUpperCase();
+          const isConfirmed = (st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS');
           const selectClass = isConfirmed ? "status-confirmed" : "status-waitlist";
 
-          const photoUrl = w.photo_url || w.photo || defaultAvatar;
+          const photoUrl = w.photo_url || w.photo || defaultRacerSilhouette;
           const dialablePhone = formatPhoneForDialing(w.phone);
           const callLink = dialablePhone ? `tel:${dialablePhone}` : `javascript:alert('No phone number on record');`;
 
@@ -481,10 +680,12 @@
             <tr>
               <td>
                 <div class="worker-profile-cell">
-                  <img src="${photoUrl}" class="worker-avatar" alt="Photo" onerror="this.onerror=null; this.src='${defaultAvatar}';" />
+                  <div class="worker-avatar-frame">
+                    <img src="${photoUrl}" class="worker-avatar" alt="Photo" onerror="this.onerror=null; this.src='${defaultRacerSilhouette}';" />
+                  </div>
                   <div>
-                    <div style="font-weight:800; color:var(--admin-dark); text-transform:uppercase; line-height:1.2; cursor:pointer;" onclick="openWorkerProfileDrawer('${targetUserId}', '${targetWorkerName.replace(/'/g, "\\'")}')">${targetWorkerName}</div>
-                    <div style="font-size:10px; color:var(--text-muted); margin-top:3px; font-weight:600;">Passport: ${targetUserId}</div>
+                    <div class="view-drawable-name" style="font-size:11px; font-weight:800; text-transform:uppercase; line-height:1.2; cursor:pointer;" onclick="openWorkerProfileDrawer('${targetUserId}', '${targetWorkerName.replace(/'/g, "\\'")}')">${targetWorkerName}</div>
+                    <div style="font-size:9px; color:var(--text-muted); margin-top:2px; font-family:monospace; font-weight:600;">Passport: ${targetUserId}</div>
                   </div>
                 </div>
               </td>
@@ -512,22 +713,23 @@
 
     function downloadRosterCSV(shiftId) {
       const shift = cachedShifts.find(s => s.id === shiftId);
-      const bookings = cachedBookings.filter(b => 
-        b.shift_id === shiftId && 
-        String(b.status).toUpperCase() !== 'CANCELLED' &&
-        isPassportHolder(b.user_id || b.doc_no)
-      );
+      const bookings = cachedBookings.filter(b => {
+        const targetUserId = b.user_id || b.doc_no;
+        return b.shift_id === shiftId && 
+               String(b.status).toUpperCase() !== 'CANCELLED' && 
+               isPassportHolder(targetUserId);
+      });
 
       if (!bookings || bookings.length === 0) {
-        alert("No non-Malaysian workers available to download.");
+        alert("No passport workers available to download.");
         return;
       }
 
-      let csvContent = "\uFEFF Worker Name,Passport ID,Doc Type,Status,Phone\n";
+      let csvContent = "\uFEFF Worker Name,Passport ID,Status,Phone\n";
       bookings.forEach(b => {
         const targetUserId = b.user_id || b.doc_no;
         const targetWorkerName = b.worker_name || b.name || "Casual Worker";
-        csvContent += `"${targetWorkerName}","${targetUserId}","Passport","${b.status}","${b.phone || ''}"\n`;
+        csvContent += `"${targetWorkerName}","${targetUserId}","${b.status}","${b.phone || ''}"\n`;
       });
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -542,101 +744,95 @@
       URL.revokeObjectURL(url);
     }
 
-    // DIRECT SUPABASE PATCH FOR STATUS TOGGLE
     async function toggleWorkerStatus(shiftId, workerId, targetToWaitlist) {
-      const isWaitlist = (targetToWaitlist === 'true' || targetToWaitlist === true);
-      const newStatus = isWaitlist ? "WAITLIST" : "CONFIRMED";
-      const promptMsg = isWaitlist 
-        ? `Demote Worker ID: ${workerId} back to Standby Waitlist?` 
-        : `Promote & Confirm registration for Worker ID: ${workerId}?`;
+      // Guard check: Ensure worker is a passport holder before executing transaction
+      if (!isPassportHolder(workerId)) {
+        alert("Action restricted: MyKad holders cannot be managed or reinstated through this console.");
+        return;
+      }
+
+      const promptMsg = targetToWaitlist === 'true' 
+        ? `Demote Passport Worker ID: ${workerId} back to Standby Waitlist?` 
+        : `Promote & Confirm registration for Passport Worker ID: ${workerId}?`;
 
       if (!confirm(promptMsg)) return;
 
-      document.getElementById('sync-loader').querySelector('.loader-text').textContent = "Updating Supabase Record...";
+      document.getElementById('sync-loader').querySelector('.loader-text').textContent = "SYNCHRONIZING STATUS TRANSACTION...";
       document.getElementById('sync-loader').style.display = 'flex';
 
-      const docNoWithoutQuote = String(workerId).replace(/^'/, '');
-      const docNoWithQuote = `'${docNoWithoutQuote}`;
+      const cleanDocNo = String(workerId).trim().replace(/^'/, '');
+      const docWithQuote = `'${cleanDocNo}`;
+      const newStatus = targetToWaitlist === 'true' ? "WAITLIST" : "CONFIRMED";
 
       try {
-        const url = `${SUPABASE_URL}/rest/v1/booking_record?shift_id=eq.${encodeURIComponent(shiftId)}&doc_no=in.("${encodeURIComponent(docNoWithoutQuote)}","${encodeURIComponent(docNoWithQuote)}")`;
+        const url = `${SUPABASE_URL}/rest/v1/booking_record?shift_id=eq.${encodeURIComponent(shiftId)}&doc_no=in.("${encodeURIComponent(cleanDocNo)}","${encodeURIComponent(docWithQuote)}")`;
         const res = await fetch(url, {
           method: "PATCH",
-          headers: supabaseHeaders,
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({ 
-            status: newStatus,
+            status: newStatus, 
             updated_at: new Date().toISOString()
           })
         });
 
         if (res.ok) {
-          await loadAdminDataSuite();
+          loadAdminDataSuite();
         } else {
-          const err = await res.json();
-          alert("Update failed: " + (err.message || "Database error"));
+          const errData = await res.json();
+          alert("Update Failed: " + (errData.message || "Matching record not found."));
           document.getElementById('sync-loader').style.display = 'none';
         }
       } catch (err) {
-        alert("Network Error: " + err.message);
         document.getElementById('sync-loader').style.display = 'none';
+        alert("An error occurred while transmitting transaction variables: " + err.message);
       }
     }
 
     function openWorkerProfileDrawer(workerId, workerName) {
+      if (!isPassportHolder(workerId)) {
+        alert("Profile restricted to Passport holders only.");
+        return;
+      }
+
       document.getElementById('wp-drawer-name').textContent = workerName;
       let totalConfirmed = 0, noShows = 0, profileRowsMarkup = "";
+      const cleanTargetId = String(workerId).trim().replace(/^'/, '');
 
-      const today = new Date(); 
-      today.setHours(0, 0, 0, 0);
+      const historySubset = cachedBookings.filter(b => String(b.user_id || b.doc_no).trim().replace(/^'/, '') === cleanTargetId);
+      historySubset.sort((a, b) => getShiftDateObj(b.date) - getShiftDateObj(a.date));
 
-      const confirmedHistory = cachedBookings.filter(b => {
-        const targetUserId = b.user_id || b.doc_no;
-        const isWorker = String(targetUserId).trim().replace(/^'/, '') === String(workerId).trim().replace(/^'/, '');
-        const st = String(b.status).toUpperCase();
-        return isWorker && (st === 'CONFIRMED' || st === 'SUBMITTED');
-      });
-
-      confirmedHistory.sort((a, b) => getShiftDateObj(b.date) - getShiftDateObj(a.date));
-
-      confirmedHistory.forEach(b => {
-        totalConfirmed++;
+      historySubset.forEach(b => {
+        const rawStatus = String(b.status).toUpperCase();
         const attendanceStr = String(b.attendance || "").trim().toLowerCase();
+        if (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED' || rawStatus === 'SUBNS') totalConfirmed++;
+        if (attendanceStr === 'no show') noShows++;
 
         let matchingShift = cachedShifts.find(s => String(s.id).toUpperCase() === String(b.shift_id).toUpperCase());
         let finalDisplayDate = b.date || (matchingShift ? matchingShift.date : "N/A");
         let finalDisplayDept = b.dept || (matchingShift ? matchingShift.dept : "N/A");
 
-        const shiftDateObj = getShiftDateObj(finalDisplayDate);
-        const isPastShift = shiftDateObj < today;
-
-        let attendanceDisplay = "";
-
-        if (attendanceStr !== "" && attendanceStr !== "-" && attendanceStr !== "0" && attendanceStr !== "no show") {
-          attendanceDisplay = `<span style="color:var(--admin-dark); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`;
-        } else if (isPastShift) {
-          noShows++;
-          attendanceDisplay = `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>`;
-        } else {
-          attendanceDisplay = `<span style="color:var(--text-muted); font-weight:600;">-</span>`;
-        }
+        let statusPill = (rawStatus === 'CANCELLED') ? '<span class="status-pill pill-cancelled">Cancelled</span>' : (rawStatus.includes('WAIT') ? '<span class="status-pill pill-wait">Waitlist</span>' : '<span class="status-pill pill-sub">Confirmed</span>');
+        let attendanceDisplay = (rawStatus === 'CANCELLED' || rawStatus.includes('WAIT')) ? `<span style="color:var(--text-muted); font-weight:700;">-</span>` : ((attendanceStr === "no show" || attendanceStr === "" || attendanceStr === "0") ? `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>` : `<span style="color:var(--text-main); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`);
 
         profileRowsMarkup += `
           <tr>
             <td>
-              <div style="font-weight:700; color:var(--admin-dark);">${finalDisplayDate}</div>
+              <div style="font-weight:700; color:var(--text-main);">${finalDisplayDate}</div>
               <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-top:2px;">${finalDisplayDept}</div>
             </td>
-            <td style="text-align:center;"><span class="status-pill pill-sub">Confirmed</span></td>
+            <td style="text-align:center;">${statusPill}</td>
             <td style="text-align:center;">${attendanceDisplay}</td>
           </tr>`;
       });
 
       document.getElementById('wp-drawer-meta').innerHTML = `
-        <span><i class="ph ph-identification-card"></i> Passport ID: <b>${workerId}</b></span>
+        <span><i class="ph ph-identification-card"></i> Passport ID: <b>${cleanTargetId}</b></span>
         <span><i class="ph ph-shield-warning"></i> Matrix Analytics: <b>${noShows} No-Shows</b> out of <b>${totalConfirmed} Confirmed</b></span>`;
-
-      document.getElementById('wp-drawer-table-body').innerHTML = profileRowsMarkup || `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">No confirmed attendance records found.</td></tr>`;
-
+      document.getElementById('wp-drawer-table-body').innerHTML = profileRowsMarkup || `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">No logged history discovered.</td></tr>`;
       document.getElementById('worker-profile-drawer').style.display = 'flex';
     }
 
