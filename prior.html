@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MITEC — Worker Access Manager</title>
+
+  <!-- Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Phosphor Icons -->
+  <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --background: #eef2f7;
+      --foreground: #0f172a;
+      --card: #ffffff;
+      --primary: #063e99;
+      --primary-foreground: #ffffff;
+      --muted: #f1f5f9;
+      --muted-foreground: #64748b;
+      --border: #cad5e2;
+      --radius: 0.75rem;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; font-family: var(--font-sans); }
+
+    body { 
+      background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--foreground); 
+      padding-bottom: 60px; 
+      min-height: 100vh;
+    }
+
+    .header { 
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      height: 58px;
+      border-bottom: 1px solid rgba(203, 213, 225, 0.8);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .back-action-arrow {
+      color: var(--foreground);
+      font-size: 18px;
+      text-decoration: none;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(0,0,0,0.1);
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .back-action-arrow:hover { transform: translateY(-1px); }
+
+    .portal-container { max-width: 650px; margin: 0 auto; padding: 16px; }
+
+    .admin-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid rgba(6, 62, 153, 0.15);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.06);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .badge-priority {
+      background: linear-gradient(180deg, #dcfce7 0%, #bbf7d0 100%);
+      color: #14532d;
+      border: 1px solid #86efac;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .badge-banned {
+      background: linear-gradient(180deg, #fef2f2 0%, #fecaca 100%);
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .badge-standard {
+      background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .btn-grant { background: linear-gradient(180deg, #1b63d7 0%, #063e99 100%); color: #ffffff; border: 1px solid #05337e; font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: calc(var(--radius) - 0.2rem); }
+    .btn-revoke { background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%); color: #334155; border: 1px solid #cbd5e1; font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: calc(var(--radius) - 0.2rem); }
+    .btn-ban { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); color: #ffffff; border: 1px solid #b91c1c; font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: calc(var(--radius) - 0.2rem); }
+    .btn-unban { background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%); color: #166534; border: 1px solid #86efac; font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: calc(var(--radius) - 0.2rem); }
+
+    #sync-loader { position: fixed; inset: 0; background: rgba(238, 242, 247, 0.85); backdrop-filter: blur(12px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+    .loader-spinner { width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 12px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div id="sync-loader">
+    <div class="loader-spinner"></div>
+    <div class="fw-bold text-secondary" style="font-size: 12px;">Updating Database...</div>
+  </div>
+
+  <header class="header sticky-top d-flex align-items-center justify-content-center px-3">
+    <div class="position-absolute start-0 ms-3">
+      <a href="booking.html" class="back-action-arrow" title="Return"><i class="ph ph-caret-left"></i></a>
+    </div>
+    <span class="fw-bold" style="font-size: 14px; color: var(--primary);">Worker Access & Priority Control</span>
+  </header>
+
+  <div class="portal-container">
+    <div class="admin-card mb-3">
+      <h1 class="h6 fw-bold mb-2">Access Control Whitelist & Ban List</h1>
+      <p class="text-muted small mb-3">Manage priority booking privileges or temporary booking bans for workers from a single consolidated table.</p>
+      
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0"><i class="ph ph-magnifying-glass text-muted"></i></span>
+        <input type="text" id="searchInput" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search by name or document number..." onkeyup="filterWorkers()">
+      </div>
+    </div>
+
+    <div id="workersListContainer">
+      <p class="text-center text-muted py-5 small">Loading database...</p>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+
+    let allWorkers = [];
+    let accessMap = {}; // Maps doc_no -> { is_priority, is_banned }
+
+    window.onload = () => { fetchData(); };
+
+    function showLoader(show) { document.getElementById('sync-loader').style.display = show ? 'flex' : 'none'; }
+
+    async function fetchData() {
+      const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` };
+
+      try {
+        const [profileRes, accessRes] = await Promise.all([
+          fetch(`${SUPABASE_URL}/rest/v1/casual_labour_profile?select=*`, { headers }).then(r => r.json()),
+          fetch(`${SUPABASE_URL}/rest/v1/worker_access_control?select=*`, { headers }).then(r => r.json()).catch(() => [])
+        ]);
+
+        allWorkers = Array.isArray(profileRes) ? profileRes : [];
+        
+        accessMap = {};
+        if (Array.isArray(accessRes)) {
+          accessRes.forEach(row => {
+            const cleanDoc = String(row.doc_no || '').trim().replace(/^'/, '').toUpperCase();
+            accessMap[cleanDoc] = {
+              is_priority: !!row.is_priority,
+              is_banned: !!row.is_banned
+            };
+          });
+        }
+
+        renderWorkers(allWorkers);
+      } catch (err) {
+        console.error("Error fetching database:", err);
+        document.getElementById('workersListContainer').innerHTML = '<p class="text-center text-danger small py-4">Failed to load profiles.</p>';
+      }
+    }
+
+    function renderWorkers(workers) {
+      const container = document.getElementById('workersListContainer');
+      if (workers.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted py-4 small">No workers found.</p>';
+        return;
+      }
+
+      let html = '';
+      workers.forEach(w => {
+        const docNo = String(w.doc_no || w.mykad || '').trim();
+        const cleanDocNo = docNo.replace(/^'/, '').toUpperCase();
+        const name = w.full_name || w.name_mykad || 'Unknown Worker';
+        const docType = String(w.document_type || (/^[a-zA-Z]/.test(cleanDocNo) ? 'PASSPORT' : 'MYKAD')).toUpperCase();
+        
+        const workerAccess = accessMap[cleanDocNo] || { is_priority: false, is_banned: false };
+
+        let statusBadge = '<span class="badge-standard">STANDARD</span>';
+        if (workerAccess.is_banned) {
+          statusBadge = '<span class="badge-banned">TEMP BANNED</span>';
+        } else if (workerAccess.is_priority) {
+          statusBadge = '<span class="badge-priority">PRIORITY</span>';
+        }
+
+        html += `
+          <div class="admin-card d-flex align-items-center justify-content-between py-3 mb-2">
+            <div>
+              <div class="fw-semibold text-dark mb-1" style="font-size: 13px;">${name}</div>
+              <div class="text-muted d-flex align-items-center gap-2 mb-2" style="font-size: 11px;">
+                <span><i class="ph ph-identification-card"></i> ${docNo}</span>
+                <span>•</span>
+                <span>${docType}</span>
+              </div>
+              <div>${statusBadge}</div>
+            </div>
+            <div class="d-flex flex-column gap-2 text-end">
+              ${workerAccess.is_banned ? 
+                `<button class="btn btn-unban" onclick="updateAccess('${cleanDocNo}', '${name}', { is_banned: false })"><i class="ph ph-check-circle"></i> Unban</button>` :
+                `<button class="btn btn-ban" onclick="updateAccess('${cleanDocNo}', '${name}', { is_banned: true })"><i class="ph ph-prohibit"></i> Temp Ban</button>`
+              }
+              
+              ${!workerAccess.is_banned ? (workerAccess.is_priority ? 
+                `<button class="btn btn-revoke" onclick="updateAccess('${cleanDocNo}', '${name}', { is_priority: false })">Revoke Priority</button>` : 
+                `<button class="btn btn-grant" onclick="updateAccess('${cleanDocNo}', '${name}', { is_priority: true })">Grant Priority</button>`
+              ) : ''}
+            </div>
+          </div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function filterWorkers() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allWorkers.filter(w => {
+        const name = String(w.full_name || w.name_mykad || '').toLowerCase();
+        const doc = String(w.doc_no || w.mykad || '').toLowerCase();
+        return name.includes(query) || doc.includes(query);
+      });
+      renderWorkers(filtered);
+    }
+
+    async function updateAccess(docNo, name, updates) {
+      showLoader(true);
+      const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" };
+      const formattedDocNo = `'${docNo.replace(/^'/, '')}`;
+
+      // Get current state or defaults
+      const current = accessMap[docNo] || { is_priority: false, is_banned: false };
+      const newPriority = updates.hasOwnProperty('is_priority') ? updates.is_priority : current.is_priority;
+      const newBanned = updates.hasOwnProperty('is_banned') ? updates.is_banned : current.is_banned;
+
+      const payload = {
+        doc_no: formattedDocNo,
+        name: name,
+        is_priority: newPriority,
+        is_banned: newBanned,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/worker_access_control`, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          accessMap[docNo] = { is_priority: newPriority, is_banned: newBanned };
+          filterWorkers();
+        } else {
+          alert("Operation failed.");
+        }
+      } catch (err) {
+        alert("Network error: " + err.message);
+      } finally {
+        showLoader(false);
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
