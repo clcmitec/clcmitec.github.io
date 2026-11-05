@@ -321,13 +321,13 @@
 
 <script>
   // ⚠️ PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbyHlx9flYBlUSr3MvV0EmxcjMOIEge5m30EgIVOQF18FHsx3yG8FKRqL6v-w5BVLgWH9g/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbx3qDWBhfyeJEEMw4nShZUEztAePxMIWFdE0Lrb_krWJChnjQ6N6zc7x-zrLI3tD3jmSg/exec";
 
   let allRows = [];
 
   // ── INIT ──────────────────────────────────────────
   window.onload = function() {
-    if (GAS_URL === "https://script.google.com/macros/s/AKfycbyHlx9flYBlUSr3MvV0EmxcjMOIEge5m30EgIVOQF18FHsx3yG8FKRqL6v-w5BVLgWH9g/exec") {
+    if (GAS_URL === "https://script.google.com/macros/s/AKfycbx3qDWBhfyeJEEMw4nShZUEztAePxMIWFdE0Lrb_krWJChnjQ6N6zc7x-zrLI3tD3jmSg/exec") {
       document.getElementById('config-banner').style.display = 'block';
       document.getElementById('loading').textContent = '⚠️ GAS_URL not configured yet.';
       return;
