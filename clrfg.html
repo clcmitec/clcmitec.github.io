@@ -65,12 +65,12 @@
     table col.shift-col { width: calc((100% - 185px) / 21); }
 
     /* A1 - DAY row */
-    .row-day th { background:#164B81; color:#fff; font-weight:700; font-size:0.7rem; padding:5px 2px; text-transform:uppercase; }
-    .row-day th.lbl { background:#164B81; color:#fff; text-align:left; padding-left:8px; width:185px; min-width:185px; }
+    .row-day th { background:#234280; color:#fff; font-weight:700; font-size:0.7rem; padding:5px 2px; text-transform:uppercase; }
+    .row-day th.lbl { background:#234280; color:#fff; text-align:left; padding-left:8px; width:185px; min-width:185px; }
 
     /* A2 - SHIFT row */
-    .row-shift th { background:#D1E2EF; color:#000; font-weight:700; font-size:0.65rem; padding:4px 2px; }
-    .row-shift th.lbl { background:#D1E2EF; color:#000; text-align:left; padding-left:8px; font-size:0.68rem; }
+    .row-shift th { background:#164B81; color:#000; font-weight:700; font-size:0.65rem; padding:4px 2px; }
+    .row-shift th.lbl { background:#164B81; color:#000; text-align:left; padding-left:8px; font-size:0.68rem; }
 
     /* A3 - Total */
     .row-total td { background:#fff; height:30px; }
@@ -154,7 +154,7 @@
           <option value="SC">SC</option>
           <option value="SETUP">SETUP</option>
           <option value="STWD">STWD</option>
-           <option value="SH">SH</option>
+          <option value="SH">SH</option>
         </select>
 
         <label style="margin-left:10px;">Week :</label>
@@ -238,7 +238,7 @@
 
 <script>
   // ⚠️ PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbyFVC48lv8MndBuQwVlVMD1zkke2QJ2FNodIXFXEZEfXCMTfZdzjAwEGlk9TaHnxpHpHw/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbx3qDWBhfyeJEEMw4nShZUEztAePxMIWFdE0Lrb_krWJChnjQ6N6zc7x-zrLI3tD3jmSg/exec";
 
   const DAYS   = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
   const SHIFTS = ['AM','PM','SUP'];
@@ -276,8 +276,8 @@
       + '<label>Payment Method:</label>'
       + '<select id="pay-'+i+'">'
       + '<option value="Online">Online</option>'
+      + '<option value="Infotech">Infotech</option>'
       + '<option value="Cash">Cash</option>'
-      + '<option value="Monthly">Infotech</option>'
       + '</select>'
       + '</div>'
       + '<div class="wrap"><table>'
