@@ -1,569 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MITEC — Casual Labour Approval Portal</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: Arial, sans-serif;
-      background: #f1f5f9;
-      min-height: 100vh;
-      padding: 24px 12px;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MITEC — Casual Labour Approval Portal</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Arial,sans-serif; background:#f1f5f9; min-height:100vh; padding:20px 12px; color:#0f172a; }
 
-    /* HEADER */
-    .top-bar {
-      background: #164B81;
-      color: #fff;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border-radius: 8px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    .top-bar img { height: 44px; filter: brightness(0) invert(1); }
-    .top-bar h1 { font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
-    .top-bar p { font-size: 0.75rem; opacity: 0.8; margin-top: 2px; }
+  .top-bar { background:#164B81; color:#fff; padding:12px 18px; display:flex; align-items:center; gap:14px; border-radius:8px; margin-bottom:18px; flex-wrap:wrap; }
+  .top-bar img { height:40px; filter:brightness(0) invert(1); }
+  .top-bar h1 { font-size:1rem; font-weight:900; text-transform:uppercase; }
+  .top-bar p { font-size:0.72rem; opacity:0.8; margin-top:2px; }
+  #userbox { margin-left:auto; display:none; align-items:center; gap:10px; font-size:0.78rem; }
+  #userbox button { background:#fff; color:#164B81; border:none; border-radius:4px; padding:5px 12px; font-weight:700; cursor:pointer; }
 
-    /* FILTERS */
-    .filters {
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 20px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }
-    .filters label { font-size: 0.82rem; font-weight: 700; color: #334155; }
-    .filters select, .filters input {
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      padding: 5px 10px;
-      font-size: 0.82rem;
-      background: #fff;
-      outline: none;
-      cursor: pointer;
-    }
-    .btn-refresh {
-      background: #164B81;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 6px 16px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-left: auto;
-    }
-    .btn-refresh:hover { background: #0f3460; }
+  .card { background:#fff; border-radius:8px; padding:22px; max-width:420px; margin:30px auto; box-shadow:0 1px 6px rgba(0,0,0,0.1); }
+  .card h2 { font-size:1.1rem; margin-bottom:6px; }
+  .card p { font-size:0.82rem; color:#475569; margin-bottom:14px; line-height:1.4; }
+  .card input { width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:10px 12px; font-size:0.95rem; margin-bottom:10px; outline:none; }
+  .card input:focus { border-color:#164B81; }
+  .card button { width:100%; background:#164B81; color:#fff; border:none; border-radius:6px; padding:10px; font-size:0.9rem; font-weight:700; cursor:pointer; margin-bottom:8px; }
+  .card button:disabled { opacity:0.5; cursor:not-allowed; }
+  #login-msg { font-size:0.8rem; margin-top:6px; min-height:18px; }
+  #login-msg.err { color:#b91c1c; } #login-msg.ok { color:#166534; }
 
-    /* STATS CARDS */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 14px 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      border-left: 4px solid #cbd5e1;
-    }
-    .stat-card.pending { border-left-color: #f59e0b; }
-    .stat-card.approved { border-left-color: #16a34a; }
-    .stat-card.rejected { border-left-color: #dc2626; }
-    .stat-card.total { border-left-color: #164B81; }
-    .stat-card .val { font-size: 1.6rem; font-weight: 900; color: #0f172a; }
-    .stat-card .lbl { font-size: 0.72rem; color: #64748b; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .filters { background:#fff; border-radius:8px; padding:12px 16px; margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .filters label { font-size:0.8rem; font-weight:700; color:#334155; }
+  .filters select { border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:0.8rem; background:#fff; }
+  .btn-refresh { margin-left:auto; background:#164B81; color:#fff; border:none; border-radius:4px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; }
 
-    /* BATCH CARDS */
-    .batch-grid { display: flex; flex-direction: column; gap: 16px; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
+  .stat { background:#fff; border-radius:8px; padding:12px 14px; border-left:4px solid #cbd5e1; }
+  .stat.mine { border-left-color:#f59e0b; } .stat.ok { border-left-color:#16a34a; } .stat.bad { border-left-color:#dc2626; } .stat.all { border-left-color:#164B81; }
+  .stat .v { font-size:1.5rem; font-weight:900; } .stat .l { font-size:0.7rem; color:#64748b; text-transform:uppercase; margin-top:2px; }
 
-    .batch-card {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-    }
+  .batch-grid { display:flex; flex-direction:column; gap:14px; }
+  .batch { background:#fff; border-radius:8px; border:1px solid #e2e8f0; overflow:hidden; }
+  .batch-head { background:#234280; color:#fff; padding:10px 16px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+  .batch-head .t { font-weight:900; font-size:0.9rem; } .batch-head .m { font-size:0.7rem; opacity:0.85; }
+  .batch-body { padding:12px 16px; }
+  .flow { display:flex; gap:10px; flex-wrap:wrap; }
+  .step { flex:1; min-width:210px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 12px; }
+  .step .st { font-size:0.7rem; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:5px; }
+  .step .em { font-size:0.76rem; color:#334155; margin-bottom:6px; word-break:break-all; }
+  .step .dt { font-size:0.68rem; color:#94a3b8; margin-top:4px; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.68rem; font-weight:700; text-transform:uppercase; }
+  .b-PENDING { background:#fef3c7; color:#92400e; } .b-APPROVED { background:#dcfce7; color:#166534; } .b-REJECTED { background:#fee2e2; color:#991b1b; }
+  .acts { display:flex; gap:8px; margin-top:8px; }
+  .acts button { flex:1; border:none; border-radius:4px; padding:7px; font-size:0.78rem; font-weight:700; cursor:pointer; color:#fff; }
+  .acts .ap { background:#16a34a; } .acts .rj { background:#dc2626; }
+  .acts button:disabled { opacity:0.3; cursor:not-allowed; }
+  .note { font-size:0.68rem; color:#94a3b8; margin-top:6px; }
 
-    .batch-header {
-      background: #234280;
-      color: #fff;
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .batch-header .batch-title { font-weight: 900; font-size: 0.95rem; letter-spacing: 0.3px; }
-    .batch-header .batch-meta { font-size: 0.75rem; opacity: 0.85; }
+  table.d { width:100%; border-collapse:collapse; font-size:0.7rem; margin-top:10px; }
+  table.d th { background:#f1f5f9; padding:5px 7px; text-align:left; color:#475569; border-bottom:1px solid #e2e8f0; }
+  table.d td { padding:5px 7px; border-bottom:1px solid #f1f5f9; }
+  .wrap { overflow-x:auto; }
+  .pdf { display:inline-block; margin-top:8px; font-size:0.75rem; color:#2563eb; font-weight:700; text-decoration:none; }
+  .empty { text-align:center; padding:40px; color:#94a3b8; font-size:0.9rem; }
 
-    .batch-body { padding: 14px 18px; }
-
-    /* Status badges */
-    .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-    .badge-pending  { background: #fef3c7; color: #92400e; }
-    .badge-approved { background: #dcfce7; color: #166534; }
-    .badge-rejected { background: #fee2e2; color: #991b1b; }
-
-    /* Approval flow row */
-    .approval-flow {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .approval-step {
-      flex: 1;
-      min-width: 220px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 10px 14px;
-    }
-    .approval-step .step-title {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-bottom: 6px;
-    }
-    .approval-step .step-email { font-size: 0.78rem; color: #334155; margin-bottom: 8px; }
-    .approval-step .step-date { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; }
-
-    .action-btns { display: flex; gap: 8px; margin-top: 8px; }
-    .btn-approve, .btn-reject {
-      flex: 1;
-      border: none;
-      border-radius: 4px;
-      padding: 6px 10px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    .btn-approve { background: #16a34a; color: #fff; }
-    .btn-approve:hover { opacity: 0.85; }
-    .btn-reject  { background: #dc2626; color: #fff; }
-    .btn-reject:hover  { opacity: 0.85; }
-    .btn-approve:disabled, .btn-reject:disabled {
-      opacity: 0.35; cursor: not-allowed;
-    }
-
-    /* Data rows table inside card */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.72rem;
-      margin-top: 10px;
-    }
-    .data-table th {
-      background: #f1f5f9;
-      padding: 5px 8px;
-      text-align: left;
-      font-weight: 700;
-      color: #475569;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .data-table td {
-      padding: 5px 8px;
-      border-bottom: 1px solid #f1f5f9;
-      color: #334155;
-    }
-    .data-table tr:last-child td { border-bottom: none; }
-
-    .pdf-link {
-      display: inline-block;
-      font-size: 0.75rem;
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-    .pdf-link:hover { text-decoration: underline; }
-
-    /* Loading / empty */
-    #loading, #empty {
-      text-align: center;
-      padding: 48px;
-      color: #94a3b8;
-      font-size: 0.9rem;
-    }
-
-    /* Toast */
-    #toast {
-      display: none;
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #fff;
-      z-index: 9999;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-    }
-    .toast-success { background: #16a34a; }
-    .toast-error   { background: #dc2626; }
-    .toast-info    { background: #164B81; }
-
-    /* Config banner */
-    #config-banner {
-      background: #fef3c7;
-      border: 1px solid #f59e0b;
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
-      font-size: 0.82rem;
-      color: #92400e;
-      display: none;
-    }
-  </style>
+  #toast { display:none; position:fixed; bottom:22px; left:50%; transform:translateX(-50%); padding:11px 22px; border-radius:8px; font-size:0.85rem; font-weight:700; color:#fff; z-index:99; max-width:90%; text-align:center; }
+  .t-ok { background:#16a34a; } .t-err { background:#dc2626; } .t-info { background:#164B81; }
+</style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="top-bar">
   <img src="https://mitec.com.my/static/img/logos/logo-footer.png" alt="MiTEC"/>
   <div>
-    <h1>Casual Labour — Executive Approval Portal</h1>
-    <p>Review, approve or reject weekly casual labour requisition batches</p>
+    <h1>Casual Labour — Approval Portal</h1>
+    <p>Sign in to review and decide on requisitions assigned to you</p>
   </div>
+  <div id="userbox"><span id="whoami"></span><button onclick="logout()">Logout</button></div>
 </div>
 
-<!-- CONFIG WARNING -->
-<div id="config-banner">
-  ⚠️ <b>Setup required:</b> Please paste your Google Apps Script Web App URL into the <code>GAS_URL</code> variable at the top of this file's script section.
+<!-- LOGIN -->
+<div id="login" class="card">
+  <h2>🔐 Sign in</h2>
+  <p>Enter your registered work email. We'll send a 6-digit code to that address.</p>
+  <input id="email" type="email" placeholder="name@mitec.com.my" autocomplete="email"/>
+  <button id="btn-send" onclick="sendCode()">Send code</button>
+  <div id="step2" style="display:none">
+    <input id="code" inputmode="numeric" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code"/>
+    <button id="btn-verify" onclick="verifyCode()">Verify &amp; sign in</button>
+  </div>
+  <div id="login-msg"></div>
 </div>
 
-<!-- FILTERS -->
-<div class="filters">
-  <label>Department:</label>
-  <select id="filter-dept" onchange="applyFilters()">
-    <option value="">All</option>
-    <option value="AV">AV</option><option value="CAT">CAT</option>
-    <option value="EXH">EXH</option><option value="FIN">FIN</option>
-    <option value="GCC">GCC</option><option value="GS">GS</option>
-    <option value="HK">HK</option><option value="HR">HR</option>
-    <option value="KIT">KIT</option><option value="LINEN">LINEN</option>
-    <option value="OPERATION">OPERATION</option><option value="PUR">PUR</option>
-    <option value="QA">QA</option><option value="SC">SC</option>
-    <option value="SETUP">SETUP</option><option value="STWD">STWD</option>
-  </select>
-
-  <label>Status:</label>
-  <select id="filter-status" onchange="applyFilters()">
-    <option value="">All</option>
-    <option value="PENDING">Pending</option>
-    <option value="APPROVED">Approved</option>
-    <option value="REJECTED">Rejected</option>
-  </select>
-
-  <label>Week:</label>
-  <select id="filter-week" onchange="applyFilters()">
-    <option value="">All</option>
-  </select>
-
-  <button class="btn-refresh" onclick="loadData()">🔄 Refresh</button>
+<!-- APP -->
+<div id="app" style="display:none">
+  <div class="filters">
+    <label>Department:</label>
+    <select id="f-dept" onchange="render()"><option value="">All</option></select>
+    <label>Week:</label>
+    <select id="f-week" onchange="render()"><option value="">All</option></select>
+    <label>Status:</label>
+    <select id="f-status" onchange="render()">
+      <option value="">All</option>
+      <option value="MINE">Awaiting my action</option>
+      <option value="APPROVED">Fully approved</option>
+      <option value="REJECTED">Rejected</option>
+    </select>
+    <button class="btn-refresh" onclick="loadData()">🔄 Refresh</button>
+  </div>
+  <div class="stats">
+    <div class="stat all"><div class="v" id="s-all">—</div><div class="l">My batches</div></div>
+    <div class="stat mine"><div class="v" id="s-mine">—</div><div class="l">Awaiting my action</div></div>
+    <div class="stat ok"><div class="v" id="s-ok">—</div><div class="l">Fully approved</div></div>
+    <div class="stat bad"><div class="v" id="s-bad">—</div><div class="l">Rejected</div></div>
+  </div>
+  <div id="loading" class="empty">⏳ Loading…</div>
+  <div id="empty" class="empty" style="display:none">📭 No requisitions found.</div>
+  <div class="batch-grid" id="grid"></div>
 </div>
 
-<!-- STATS -->
-<div class="stats">
-  <div class="stat-card total">
-    <div class="val" id="stat-total">—</div>
-    <div class="lbl">Total Batches</div>
-  </div>
-  <div class="stat-card pending">
-    <div class="val" id="stat-pending">—</div>
-    <div class="lbl">Pending HOD</div>
-  </div>
-  <div class="stat-card approved">
-    <div class="val" id="stat-approved">—</div>
-    <div class="lbl">Fully Approved</div>
-  </div>
-  <div class="stat-card rejected">
-    <div class="val" id="stat-rejected">—</div>
-    <div class="lbl">Rejected</div>
-  </div>
-</div>
-
-<!-- BATCH LIST -->
-<div id="loading">⏳ Loading requisition data...</div>
-<div id="empty" style="display:none;">📭 No requisitions found.</div>
-<div class="batch-grid" id="batch-grid"></div>
-
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
-  // ⚠️ PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
   const GAS_URL = "https://script.google.com/macros/s/AKfycbx3qDWBhfyeJEEMw4nShZUEztAePxMIWFdE0Lrb_krWJChnjQ6N6zc7x-zrLI3tD3jmSg/exec";
+  let TOKEN = null, ME = "", ROWS = [];
 
-  let allRows = [];
+  // ---------- helpers ----------
+  function sget(k){ try { return sessionStorage.getItem(k); } catch(e){ return null; } }
+  function sset(k,v){ try { sessionStorage.setItem(k,v); } catch(e){} }
+  function sdel(k){ try { sessionStorage.removeItem(k); } catch(e){} }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function $(id){ return document.getElementById(id); }
+  function api(params){
+    return fetch(GAS_URL + '?' + new URLSearchParams(params).toString()).then(function(r){ return r.json(); });
+  }
+  function toast(msg, cls){
+    var t=$('toast'); t.textContent=msg; t.className=cls||'t-info'; t.style.display='block';
+    clearTimeout(t._t); t._t=setTimeout(function(){ t.style.display='none'; },4500);
+  }
+  function loginMsg(msg, cls){ var m=$('login-msg'); m.textContent=msg; m.className=cls||''; }
 
-  // ── INIT ──────────────────────────────────────────
-  window.onload = function() {
-    if (GAS_URL === "https://script.google.com/macros/s/AKfycbx3qDWBhfyeJEEMw4nShZUEztAePxMIWFdE0Lrb_krWJChnjQ6N6zc7x-zrLI3tD3jmSg/exec") {
-      document.getElementById('config-banner').style.display = 'block';
-      document.getElementById('loading').textContent = '⚠️ GAS_URL not configured yet.';
-      return;
-    }
+  // ---------- login flow ----------
+  function sendCode(){
+    var email=$('email').value.trim().toLowerCase();
+    if(!email){ loginMsg('Please enter your email.','err'); return; }
+    $('btn-send').disabled=true; loginMsg('Sending…');
+    api({action:'requestOtp', email:email}).then(function(){
+      $('step2').style.display='block';
+      loginMsg('If this email is registered, a 6-digit code has been sent. It expires in 10 minutes.','ok');
+      $('code').focus();
+    }).catch(function(){ loginMsg('Network error. Try again.','err'); })
+      .then(function(){ $('btn-send').disabled=false; });
+  }
+  function verifyCode(){
+    var email=$('email').value.trim().toLowerCase(), code=$('code').value.trim();
+    if(!code){ loginMsg('Enter the 6-digit code.','err'); return; }
+    $('btn-verify').disabled=true; loginMsg('Verifying…');
+    api({action:'verifyOtp', email:email, code:code}).then(function(res){
+      if(res.status==='success'){
+        TOKEN=res.token; ME=email; sset('tok',TOKEN); sset('me',ME); showApp();
+      } else { loginMsg(res.message||'Invalid or expired code.','err'); }
+    }).catch(function(){ loginMsg('Network error. Try again.','err'); })
+      .then(function(){ $('btn-verify').disabled=false; });
+  }
+  function logout(){
+    TOKEN=null; ME=""; ROWS=[]; sdel('tok'); sdel('me');
+    $('app').style.display='none'; $('userbox').style.display='none';
+    $('login').style.display='block'; $('step2').style.display='none';
+    $('code').value=''; loginMsg('');
+  }
+  function showApp(){
+    $('login').style.display='none'; $('app').style.display='block';
+    $('userbox').style.display='flex'; $('whoami').textContent='👤 '+ME;
     loadData();
-  };
-
-  // ── LOAD DATA FROM GAS ────────────────────────────
-  function loadData() {
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('batch-grid').innerHTML = '';
-    document.getElementById('empty').style.display = 'none';
-
-    fetch(GAS_URL + '?action=readAll')
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        allRows = data;
-        document.getElementById('loading').style.display = 'none';
-        populateWeekFilter(data);
-        applyFilters();
-      })
-      .catch(function(err) {
-        document.getElementById('loading').textContent = '❌ Failed to load data. Check GAS_URL.';
-      });
   }
 
-  function populateWeekFilter(rows) {
-    var weeks = [...new Set(rows.map(r => r.week))].sort();
-    var sel = document.getElementById('filter-week');
-    sel.innerHTML = '<option value="">All</option>';
-    weeks.forEach(function(w) {
-      sel.innerHTML += '<option value="'+w+'">WEEK '+w+'</option>';
-    });
-  }
-
-  // ── GROUP ROWS INTO BATCHES ───────────────────────
-  function groupByBatch(rows) {
-    var map = {};
-    rows.forEach(function(row) {
-      if (!map[row.batchId]) {
-        map[row.batchId] = {
-          batchId:    row.batchId,
-          department: row.department,
-          week:       row.week,
-          hodEmail:   row.hodEmail,
-          dceoEmail:  row.dceoEmail,
-          hodStatus:  row.hodStatus,
-          dceoStatus: row.dceoStatus,
-          hodDate:    row.hodDate,
-          dceoDate:   row.dceoDate,
-          pdfUrl:     row.pdfUrl,
-          rows:       []
-        };
+  // ---------- data ----------
+  function loadData(){
+    $('loading').style.display='block'; $('grid').innerHTML=''; $('empty').style.display='none';
+    api({action:'readAll', token:TOKEN}).then(function(res){
+      if(!Array.isArray(res)){
+        if(res && res.message==='AUTH'){ toast('Session expired. Please sign in again.','t-err'); logout(); return; }
+        throw new Error((res&&res.message)||'Load failed');
       }
-      map[row.batchId].rows.push(row);
-    });
-    return Object.values(map);
+      ROWS=res; $('loading').style.display='none'; fillFilters(); render();
+    }).catch(function(err){ $('loading').textContent='❌ '+err.message; });
   }
+  function fillFilters(){
+    var depts=[...new Set(ROWS.map(function(r){return r.department;}))].sort();
+    var weeks=[...new Set(ROWS.map(function(r){return String(r.week);}))].sort();
+    var fd=$('f-dept').value, fw=$('f-week').value;
+    $('f-dept').innerHTML='<option value="">All</option>'+depts.map(function(d){return '<option>'+esc(d)+'</option>';}).join('');
+    $('f-week').innerHTML='<option value="">All</option>'+weeks.map(function(w){return '<option value="'+esc(w)+'">WEEK '+esc(w)+'</option>';}).join('');
+    $('f-dept').value=fd; $('f-week').value=fw;
+  }
+  function group(rows){
+    var m={};
+    rows.forEach(function(r){
+      if(!m[r.batchId]) m[r.batchId]={id:r.batchId,dept:r.department,week:r.week,hodEmail:r.hodEmail,dceoEmail:r.dceoEmail,
+        hodStatus:r.hodStatus,dceoStatus:r.dceoStatus,hodDate:r.hodDate,dceoDate:r.dceoDate,pdf:r.pdfUrl,rows:[]};
+      m[r.batchId].rows.push(r);
+    });
+    return Object.keys(m).map(function(k){return m[k];});
+  }
+  function canHod(b){ return String(b.hodEmail).toLowerCase()===ME && b.hodStatus==='PENDING'; }
+  function canDceo(b){ return String(b.dceoEmail).toLowerCase()===ME && b.hodStatus==='APPROVED' && b.dceoStatus==='PENDING'; }
 
-  // ── APPLY FILTERS ─────────────────────────────────
-  function applyFilters() {
-    var deptF   = document.getElementById('filter-dept').value;
-    var statusF = document.getElementById('filter-status').value;
-    var weekF   = document.getElementById('filter-week').value;
-
-    var filtered = allRows.filter(function(r) {
-      if (deptF   && r.department !== deptF) return false;
-      if (weekF   && r.week !== weekF)       return false;
-      if (statusF) {
-        if (statusF === 'PENDING'  && (r.hodStatus !== 'PENDING'))  return false;
-        if (statusF === 'APPROVED' && (r.dceoStatus !== 'APPROVED')) return false;
-        if (statusF === 'REJECTED' && r.hodStatus !== 'REJECTED' && r.dceoStatus !== 'REJECTED') return false;
-      }
+  // ---------- render ----------
+  function render(){
+    var fd=$('f-dept').value, fw=$('f-week').value, fs=$('f-status').value;
+    var batches=group(ROWS.filter(function(r){ return (!fd||r.department===fd)&&(!fw||String(r.week)===fw); }));
+    batches=batches.filter(function(b){
+      if(fs==='MINE') return canHod(b)||canDceo(b);
+      if(fs==='APPROVED') return b.dceoStatus==='APPROVED';
+      if(fs==='REJECTED') return b.hodStatus==='REJECTED'||b.dceoStatus==='REJECTED';
       return true;
     });
+    $('s-all').textContent=batches.length;
+    $('s-mine').textContent=batches.filter(function(b){return canHod(b)||canDceo(b);}).length;
+    $('s-ok').textContent=batches.filter(function(b){return b.dceoStatus==='APPROVED';}).length;
+    $('s-bad').textContent=batches.filter(function(b){return b.hodStatus==='REJECTED'||b.dceoStatus==='REJECTED';}).length;
 
-    var batches = groupByBatch(filtered);
-    renderStats(batches);
-    renderBatches(batches);
-  }
-
-  // ── STATS ─────────────────────────────────────────
-  function renderStats(batches) {
-    var pending  = batches.filter(b => b.hodStatus === 'PENDING').length;
-    var approved = batches.filter(b => b.dceoStatus === 'APPROVED').length;
-    var rejected = batches.filter(b => b.hodStatus === 'REJECTED' || b.dceoStatus === 'REJECTED').length;
-    document.getElementById('stat-total').textContent    = batches.length;
-    document.getElementById('stat-pending').textContent  = pending;
-    document.getElementById('stat-approved').textContent = approved;
-    document.getElementById('stat-rejected').textContent = rejected;
-  }
-
-  // ── RENDER BATCH CARDS ────────────────────────────
-  function renderBatches(batches) {
-    var grid = document.getElementById('batch-grid');
-    var empty = document.getElementById('empty');
-    grid.innerHTML = '';
-
-    if (batches.length === 0) { empty.style.display = 'block'; return; }
-    empty.style.display = 'none';
-
-    // Sort: PENDING first, then by batchId desc
-    batches.sort(function(a, b) {
-      if (a.hodStatus === 'PENDING' && b.hodStatus !== 'PENDING') return -1;
-      if (b.hodStatus === 'PENDING' && a.hodStatus !== 'PENDING') return  1;
-      return b.batchId.localeCompare(a.batchId);
+    batches.sort(function(a,b){
+      var am=(canHod(a)||canDceo(a))?0:1, bm=(canHod(b)||canDceo(b))?0:1;
+      return am-bm || String(b.id).localeCompare(String(a.id));
     });
 
-    batches.forEach(function(batch) {
-      var totalCost = batch.rows.reduce(function(s, r) { return s + r.wages; }, 0);
-      var totalPax  = batch.rows.reduce(function(s, r) { return s + r.pt;   }, 0);
+    var grid=$('grid'); grid.innerHTML='';
+    $('empty').style.display=batches.length?'none':'block';
+    batches.forEach(function(b){
+      var cost=b.rows.reduce(function(s,r){return s+r.wages;},0);
+      var pax=b.rows.reduce(function(s,r){return s+r.pt;},0);
+      var rowsHtml=b.rows.slice(0,6).map(function(r){
+        return '<tr><td>'+esc(r.date)+' ('+esc(r.day)+')</td><td>'+esc(r.shift)+'</td><td>'+r.pt+' pax</td><td>'+r.hours+' hrs</td><td>RM '+r.rate.toFixed(2)+'</td><td><b>RM '+r.wages.toFixed(2)+'</b></td></tr>';
+      }).join('');
+      if(b.rows.length>6) rowsHtml+='<tr><td colspan="6" style="text-align:center;color:#94a3b8;">… and '+(b.rows.length-6)+' more rows. See PDF.</td></tr>';
 
-      var hodBadge  = badgeHtml(batch.hodStatus);
-      var dceoBadge = badgeHtml(batch.dceoStatus);
+      var h=canHod(b), d=canDceo(b);
+      var hodNote = String(b.hodEmail).toLowerCase()===ME ? '' : '<div class="note">Only the assigned HOD can act here.</div>';
+      var dceoNote = String(b.dceoEmail).toLowerCase()===ME ? (b.hodStatus!=='APPROVED'?'<div class="note">Unlocks after HOD approval.</div>':'') : '<div class="note">Only the assigned DCEO can act here.</div>';
 
-      // Determine what actions are available
-      var hodDisabled  = batch.hodStatus  !== 'PENDING'  ? 'disabled' : '';
-      var dceoDisabled = batch.dceoStatus !== 'PENDING' || batch.hodStatus !== 'APPROVED' ? 'disabled' : '';
-
-      // Summary rows (top 5 only in card, full in PDF)
-      var rowsHtml = '';
-      batch.rows.slice(0, 6).forEach(function(r) {
-        rowsHtml += '<tr>'
-          + '<td>'  + r.date + ' ('+ r.day +')</td>'
-          + '<td>'  + r.shift + '</td>'
-          + '<td style="text-align:center;">' + r.pt + ' pax</td>'
-          + '<td style="text-align:center;">' + r.hours + ' hrs</td>'
-          + '<td style="text-align:right;">RM ' + r.rate.toFixed(2) + '</td>'
-          + '<td style="text-align:right; font-weight:700; color:#164B81;">RM ' + r.wages.toFixed(2) + '</td>'
-          + '</tr>';
-      });
-      if (batch.rows.length > 6) {
-        rowsHtml += '<tr><td colspan="6" style="text-align:center; color:#94a3b8; font-style:italic;">... and '+(batch.rows.length-6)+' more rows. See PDF for full details.</td></tr>';
-      }
-
-      var pdfBtn = batch.pdfUrl
-        ? '<a class="pdf-link" href="'+batch.pdfUrl+'" target="_blank">📄 View Full PDF Report</a>'
-        : '';
-
-      var card = document.createElement('div');
-      card.className = 'batch-card';
-      card.id = 'card-' + batch.batchId;
-      card.innerHTML = `
-        <div class="batch-header">
-          <div>
-            <div class="batch-title">🏢 ${batch.department} &nbsp;|&nbsp; 📅 WEEK ${batch.week}</div>
-            <div class="batch-meta">Batch ID: ${batch.batchId}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:0.8rem;">Est. Cost: <b>RM ${totalCost.toFixed(2)}</b> &nbsp;|&nbsp; ${totalPax} Pax</div>
-          </div>
-        </div>
-        <div class="batch-body">
-
-          <!-- Approval flow -->
-          <div class="approval-flow">
-            <div class="approval-step">
-              <div class="step-title">① HOD Verification</div>
-              <div class="step-email">📧 ${batch.hodEmail}</div>
-              <div>${hodBadge}</div>
-              <div class="step-date">${batch.hodDate ? '🕐 ' + batch.hodDate : ''}</div>
-              <div class="action-btns">
-                <button class="btn-approve" ${hodDisabled} onclick="updateBatch('${batch.batchId}','HOD','APPROVED','${batch.department}','${batch.week}')">✔ Approve</button>
-                <button class="btn-reject"  ${hodDisabled} onclick="updateBatch('${batch.batchId}','HOD','REJECTED','${batch.department}','${batch.week}')">✘ Reject</button>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;font-size:1.2rem;color:#94a3b8;padding-top:30px;">→</div>
-            <div class="approval-step">
-              <div class="step-title">② Deputy CEO Final Approval</div>
-              <div class="step-email">📧 ${batch.dceoEmail}</div>
-              <div>${dceoBadge}</div>
-              <div class="step-date">${batch.dceoDate ? '🕐 ' + batch.dceoDate : ''}</div>
-              <div class="action-btns">
-                <button class="btn-approve" ${dceoDisabled} onclick="updateBatch('${batch.batchId}','DCEO','APPROVED','${batch.department}','${batch.week}')">✔ Approve</button>
-                <button class="btn-reject"  ${dceoDisabled} onclick="updateBatch('${batch.batchId}','DCEO','REJECTED','${batch.department}','${batch.week}')">✘ Reject</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Row summary -->
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Date</th><th>Shift</th><th>Headcount</th>
-                <th>Hours</th><th>Rate</th><th>Wages</th>
-              </tr>
-            </thead>
-            <tbody>${rowsHtml}</tbody>
-          </table>
-
-          ${pdfBtn}
-        </div>
-      `;
-      grid.appendChild(card);
+      var el=document.createElement('div'); el.className='batch';
+      el.innerHTML=
+        '<div class="batch-head"><div><div class="t">🏢 '+esc(b.dept)+' | 📅 WEEK '+esc(b.week)+'</div><div class="m">'+esc(b.id)+'</div></div>'+
+        '<div style="font-size:0.78rem;">Est. Cost: <b>RM '+cost.toFixed(2)+'</b> | '+pax+' Pax</div></div>'+
+        '<div class="batch-body"><div class="flow">'+
+          '<div class="step"><div class="st">① HOD Verification</div><div class="em">📧 '+esc(b.hodEmail)+'</div>'+
+            '<span class="badge b-'+esc(b.hodStatus)+'">'+esc(b.hodStatus)+'</span><div class="dt">'+(b.hodDate?'🕐 '+esc(b.hodDate):'')+'</div>'+
+            '<div class="acts"><button class="ap" data-batch="'+esc(b.id)+'" data-level="HOD" data-act="APPROVED" data-label="'+esc(b.dept)+' Week '+esc(b.week)+'" '+(h?'':'disabled')+'>✔ Approve</button>'+
+            '<button class="rj" data-batch="'+esc(b.id)+'" data-level="HOD" data-act="REJECTED" data-label="'+esc(b.dept)+' Week '+esc(b.week)+'" '+(h?'':'disabled')+'>✘ Reject</button></div>'+hodNote+'</div>'+
+          '<div class="step"><div class="st">② Deputy CEO Approval</div><div class="em">📧 '+esc(b.dceoEmail)+'</div>'+
+            '<span class="badge b-'+esc(b.dceoStatus)+'">'+esc(b.dceoStatus)+'</span><div class="dt">'+(b.dceoDate?'🕐 '+esc(b.dceoDate):'')+'</div>'+
+            '<div class="acts"><button class="ap" data-batch="'+esc(b.id)+'" data-level="DCEO" data-act="APPROVED" data-label="'+esc(b.dept)+' Week '+esc(b.week)+'" '+(d?'':'disabled')+'>✔ Approve</button>'+
+            '<button class="rj" data-batch="'+esc(b.id)+'" data-level="DCEO" data-act="REJECTED" data-label="'+esc(b.dept)+' Week '+esc(b.week)+'" '+(d?'':'disabled')+'>✘ Reject</button></div>'+dceoNote+'</div>'+
+        '</div>'+
+        '<div class="wrap"><table class="d"><thead><tr><th>Date</th><th>Shift</th><th>Headcount</th><th>Hours</th><th>Rate</th><th>Wages</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
+        (b.pdf?'<a class="pdf" href="'+esc(b.pdf)+'" target="_blank" rel="noopener">📄 View Full PDF</a>':'')+
+        '</div>';
+      grid.appendChild(el);
     });
   }
 
-  // ── BADGE HTML ────────────────────────────────────
-  function badgeHtml(status) {
-    var cls = status === 'APPROVED' ? 'badge-approved'
-            : status === 'REJECTED' ? 'badge-rejected'
-            : 'badge-pending';
-    return '<span class="badge '+cls+'">'+status+'</span>';
-  }
+  // ---------- decisions ----------
+  $('grid').addEventListener('click',function(ev){
+    var btn=ev.target.closest('button[data-act]');
+    if(!btn||btn.disabled) return;
+    var label=btn.dataset.label, level=btn.dataset.level, act=btn.dataset.act, id=btn.dataset.batch;
+    if(!confirm((act==='APPROVED'?'Approve':'Reject')+' '+label+' as '+level+'?')) return;
+    document.querySelectorAll('#grid button[data-act]').forEach(function(x){x.disabled=true;});
+    toast('⏳ Updating…','t-info');
+    api({action:'updateBatch', token:TOKEN, batchId:id, level:level, status:act}).then(function(res){
+      if(res.status==='success'){ toast('✅ '+level+' '+act,'t-ok'); setTimeout(loadData,1200); }
+      else if(res.message==='AUTH'){ toast('Session expired. Sign in again.','t-err'); logout(); }
+      else { toast('❌ '+(res.message||'Not allowed'),'t-err'); loadData(); }
+    }).catch(function(){ toast('❌ Network error','t-err'); loadData(); });
+  });
 
-  // ── APPROVE / REJECT ACTION ───────────────────────
-  function updateBatch(batchId, level, status, dept, week) {
-    var action = status === 'APPROVED' ? 'approve' : 'reject';
-    if (!confirm('Confirm ' + action + ' for ' + dept + ' Week ' + week + ' (' + level + ')?')) return;
+  $('email').addEventListener('keydown',function(e){ if(e.key==='Enter') sendCode(); });
+  $('code').addEventListener('keydown',function(e){ if(e.key==='Enter') verifyCode(); });
 
-    showToast('⏳ Updating...', 'toast-info');
-
-    fetch(GAS_URL + '?action=updateBatch&batchId=' + encodeURIComponent(batchId) + '&level=' + level + '&status=' + status)
-      .then(function(r) { return r.json(); })
-      .then(function(res) {
-        if (res.status === 'success') {
-          showToast('✅ ' + level + ' ' + status + ' successfully!', 'toast-success');
-          setTimeout(loadData, 1500);
-        } else {
-          showToast('❌ Error: ' + (res.message || 'Unknown'), 'toast-error');
-        }
-      })
-      .catch(function() {
-        showToast('❌ Network error.', 'toast-error');
-      });
-  }
-
-  // ── TOAST ─────────────────────────────────────────
-  function showToast(msg, cls) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = cls || '';
-    t.style.display = 'block';
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function() { t.style.display = 'none'; }, 4000);
-  }
+  // ---------- init ----------
+  TOKEN=sget('tok'); ME=sget('me')||"";
+  if(TOKEN && ME) showApp();
 </script>
 </body>
 </html>
