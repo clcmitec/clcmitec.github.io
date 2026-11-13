@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MITEC — Booking Manager | Operations Console</title>
+  <title>MITEC — Booking Manager | Google Sheets Console</title>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <!-- Google Tag -->
@@ -17,7 +17,6 @@
 
   <style>
     :root {
-      /* MITEC Navy Blue Theme Palette */
       --mitec-black: #111111;
       --mitec-dark-nav: #0a4494;
       --mitec-blue: #054db3;
@@ -29,11 +28,6 @@
       --text-muted: #51525c;
       --text-light: #ffffff;
       --border-thin: #cbd5e1;
-
-      /* Status Pill Color Palette */
-      --pill-teal-bg: #f3f9e9;
-      --pill-teal-text: #598522;
-      --pill-teal-border: #cbe69d;
 
       --pill-amber-bg: #fffbeb;
       --pill-amber-text: #b45309;
@@ -51,93 +45,30 @@
       --pill-orange-text: #c2410c;
       --pill-orange-border: #ffedd5;
 
-      --accent-emerald: #1B365D;
       --accent-warn: #9b1c1c;
-      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
     body { background-color: var(--bg-slate); font-family: var(--font-main); color: var(--text-main); line-height: 1.5; padding-bottom: 60px; }
 
-    /* Top Utility Bar */
-    .top-bar {
-      background: var(--mitec-black);
-      color: #888;
-      font-size: 0.75rem;
-      padding: 0.5rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #222;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
+    .top-bar { background: var(--mitec-black); color: #888; font-size: 0.75rem; padding: 0.5rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; text-transform: uppercase; font-weight: 700; }
     .top-bar-left { display: flex; align-items: center; gap: 8px; color: #aaa; }
-    .top-bar-left .live-dot { width: 8px; height: 8px; background: var(--mitec-blue-hover); border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+    .live-dot { width: 8px; height: 8px; background: var(--mitec-blue-hover); border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* Sticky Main Navigation */
-    .main-nav {
-      position: sticky;
-      top: 0;
-      z-index: 1100;
-      background: var(--mitec-dark-nav);
-      color: var(--text-light);
-      padding: 0.75rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
+    .main-nav { position: sticky; top: 0; z-index: 1100; background: var(--mitec-dark-nav); color: var(--text-light); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
     .brand-container { display: flex; align-items: center; gap: 12px; }
     .brand-img { height: 28px; width: auto; display: block; filter: brightness(0) invert(1); }
-    .brand-tag { font-size: 0.75rem; font-weight: 900; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+    .user-profile-tag { font-size: 10px; font-weight: 800; color: #fff; text-transform: uppercase; background: var(--mitec-blue-hover); padding: 4px 10px; border-radius: 4px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .user-profile-tag { 
-      font-size: 10px; 
-      font-weight: 800; 
-      color: #ffffff; 
-      text-transform: uppercase; 
-      letter-spacing: 0.5px; 
-      background: var(--mitec-blue-hover); 
-      padding: 4px 10px; 
-      border-radius: 4px; 
-      max-width: 200px; 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-    }
-
-    /* Tab Bar (Sub-Nav Tabs) */
-    .tab-bar { 
-      display: flex; 
-      background: var(--mitec-black); 
-      border-bottom: 1px solid #2a2a2a; 
-      position: sticky; 
-      top: 51px; 
-      z-index: 1000; 
-      padding: 0 1rem;
-    }
-    .tab-item { 
-      flex: 1; 
-      text-align: center; 
-      padding: 14px 0; 
-      font-size: 11px; 
-      font-weight: 800; 
-      color: #888888; 
-      text-transform: uppercase; 
-      cursor: pointer; 
-      letter-spacing: 0.5px; 
-      border-bottom: 3px solid transparent; 
-      transition: all 0.2s ease;
-    }
-    .tab-item:hover { color: #ffffff; }
-    .tab-item.active { color: #ffffff; border-bottom-color: var(--mitec-blue-hover); }
+    .tab-bar { display: flex; background: var(--mitec-black); border-bottom: 1px solid #2a2a2a; position: sticky; top: 51px; z-index: 1000; padding: 0 1rem; }
+    .tab-item { flex: 1; text-align: center; padding: 14px 0; font-size: 11px; font-weight: 800; color: #888; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
+    .tab-item:hover { color: #fff; }
+    .tab-item.active { color: #fff; border-bottom-color: var(--mitec-blue-hover); }
 
     .container { max-width: 1000px; margin: 0 auto; padding: 20px 15px; }
 
-    /* Login Overlay */
     #login-overlay { position: fixed; inset: 0; background: var(--mitec-black); z-index: 5500; display: none; align-items: center; justify-content: center; padding: 20px; }
     .login-card { background: #fff; width: 100%; max-width: 400px; border-radius: 12px; padding: 36px 28px; border: 1px solid var(--border-thin); box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; }
     .login-logo { font-size: 48px; color: var(--mitec-blue); margin-bottom: 12px; }
@@ -145,330 +76,143 @@
     .app-page { display: none; }
     .app-page.active { display: block; }
 
-    .section-label { 
-      font-size: 11px; 
-      font-weight: 900; 
-      color: var(--text-main); 
-      margin: 25px 0 12px 2px; 
-      text-transform: uppercase; 
-      letter-spacing: 1.5px; 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-    }
+    .section-label { font-size: 11px; font-weight: 900; color: var(--text-main); margin: 25px 0 12px 2px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
     .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border-thin); }
 
-    /* Scorecard Grid */
     .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0 20px 0; }
-
-    .dash-tile { 
-      background: #fff; 
-      border: 1px solid var(--border-thin); 
-      border-radius: 8px; 
-      padding: 16px; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 4px; 
-      cursor: pointer; 
-      transition: all 0.2s ease; 
-      position: relative; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
-    }
+    .dash-tile { background: #fff; border: 1px solid var(--border-thin); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: left; }
     .dash-tile:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
-    .dash-tile:active { transform: scale(0.97); }
-    .dash-tile.selected { border-width: 2px; border-color: var(--mitec-blue) !important; box-shadow: 0 4px 14px rgba(27, 54, 93, 0.2); }
-
-    .dash-tile.tile-cap.selected { background: #ffffff; color: var(--text-main); }
-    .dash-tile.tile-conf.selected { background: var(--pill-teal-bg); }
+    .dash-tile.selected { border-width: 2px; border-color: var(--mitec-blue) !important; }
+    .dash-tile.tile-conf.selected { background: #f3f9e9; }
     .dash-tile.tile-wait.selected { background: var(--pill-amber-bg); }
     .dash-tile.tile-pres.selected { background: var(--pill-emerald-bg); }
+    .dash-tile span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+    .dash-tile h2 { margin: 0; font-size: 24px; font-weight: 900; color: var(--text-main); }
+    .matrix-title-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; background: var(--mitec-blue); color: #fff; font-weight: 800; text-transform: uppercase; margin-left: 6px; }
 
-    .dash-tile span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.8px; }
-    .dash-tile h2 { margin: 0; font-size: 24px; font-weight: 900; color: var(--text-main); transition: color 0.2s; letter-spacing: -0.5px; }
-    .matrix-title-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; background: var(--mitec-blue); color: #ffffff; font-weight: 800; text-transform: uppercase; margin-left: 6px; vertical-align: middle; }
-
-    /* Calendar UI Elements */
     .calendar-wrapper { background: #fff; border: 1px solid var(--border-thin); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
     .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-    .cal-header h3 { margin: 0; font-size: 15px; font-weight: 900; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
-    .btn-cal-nav { background: var(--mitec-blue); border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; color: #fff; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .btn-cal-nav:hover { background: var(--mitec-blue-hover); }
-    .btn-cal-nav:active { transform: scale(0.9); }
+    .cal-header h3 { margin: 0; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+    .btn-cal-nav { background: var(--mitec-blue); border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; color: #fff; font-size: 16px; display: flex; align-items: center; justify-content: center; }
 
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
     .cal-day-label { font-size: 10px; font-weight: 900; color: var(--mitec-blue); text-transform: uppercase; margin-bottom: 6px; }
-    .cal-cell { aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--text-main); cursor: pointer; border: 1px solid var(--border-thin); transition: 0.2s; position: relative; background: #fafafa; }
-    .cal-cell:hover { background: #f0f0f0; border-color: #ccc; }
+    .cal-cell { aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid var(--border-thin); background: #fafafa; }
     .cal-cell.empty { background: transparent; border-color: transparent; cursor: default; }
-    .cal-cell.has-shifts { background: #ffffff; border-color: #000; color: var(--text-main); }
-    .cal-cell.selected { background: var(--mitec-blue) !important; color: #fff !important; border-color: var(--mitec-blue) !important; box-shadow: 0 4px 12px rgba(27, 54, 93, 0.4); transform: scale(1.06); z-index: 2; }
+    .cal-cell.has-shifts { background: #fff; border-color: #000; }
+    .cal-cell.selected { background: var(--mitec-blue) !important; color: #fff !important; border-color: var(--mitec-blue) !important; }
+    .cal-indicator { font-size: 8px; font-weight: 800; border-radius: 3px; padding: 1px 4px; margin-top: 3px; text-transform: uppercase; }
 
-    .cal-indicator { font-size: 8px; font-weight: 800; border-radius: 3px; padding: 1px 4px; margin-top: 3px; line-height: 1.2; text-transform: uppercase; }
-    .cal-cell.selected .cal-indicator { background: rgba(0,0,0,0.25) !important; color: #fff !important; }
-
-    /* GOOGLE SHEETS / SPREADSHEET STYLE DATABASE TABLE (Tab 2) */
-    .db-console-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 6px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .db-console-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 6px; padding: 16px; }
     .db-filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
     @media (max-width: 900px) { .db-filter-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 500px) { .db-filter-grid { grid-template-columns: 1fr; } }
-
-    .db-checkbox-filters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 0 14px 0; border-top: 1px dashed var(--border-thin); margin-bottom: 10px; }
-    @media (max-width: 768px) { .db-checkbox-filters-row { grid-template-columns: 1fr; } }
+    .db-checkbox-filters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 0 14px; border-top: 1px dashed var(--border-thin); margin-bottom: 10px; }
     .filter-box-group { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 6px; padding: 10px 12px; }
-    .filter-box-title { font-size: 10px; font-weight: 900; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .filter-box-title { font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px; }
     .filter-checkboxes { display: flex; flex-wrap: wrap; gap: 14px; }
+    .db-table-wrapper { overflow-x: auto; max-height: 650px; border: 1px solid var(--border-thin); background: #fff; }
 
-    .db-table-wrapper { overflow-x: auto; max-height: 650px; overflow-y: auto; border: 1px solid var(--border-thin); background: #ffffff; }
+    .sheets-db-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
+    .sheets-db-table th { position: sticky; top: 0; background: #f1f5f9; color: #334155; padding: 8px 10px; font-weight: 800; text-transform: uppercase; font-size: 10px; border: 1px solid #cbd5e1; z-index: 10; }
+    .sheets-db-table td { padding: 6px 10px; border: 1px solid #e2e8f0; white-space: nowrap; }
 
-    /* Spreadsheet Grid Styles */
-    .sheets-db-table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: var(--font-main); text-align: left; }
-    .sheets-db-table th { 
-      position: sticky; 
-      top: 0; 
-      background: #f1f5f9; 
-      color: #334155; 
-      padding: 8px 10px; 
-      font-weight: 800; 
-      text-transform: uppercase; 
-      font-size: 10px; 
-      letter-spacing: 0.5px; 
-      border: 1px solid #cbd5e1; 
-      z-index: 10;
-    }
-    .sheets-db-table td { 
-      padding: 6px 10px; 
-      border: 1px solid #e2e8f0; 
-      vertical-align: middle; 
-      white-space: nowrap;
-    }
-    .sheets-db-table tr:nth-child(even) { background-color: #f9fafb; }
-    .sheets-db-table tr:hover { background-color: #f1f5f9; }
-
-    .sheet-cell-id { font-family: monospace; font-weight: 700; color: var(--mitec-blue); font-size: 11px; }
-    .sheet-cell-name { font-weight: 700; color: var(--text-main); text-transform: uppercase; }
+    .sheet-cell-id { font-family: monospace; font-weight: 700; color: var(--mitec-blue); }
+    .sheet-cell-name { font-weight: 700; text-transform: uppercase; }
     .sheet-cell-sub { font-size: 10px; color: var(--text-muted); font-family: monospace; }
 
-    /* Status Badge Plain Text */
-    .status-text-badge { font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; letter-spacing: 0.5px; }
-    .status-text-badge.confirmed { background-color: var(--mitec-blue); color: #ffffff; }
-    .status-text-badge.waitlist { background-color: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
-    .status-text-badge.cancelled { background-color: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
+    .status-text-badge { font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; }
+    .status-text-badge.confirmed { background: var(--mitec-blue); color: #fff; }
+    .status-text-badge.waitlist { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
+    .status-text-badge.cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
 
-    /* Attendance Cells & Toggles */
-    .att-badge { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 3px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; font-family: monospace; }
+    .att-badge { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 3px; display: inline-flex; align-items: center; gap: 4px; font-family: monospace; }
     .att-badge.present { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
     .att-badge.noshow { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
-    /* Stat Cards & Roster Styling */
-    .stat-row-card { background: var(--card-bg); border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s ease; }
+    .stat-row-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
     .stat-row-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
-    .stat-row-card:active { transform: scale(0.98); }
-    .stat-row-card.selected-card { border: 2px solid var(--mitec-blue); box-shadow: 0 4px 14px rgba(27, 54, 93, 0.2); }
+    .stat-row-card.selected-card { border: 2px solid var(--mitec-blue); }
+    .stat-info h3 { font-size: 16px; font-weight: 900; text-transform: uppercase; }
+    .stat-info p { font-size: 12px; color: var(--text-muted); font-weight: 600; display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+    .metrics-pill-pack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+    .mini-badge { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; text-align: center; min-width: 65px; }
+    .pill-sub { background: var(--mitec-blue); color: #fff; }
+    .pill-pres { background: var(--pill-emerald-bg); color: var(--pill-emerald-text); }
+    .pill-noshow { background: var(--pill-orange-bg); color: var(--pill-orange-text); }
+    .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); }
+    .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); }
 
-    .stat-info h3 { margin: 0; font-size: 16px; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
-    .stat-info p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; display: flex; flex-direction: column; gap: 3px; }
-    .meta-data-line { display: flex; align-items: center; gap: 6px; }
-
-    .metrics-pill-pack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; align-items: center; }
-    .mini-badge { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; text-align: center; min-width: 65px; letter-spacing: 0.5px; }
-    .pill-pres { background: var(--pill-emerald-bg); color: var(--pill-emerald-text); border: 1px solid var(--pill-emerald-border); }
-    .pill-noshow { background: var(--pill-orange-bg); color: var(--pill-orange-text); border: 1px solid var(--pill-orange-border); }
-
-    /* Worker Manager Filter & Table Styles */
-    .filter-panel-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+    .filter-panel-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
     .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .doc-type-filter-group { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-thin); }
-    .doc-type-options { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
-    .checkbox-label { font-size: 12px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--mitec-blue); cursor: pointer; }
+    .doc-type-options { display: flex; gap: 16px; margin-top: 6px; }
+    .checkbox-label { font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; }
 
-    .wm-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-    .wm-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .wm-header-title { font-size: 24px; font-weight: 900; color: var(--text-main); margin: 0 0 10px 0; text-transform: uppercase; }
-    .wm-meta-line { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-
-    .btn-download-roster { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-thin); border-radius: 6px; padding: 8px 12px; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700; transition: 0.15s; }
-    .btn-download-roster:active { transform: scale(0.95); background: #e2e8f0; }
+    .wm-card { background: #fff; border: 1px solid var(--border-thin); border-radius: 10px; padding: 20px; }
+    .wm-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .wm-header-title { font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px; }
+    .wm-meta-line { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 3px; }
+    .btn-download-roster { background: #f1f5f9; border: 1px solid var(--border-thin); border-radius: 6px; padding: 8px 12px; font-size: 16px; cursor: pointer; }
 
     .wm-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; text-align: left; }
-    .wm-table th { background: #f8fafc; padding: 12px 8px; font-weight: 800; color: var(--text-main); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-thin); }
-    .wm-table td { padding: 14px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
+    .wm-table th { background: #f8fafc; padding: 10px 8px; font-weight: 800; text-transform: uppercase; font-size: 10px; border-bottom: 1px solid var(--border-thin); }
+    .wm-table td { padding: 12px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
 
-    .wm-scorecard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0 16px 0; }
-    .wm-stat-card { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 8px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; }
-    .wm-stat-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.3px; line-height: 1.1; }
+    .wm-scorecard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0 16px; }
+    .wm-stat-card { background: #f8fafc; border: 1px solid var(--border-thin); border-radius: 8px; padding: 10px 6px; text-align: center; }
+    .wm-stat-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
     .wm-stat-value { font-size: 18px; font-weight: 900; color: var(--mitec-blue); }
 
-    /* Worker Profile Photo Frame (Tab 3) - Clickable Image for WhatsApp-style Lightbox */
     .worker-profile-cell { display: flex; align-items: center; gap: 12px; }
-    .worker-avatar-frame {
-      width: 42px;
-      height: 48px;
-      background: linear-gradient(180deg, #2b2b2b 0%, #111111 100%);
-      border-radius: 6px 6px 0 0;
-      border: 1px solid #333;
-      border-bottom: 2px solid var(--mitec-blue);
-      flex-shrink: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      position: relative;
-      cursor: pointer;
-      transition: transform 0.2s ease, filter 0.2s ease;
-    }
-    .worker-avatar-frame:hover {
-      transform: scale(1.05);
-      filter: brightness(1.1);
-    }
-    .worker-avatar { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-      object-position: top center;
-      display: block;
-    }
+    .worker-avatar-frame { width: 42px; height: 48px; background: #111; border-radius: 6px 6px 0 0; border: 1px solid #333; border-bottom: 2px solid var(--mitec-blue); overflow: hidden; cursor: pointer; }
+    .worker-avatar { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 
-    /* WHATSAPP-STYLE PHOTO LIGHTBOX MODAL */
-    #image-lightbox-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(8px);
-      z-index: 6000;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      animation: fadeIn 0.25s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .lightbox-content-box {
-      position: relative;
-      max-width: 90vw;
-      max-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .lightbox-image {
-      max-width: 100%;
-      max-height: 70vh;
-      border-radius: 12px;
-      object-fit: contain;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-      border: 2px solid rgba(255, 255, 255, 0.15);
-      animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    @keyframes zoomIn {
-      from { transform: scale(0.7); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .lightbox-caption {
-      margin-top: 14px;
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 15px;
-      text-transform: uppercase;
-      text-align: center;
-      letter-spacing: 0.5px;
-    }
-    .lightbox-subtext {
-      font-size: 11px;
-      color: #aaa;
-      font-family: monospace;
-      margin-top: 2px;
-    }
-    .lightbox-close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.15);
-      border: none;
-      color: #ffffff;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
-    }
-    .lightbox-close-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.1);
-    }
+    #image-lightbox-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px); z-index: 6000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-content-box { position: relative; max-width: 90vw; max-height: 80vh; display: flex; flex-direction: column; align-items: center; }
+    .lightbox-image { max-width: 100%; max-height: 70vh; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.15); }
+    .lightbox-caption { margin-top: 14px; color: #fff; font-weight: 800; font-size: 15px; text-transform: uppercase; }
+    .lightbox-subtext { font-size: 11px; color: #aaa; font-family: monospace; margin-top: 2px; }
+    .lightbox-close-btn { position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.15); border: none; color: #fff; width: 44px; height: 44px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
     .wm-status-select-wrapper { position: relative; display: inline-block; width: 100%; max-width: 120px; }
-    .wm-status-select { width: 100%; padding: 4px 18px 4px 6px; border-radius: 3px; font-size: 9px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; text-align: center; transition: all 0.15s ease; font-family: var(--font-main); }
-    .wm-status-select.status-confirmed { background-color: var(--mitec-blue); color: #ffffff; border: 1px solid var(--mitec-blue); }
-    .wm-status-select.status-waitlist { background-color: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
-    .wm-status-select.status-cancelled { background-color: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
-    .wm-status-chevron { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 9px; }
-    .status-confirmed + .wm-status-chevron { color: #ffffff; }
-    .status-waitlist + .wm-status-chevron { color: var(--pill-amber-text); }
-    .status-cancelled + .wm-status-chevron { color: var(--pill-red-text); }
+    .wm-status-select { width: 100%; padding: 4px 18px 4px 6px; border-radius: 3px; font-size: 9px; font-weight: 900; text-transform: uppercase; appearance: none; cursor: pointer; text-align: center; }
+    .wm-status-select.status-confirmed { background: var(--mitec-blue); color: #fff; border: 1px solid var(--mitec-blue); }
+    .wm-status-select.status-waitlist { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
 
-    .btn-call-action { background: #fff; color: var(--mitec-blue); border: 1px solid var(--mitec-blue); font-size: 10px; font-weight: 800; padding: 6px 14px; border-radius: 4px; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: 0.15s; width: 100%; max-width: 90px; }
-    .btn-call-action:hover { background: var(--mitec-blue); color: #fff; }
-    .btn-call-action:active { transform: scale(0.96); }
+    .btn-call-action { background: #fff; color: var(--mitec-blue); border: 1px solid var(--mitec-blue); font-size: 10px; font-weight: 800; padding: 6px 12px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-checkin { background: var(--pill-emerald-bg); color: var(--pill-emerald-text); border: 1px solid var(--pill-emerald-border); font-size: 9px; font-weight: 800; padding: 6px 10px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-checkin.clocked { background: #047857; color: #fff; }
 
-    .view-drawable-name { color: var(--text-main); font-weight: 800; cursor: pointer; display: inline-block; transition: all 0.2s ease; }
+    .view-drawable-name { color: var(--text-main); font-weight: 800; cursor: pointer; background: none; border: none; font-size: 11px; text-transform: uppercase; text-align: left; }
     .view-drawable-name:hover { color: var(--mitec-blue-hover); text-decoration: underline; }
 
-    /* Drawers Overlays Hierarchy */
     .drawer-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(2px); z-index: 2000; display: none; align-items: flex-end; }
-    #worker-profile-drawer { z-index: 2500; }
-
-    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 26px 22px; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,0.25); border-top: 4px solid var(--mitec-blue); }
+    .drawer-content { background: #fff; width: 100%; max-height: 85vh; border-top-left-radius: 16px; border-top-right-radius: 16px; padding: 26px 22px; overflow-y: auto; border-top: 4px solid var(--mitec-blue); }
     .drawer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; border-bottom: 1px solid var(--border-thin); padding-bottom: 14px; }
-    .drawer-header h2 { font-size: 18px; margin: 0; color: var(--text-main); font-weight: 900; text-transform: uppercase; display: flex; flex-direction: column; gap: 4px; }
-    .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; text-transform: none; }
-    .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 4px; transition: color 0.2s; }
-    .btn-close-drawer:hover { color: var(--mitec-blue-hover); }
+    .drawer-header h2 { font-size: 18px; margin: 0; font-weight: 900; text-transform: uppercase; display: flex; flex-direction: column; gap: 4px; }
+    .drawer-meta-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
+    .btn-close-drawer { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; }
 
     .roster-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; text-align: left; }
-    .roster-table th { background: var(--mitec-black); padding: 10px; font-weight: 800; color: #fff; text-transform: uppercase; font-size: 9px; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-thin); }
-    .roster-table td { padding: 10px 8px; border-bottom: 1px solid var(--border-thin); vertical-align: middle; }
-
-    .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; border: 1px solid transparent; }
-    .pill-sub { background: var(--mitec-blue); color: #ffffff; border: 1px solid var(--mitec-blue); }
-    .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); border: 1px solid var(--pill-amber-border); }
-    .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); border: 1px solid var(--pill-red-border); }
+    .roster-table th { background: var(--mitec-black); padding: 10px; font-weight: 800; color: #fff; font-size: 9px; text-transform: uppercase; }
+    .roster-table td { padding: 10px 8px; border-bottom: 1px solid var(--border-thin); }
+    .status-pill { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; width: 95px; text-align: center; }
+    .pill-sub { background: var(--mitec-blue); color: #fff; }
+    .pill-wait { background: var(--pill-amber-bg); color: var(--pill-amber-text); }
+    .pill-cancelled { background: var(--pill-red-bg); color: var(--pill-red-text); }
 
     .form-group { margin-bottom: 16px; text-align: left; }
-    .form-group label { display: block; font-size: 11px; font-weight: 900; color: var(--text-main); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px; }
+    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 6px; padding: 0 14px; font-size: 14px; background: #fff; }
+    textarea.form-control { height: 80px; padding: 12px; resize: none; }
 
-    .form-control { width: 100%; height: 46px; border: 1px solid var(--border-thin); border-radius: 6px; padding: 0 14px; font-family: var(--font-main); font-size: 14px; color: var(--text-main); background: #fff; appearance: auto; }
-    .form-control:focus { outline: none; border-color: var(--mitec-blue); box-shadow: 0 0 0 3px rgba(27, 54, 93, 0.15); }
-    .form-control:disabled { background: #f1f5f9; color: var(--text-muted); cursor: not-allowed; }
-    textarea.form-control { height: 80px; padding: 12px; resize: none; appearance: none; }
+    .btn-submit-shift { width: 100%; height: 48px; background: var(--mitec-blue); color: #fff; font-size: 13px; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+    .btn-logout { background: none; border: 1px solid var(--mitec-blue); color: var(--mitec-blue); font-weight: 800; font-size: 11px; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
 
-    .btn-submit-shift { width: 100%; height: 48px; background: var(--mitec-blue); color: #fff; font-size: 13px; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-    .btn-submit-shift:hover { background: var(--mitec-blue-hover); }
-    .btn-submit-shift:active { transform: scale(0.98); }
-    .btn-logout { background: none; border: 1px solid var(--mitec-blue); color: var(--mitec-blue); font-weight: 800; font-size: 11px; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; letter-spacing: 0.5px; }
-    .btn-logout:hover { background: var(--mitec-blue); color: #fff; }
-
-    #sync-loader { position: fixed; inset: 0; background: var(--mitec-black); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #ffffff; letter-spacing: 1.5px; }
+    #sync-loader { position: fixed; inset: 0; background: var(--mitec-black); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: #fff; letter-spacing: 1.5px; }
     .loader-text { margin-top: 16px; text-transform: uppercase; }
 
-    /* Footer */
-    .footer { background: var(--mitec-black); color: #888; padding: 3rem 1.5rem 1.5rem 1.5rem; margin-top: 4rem; border-top: 4px solid var(--mitec-blue); }
-    .footer-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; }
-    .footer-col h4 { color: #fff; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1rem; letter-spacing: 1px; font-weight: 900; }
-    .footer-col ul { list-style: none; }
-    .footer-col li { margin-bottom: 0.5rem; }
-    .footer-col a { color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: color 0.2s; }
-    .footer-col a:hover { color: #fff; }
-    .footer-bottom { max-width: 1000px; margin: 2rem auto 0 auto; padding-top: 1.5rem; border-top: 1px solid #222; text-align: center; font-size: 0.75rem; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .footer { background: var(--mitec-black); color: #888; padding: 3rem 1.5rem; margin-top: 4rem; border-top: 4px solid var(--mitec-blue); text-align: center; font-size: 0.75rem; text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -478,14 +222,13 @@
     <div class="top-bar-left">
       <span class="live-dot"></span> Official Operations Portal
     </div>
-    <div>Live Data Sync • Active</div>
+    <div>Google Sheets Sync • Active</div>
   </div>
 
   <!-- HEADER / STICKY MAIN NAVIGATION -->
   <nav class="main-nav">
     <div class="brand-container">
       <img class="brand-img" src="https://mitec.com.my/static/img/logos/logo-footer.png" alt="MITEC">
-      <span class="brand-tag"></span>
     </div>
     <div id="adminUserDisplayTag" class="user-profile-tag">SUPER ADMIN</div>
   </nav>
@@ -501,22 +244,22 @@
   <div id="login-overlay">
     <div class="login-card">
       <div class="login-logo"><i class="ph ph-shield-check"></i></div>
-      <h2 style="margin: 0 0 6px 0; font-size: 20px; color: var(--text-main); font-weight: 900; text-transform: uppercase;">Operations Console</h2>
-      <p style="margin: 0 0 24px 0; font-size: 13px; color: var(--text-muted); font-weight: 600;">Please provide administrative credentials to access matrix.</p>
-      <form id="login-form" onsubmit="handleAdminLogin(event)">
+      <h2 style="font-size: 20px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px;">Operations Console</h2>
+      <p style="font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 24px;">Please provide administrative credentials.</p>
+      <form onsubmit="handleAdminLogin(event)">
         <div class="form-group">
           <label>MyKad / Passport ID</label>
           <input type="text" id="login-id-input" class="form-control" placeholder="Enter administrative ID Key" required />
         </div>
-        <button type="submit" class="btn-submit-shift" style="margin-top: 5px;">Verify Handshake</button>
+        <button type="submit" class="btn-submit-shift">Verify Handshake</button>
       </form>
     </div>
   </div>
 
   <!-- SYNC LOADER -->
-  <div id="sync-loader">
+  <div id="sync-loader" style="display:flex;">
     <i class="ph ph-gear-six ph-spin" style="font-size: 44px; color: var(--mitec-blue-hover);"></i>
-    <div class="loader-text">Loading Management Portal...</div>
+    <div id="loader-text-msg" class="loader-text">Loading Management Portal...</div>
   </div>
 
   <div class="container">
@@ -547,19 +290,15 @@
       <div id="stats-view-container"></div>
     </div>
 
-    <!-- PAGE 2: DATABASE TABLE CONSOLE (With Date Range Pickers) -->
+    <!-- PAGE 2: DATABASE TABLE CONSOLE -->
     <div id="page-2" class="app-page">
-      <div class="section-label">Supabase Spreadsheet Master Records <span id="db-total-badge" class="matrix-title-badge">0 Records</span></div>
+      <div class="section-label">Google Sheets Master Records <span id="db-total-badge" class="matrix-title-badge">0 Records</span></div>
 
       <div class="db-console-card">
-        <!-- Search, Department & Date Range Filters -->
         <div class="db-filter-grid">
           <div class="form-group" style="margin-bottom:0;">
             <label style="font-size:10px;">Search Sheet Records</label>
-            <div style="position:relative;">
-              <input type="text" id="db-search-input" class="form-control" style="height:38px; font-size:12px; padding-left:32px;" placeholder="Search by name, MyKad/Passport, Shift ID..." oninput="renderDatabaseTableConsole()" />
-              <i class="ph ph-magnifying-glass" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px;"></i>
-            </div>
+            <input type="text" id="db-search-input" class="form-control" style="height:38px; font-size:12px;" placeholder="Search name, ID, shift..." oninput="renderDatabaseTableConsole()" />
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label style="font-size:10px;">Filter Department</label>
@@ -577,7 +316,6 @@
           </div>
         </div>
 
-        <!-- Checkbox Filters Row (Status & Doc Type) -->
         <div class="db-checkbox-filters-row">
           <div class="filter-box-group">
             <div class="filter-box-title">Status Filter</div>
@@ -596,19 +334,15 @@
           </div>
         </div>
 
-        <!-- Spreadsheet Table Grid -->
         <div id="database-table-root"></div>
       </div>
     </div>
 
     <!-- PAGE 3: STAFFING MANAGER -->
     <div id="page-3" class="app-page">
-      <!-- Top Scorecard Container (Below Header) -->
       <div id="top-scorecard-root"></div>
-
       <div class="section-label">Worker Manager</div>
 
-      <!-- Filter Panel: Shift, Status & Doc Type Checkboxes -->
       <div class="filter-panel-card">
         <div class="filter-grid">
           <div class="form-group" style="margin-bottom:0;">
@@ -626,40 +360,31 @@
             </select>
           </div>
         </div>
-
-        <!-- Checkboxes for Doc Type -->
         <div class="doc-type-filter-group">
-          <label style="font-size:10px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:0.5px;">Document Type</label>
+          <label style="font-size:10px; font-weight:800; text-transform:uppercase;">Document Type</label>
           <div class="doc-type-options">
-            <label class="checkbox-label">
-              <input type="checkbox" id="wm-doc-ic" checked onchange="renderWorkerManagerTable()">
-              MyKad (IC)
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="wm-doc-passport" checked onchange="renderWorkerManagerTable()">
-              Passport
-            </label>
+            <label class="checkbox-label"><input type="checkbox" id="wm-doc-ic" checked onchange="renderWorkerManagerTable()"> MyKad (IC)</label>
+            <label class="checkbox-label"><input type="checkbox" id="wm-doc-passport" checked onchange="renderWorkerManagerTable()"> Passport</label>
           </div>
         </div>
       </div>
 
-      <!-- Active Shift Card & Worker Roster Table -->
       <div id="worker-manager-root"></div>
     </div>
 
   </div>
 
-  <!-- WHATSAPP-STYLE PHOTO LIGHTBOX MODAL -->
+  <!-- LIGHTBOX MODAL -->
   <div id="image-lightbox-modal" onclick="closeImageLightbox()">
     <button class="lightbox-close-btn" onclick="closeImageLightbox()"><i class="ph ph-x"></i></button>
     <div class="lightbox-content-box" onclick="event.stopPropagation()">
-      <img id="lightbox-img-element" class="lightbox-image" src="" alt="Enlarged Worker Profile Photo">
+      <img id="lightbox-img-element" class="lightbox-image" src="" alt="Profile Photo">
       <div id="lightbox-caption-text" class="lightbox-caption">Worker Profile</div>
       <div id="lightbox-subtext-element" class="lightbox-subtext">ID: --</div>
     </div>
   </div>
 
-  <!-- WORKER PROFILE DRAWER OVERLAY -->
+  <!-- WORKER PROFILE DRAWER -->
   <div id="worker-profile-drawer" class="drawer-overlay" onclick="closeWorkerProfileDrawer()">
     <div class="drawer-content" onclick="event.stopPropagation()">
       <div class="drawer-header">
@@ -684,7 +409,7 @@
     </div>
   </div>
 
-  <!-- CREATE / EDIT SHIFT DRAWER OVERLAY -->
+  <!-- SHIFT DRAWER -->
   <div id="shift-drawer" class="drawer-overlay" onclick="closeShiftDrawer()">
     <div class="drawer-content" onclick="event.stopPropagation()">
       <div class="drawer-header">
@@ -694,8 +419,7 @@
       <form id="shift-creation-form" onsubmit="handleFormSubmission(event)">
         <div class="form-group">
           <label>Shift Reference ID</label>
-          <input type="text" id="form-shift-id" class="form-control" placeholder="e.g., S015" required />
-          <div id="shift-id-hint" style="margin-top:6px; font-size:10px; color:var(--text-muted); font-weight:600;">Auto-generated ID string.</div>
+          <input type="text" id="form-shift-id" class="form-control" required />
         </div>
         <div class="form-group">
           <label>Calendar Date</label>
@@ -705,52 +429,14 @@
           <label>Department Designation</label>
           <select id="form-dept" class="form-control" required>
             <option value="" disabled selected hidden>-- Select Department --</option>
-            <option value="AV">AV</option>
-            <option value="CAT">CAT</option>
-            <option value="EXH">EXH</option>
-            <option value="FIN">FIN</option>
-            <option value="GCC">GCC</option>
-            <option value="GS">GS</option>
-            <option value="HK">HK</option>
-            <option value="HR">HR</option>
-            <option value="KIT">KIT</option>
-            <option value="LINEN">LINEN</option>
-            <option value="OPERATION">OPERATION</option>
-            <option value="PUR">PUR</option>
-            <option value="QA">QA</option>
-            <option value="SC">SC</option>
-            <option value="SETUP">SETUP</option>
-            <option value="STWD">STWD</option>
-            <option value="SH">SH</option>
+            <option value="AV">AV</option><option value="CAT">CAT</option><option value="EXH">EXH</option><option value="FIN">FIN</option><option value="GCC">GCC</option><option value="GS">GS</option><option value="HK">HK</option><option value="HR">HR</option><option value="KIT">KIT</option><option value="LINEN">LINEN</option><option value="OPERATION">OPERATION</option><option value="PUR">PUR</option><option value="QA">QA</option><option value="SC">SC</option><option value="SETUP">SETUP</option><option value="STWD">STWD</option><option value="SH">SH</option>
           </select>
         </div>
         <div class="form-group">
           <label>Operational Reporting Time</label>
           <select id="form-time" class="form-control" required>
             <option value="" disabled selected hidden>Scheduled Shift</option>
-            <option value="0700">07:00</option>
-            <option value="0800">08:00</option>
-            <option value="0900">09:00</option>
-            <option value="1000">10:00</option>
-            <option value="1100">11:00</option>
-            <option value="1200">12:00</option>
-            <option value="1300">13:00</option>
-            <option value="1400">14:00</option>
-            <option value="1500">15:00</option>
-            <option value="1600">16:00</option>
-            <option value="1700">17:00</option>
-            <option value="1800">18:00</option>
-            <option value="1900">19:00</option>
-            <option value="2000">20:00</option>
-            <option value="2100">21:00</option>
-            <option value="2200">22:00</option>
-            <option value="2300">23:00</option>
-            <option value="0000">00:00</option>
-            <option value="0100">01:00</option>
-            <option value="0200">02:00</option>
-            <option value="0300">03:00</option>
-            <option value="0400">04:00</option>
-            <option value="0500">05:00</option>
+            <option value="0700">07:00</option><option value="0800">08:00</option><option value="0900">09:00</option><option value="1000">10:00</option><option value="1100">11:00</option><option value="1200">12:00</option><option value="1300">13:00</option><option value="1400">14:00</option><option value="1500">15:00</option><option value="1600">16:00</option><option value="1700">17:00</option><option value="1800">18:00</option><option value="1900">19:00</option><option value="2000">20:00</option><option value="2100">21:00</option><option value="2200">22:00</option><option value="2300">23:00</option><option value="0000">00:00</option><option value="0100">01:00</option><option value="0200">02:00</option><option value="0300">03:00</option><option value="0400">04:00</option><option value="0500">05:00</option>
           </select>
         </div>
         <div class="form-group">
@@ -766,43 +452,13 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer">
-    <div class="footer-grid">
-      <div class="footer-col">
-        <h4>Navigation</h4>
-        <ul>
-          <li><a href="#" onclick="switchTab(1)">Statistics & Deployment</a></li>
-          <li><a href="#" onclick="switchTab(2)">Database Table</a></li>
-          <li><a href="#" onclick="switchTab(3)">Staffing Manager</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>System Operations</h4>
-        <ul>
-          <li><a href="prior.html">Workforce Management</a></li>
-          <li><a href="pivot.html">Analytic Report Tools</a></li>
-          <li><a href="admi.html">Attendance Tracker</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Support</h4>
-        <ul>
-          <li><a href="faq.html">Help Center</a></li>
-          <li><a href="feedback.html">Contact Admin</a></li>
-          <li><a href="location.html">Locate US</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      &copy; Malaysia International Trade and Exhibition Centre (MITEC). All rights reserved 2026.
-    </div>
+    &copy; Malaysia International Trade and Exhibition Centre (MITEC). All rights reserved 2026.
   </footer>
 
   <script>
-    // DIRECT SUPABASE REST API CREDENTIALS (< 150ms ULTRA FAST EXECUTIONS)
-    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+    // STANDALONE GOOGLE APPS SCRIPT WEB APP URL
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzC2Ph-9BDIN01POgnavX9FGPiJJ52owdseiQ9fIWMJoqGHAiI1RLpGnomFhNaAqZkT/exec";
 
     let activeAdminKey = null;
     let cachedShifts = [];
@@ -823,7 +479,7 @@
       let sessionKey = null;
       try {
         sessionKey = localStorage.getItem("mitec_admin_key") || localStorage.getItem("mcl_doc_no");
-      } catch (err) { console.warn("Storage restricted."); }
+      } catch (err) {}
 
       if (sessionKey) {
         activeAdminKey = String(sessionKey).trim();
@@ -831,6 +487,7 @@
         loadAdminDataSuite();
       } else {
         document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('sync-loader').style.display = 'none';
         renderStatisticsPage();
       }
     };
@@ -868,8 +525,7 @@
 
     function isPassportHolder(userId) {
       if (!userId) return false;
-      const cleanId = String(userId).trim().replace(/^'/, '');
-      return /^[a-zA-Z]/.test(cleanId);
+      return /^[a-zA-Z]/.test(String(userId).trim().replace(/^'/, ''));
     }
 
     function formatPhoneForDialing(phone) {       
@@ -881,21 +537,64 @@
       return cleaned;     
     }      
 
+    function normalizeDateToDot(rawDate) {
+      if (!rawDate) return '';
+      let str = String(rawDate).trim();
+      if (str.includes('T')) {
+        let d = new Date(str);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+        }
+      }
+      if (str.includes('-') && str.split('-')[0].length === 4) {
+        return str.split('-').reverse().join('.');
+      }
+      return str.replace(/[\/\-]/g, '.');
+    }
+
+    function parseRecordDateToYYYYMMDD(dateStr) {
+      if (!dateStr) return '';
+      let dotDate = normalizeDateToDot(dateStr);
+      let parts = dotDate.split('.');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+      return '';
+    }
+
+    function getShiftDateObj(dateStr) {
+      try {
+        if (!dateStr) return new Date(0);
+        let dotDate = normalizeDateToDot(dateStr);
+        let parts = dotDate.split('.');
+        if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      } catch(e) {}
+      return new Date(0);
+    }
+
+    function isFutureOrToday(dateStr) {
+      let d = getShiftDateObj(dateStr);
+      if (d.getTime() === 0) return false;
+      let today = new Date(); today.setHours(0, 0, 0, 0);
+      return d >= today;
+    }
+
+    function isPastOrToday(dateStr) {
+      let d = getShiftDateObj(dateStr);
+      if (d.getTime() === 0) return false;
+      let today = new Date(); today.setHours(23, 59, 59, 999);
+      return d <= today;
+    }
+
     function formatAttendanceTime(timeVal) {       
       if (!timeVal) return "";       
-      const str = String(timeVal).trim();       
-      if (str.includes("1899")) {         
+      let str = String(timeVal).trim().replace(/^'/, '');       
+      if (str.includes("1899") || str.includes("GMT")) {         
         try {           
-          const d = new Date(str);           
+          let d = new Date(str);           
           return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;         
         } catch(e) { return str; }       
       }       
-      if (str.includes("GMT")) {         
-        try {           
-          const d = new Date(str);           
-          return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-        } catch(e) { return str; }
-      }
       let cleanDigits = str.replace(/[^0-9]/g, "");
       if (cleanDigits.length === 4 && !str.includes(":")) {
         return cleanDigits.substring(0, 2) + ":" + cleanDigits.substring(2, 4);
@@ -911,112 +610,35 @@
         try {
           let d = new Date(str);
           if (!isNaN(d.getTime())) {
-            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
           }
         } catch(e) {}
       }
       return str; 
     }
 
-    function getShiftDateObj(dateStr) {
-      try {
-        if (!dateStr) return new Date(0);
-        let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
-        let parts = clean.split('.');
-        if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-      } catch(e) {}
-      return new Date(0);
-    }
-
-    function parseRecordDateToYYYYMMDD(dateStr) {
-      if (!dateStr) return '';
-      let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
-      let parts = clean.split('.');
-      if (parts.length === 3) {
-        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-      }
-      return '';
-    }
-
-    function isFutureOrToday(dateStr) {
-      if (!dateStr) return false;
-      let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
-      let parts = clean.split('.');
-      if (parts.length !== 3) return false;
-      let checkDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-      let today = new Date(); today.setHours(0, 0, 0, 0);
-      return checkDate >= today;
-    }
-
-    function isPastOrToday(dateStr) {
-      if (!dateStr) return false;
-      let clean = String(dateStr).trim().replace(/[\/\-]/g, '.');
-      let parts = clean.split('.');
-      if (parts.length !== 3) return false;
-      let checkDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-      let today = new Date(); today.setHours(23, 59, 59, 999);
-      return checkDate <= today;
-    }
-
-    // FULL PAGINATED BATCH FETCH USING LIMIT/OFFSET TO PULL ALL BOOKINGS
-    async function fetchAllBookings(headers) {
-      let allRecords = [];
-      let batchSize = 1000;
-      let start = 0;
-      let fetched = 0;
-
-      do {
-        const queryUrl = `${SUPABASE_URL}/rest/v1/booking_record?select=*,shift_master(date,dept,time,slots,wa_link),casual_labour_profile(full_name,name_mykad,phone,photo_link,document_type)&limit=${batchSize}&offset=${start}`;
-        const res = await fetch(queryUrl, { headers });
-        const data = await res.json();
-
-        if (!Array.isArray(data) || data.code) {
-          const fallbackUrl = `${SUPABASE_URL}/rest/v1/booking_record?select=*&limit=${batchSize}&offset=${start}`;
-          const fallbackRes = await fetch(fallbackUrl, { headers });
-          const fallbackData = await fallbackRes.json();
-          if (Array.isArray(fallbackData) && fallbackData.length > 0) {
-            allRecords = allRecords.concat(fallbackData);
-            fetched = fallbackData.length;
-          } else {
-            break;
-          }
-        } else {
-          allRecords = allRecords.concat(data);
-          fetched = data.length;
-        }
-
-        start += batchSize;
-      } while (fetched === batchSize);
-
-      return allRecords;
-    }
-
-    // DIRECT HIGH-SPEED SUPABASE DATA FETCH WITH FULL PAGINATION
-    async function loadAdminDataSuite() {
+    // FETCH ALL DATA FROM GOOGLE APPS SCRIPT WEB APP
+    async function loadAdminDataSuite(customMsg = "Loading Management Portal...") {
+      document.getElementById('loader-text-msg').textContent = customMsg;
       document.getElementById('sync-loader').style.display = 'flex';
 
       try {
-        const headers = { 
-          "apikey": SUPABASE_KEY, 
-          "Authorization": `Bearer ${SUPABASE_KEY}` 
-        };
+        const res = await fetch(`${APPS_SCRIPT_URL}?action=getData`);
+        const data = await res.json();
 
-        const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers }).then(r => r.json());
-        const profilesPromise = fetch(`${SUPABASE_URL}/rest/v1/casual_labour_profile?select=*`, { headers }).then(r => r.json());
-        const bookingsPromise = fetchAllBookings(headers);
+        if (!data.success) throw new Error(data.error || "Failed to load sheet data");
 
-        const [shiftsRes, profilesRes, bookingsRes] = await Promise.all([shiftsPromise, profilesPromise, bookingsPromise]);
+        const rawShifts = data.shifts || [];
+        const rawProfiles = data.profiles || [];
+        const rawBookings = data.bookings || [];
 
-        const validShifts = Array.isArray(shiftsRes) ? shiftsRes : [];
-        const validProfiles = Array.isArray(profilesRes) ? profilesRes : [];
-        const validBookings = Array.isArray(bookingsRes) ? bookingsRes : [];
-
+        // Map casual profiles
         const workerMap = {};
-        validProfiles.forEach(p => {
-          const rawDoc = String(p.doc_no || p.id || '').trim().replace(/^'/, '');
+        rawProfiles.forEach(p => {
+          let rawDoc = String(p.doc_no || '').trim().replace(/^'/, '');
           if (rawDoc) {
             workerMap[rawDoc] = {
-              name: p.full_name || p.name_mykad || "Casual Worker",
+              name: p.name_mykad || "Casual Worker",
               phone: p.phone || "",
               photo: p.photo_link || ""
             };
@@ -1025,44 +647,38 @@
 
         try { localStorage.setItem("mitec_admin_key", activeAdminKey); } catch(e) {}
 
-        cachedShifts = validShifts.map(s => ({
+        cachedShifts = rawShifts.map(s => ({
           ...s,
-          id: s.shift_id,
-          date: s.date ? (s.date.includes('-') ? s.date.split('-').reverse().join('.') : s.date) : '',
-          dept: s.dept || '',
-          time: s.time || '',
+          id: String(s.shift_id || '').trim(),
+          date: normalizeDateToDot(s.date),
+          dept: String(s.dept || '').trim(),
+          time: String(s.time || '').trim(),
           slots: parseInt(s.slots) || 0,
-          totalSlots: parseInt(s.slots) || 0,
-          Slots: parseInt(s.slots) || 0,
           notes: s.notes || ''
         }));
 
-        cachedBookings = validBookings.map(b => {
-          const shiftData = b.shift_master || {};
-          const profileData = b.casual_labour_profile || {};
-          const cleanDocNo = String(b.doc_no || b.user_id || '').trim().replace(/^'/, '');
-          const mappedWorker = workerMap[cleanDocNo] || {};
-
-          const rawDate = shiftData.date || b.date || '';
-          const formattedDate = rawDate ? (rawDate.includes('-') ? rawDate.split('-').reverse().join('.') : rawDate) : '';
+        cachedBookings = rawBookings.map(b => {
+          let cleanDocNo = String(b.doc_no || '').trim().replace(/^'/, '');
+          let mappedWorker = workerMap[cleanDocNo] || {};
+          let matchingShift = cachedShifts.find(s => s.id === String(b.shift_id).trim()) || {};
 
           return {
-            shift_id: b.shift_id || '',
+            ...b,
+            shift_id: String(b.shift_id || '').trim(),
             user_id: cleanDocNo,
             doc_no: cleanDocNo,
-            worker_name: profileData.full_name || profileData.name_mykad || mappedWorker.name || b.name || "Casual Worker",
-            name: profileData.full_name || profileData.name_mykad || mappedWorker.name || b.name || "Casual Worker",
-            phone: profileData.phone || mappedWorker.phone || b.phone || '',
-            photo_url: profileData.photo_link || mappedWorker.photo || b.photo_url || b.photo || '',
-            date: formattedDate,
-            dept: shiftData.dept || b.dept || '',
-            time: shiftData.time || b.time || '',
-            status: b.status || '',
-            attendance: b.attendance || ''
+            worker_name: mappedWorker.name || b.name || "Casual Worker",
+            phone: mappedWorker.phone || b.phone || "",
+            photo_url: mappedWorker.photo || "",
+            date: normalizeDateToDot(b.date || matchingShift.date),
+            dept: b.dept || matchingShift.dept || "",
+            time: b.time || matchingShift.time || "",
+            status: String(b.status || '').trim(),
+            attendance: String(b.attendance || '').trim()
           };
         });
 
-        const currentAdminProfile = workerMap[activeAdminKey.replace(/^'/, '')];
+        let currentAdminProfile = workerMap[activeAdminKey.replace(/^'/, '')];
         if (currentAdminProfile && currentAdminProfile.name) {
           document.getElementById("adminUserDisplayTag").textContent = currentAdminProfile.name.toUpperCase();
         }
@@ -1074,14 +690,13 @@
         populateWorkerManagerShifts();
 
       } catch (err) {
-        console.error("Admin data fetch error:", err);
-        alert("Failed to sync with Supabase database.");
+        console.error("Data sync error:", err);
+        alert("Failed to sync with Google Sheets: " + err.message);
       } finally {
         document.getElementById('sync-loader').style.display = 'none';
       }
     }
 
-    /* Tab 1: Statistics & Deployment */
     function updateMatrixNumbers(targetDate, targetShiftId) {
       let scopedShifts = cachedShifts;
       let scopedBookings = cachedBookings;
@@ -1100,28 +715,23 @@
         badgeScope = targetDate;
       }
 
-      let totalCap = 0;
-      scopedShifts.forEach(s => { totalCap += Number(s.slots || s.totalSlots || s.Slots || 0); });
-
+      let totalCap = scopedShifts.reduce((sum, s) => sum + Number(s.slots || 0), 0);
       const confirmedBookings = scopedBookings.filter(b => {
         const st = String(b.status || '').toUpperCase();
-        return st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS';
+        return ['SUBMITTED', 'CONFIRMED', 'SUBNS'].includes(st);
       });
-      const totalConf = confirmedBookings.length;
-      const totalWait = scopedBookings.filter(b => String(b.status || '').toUpperCase().includes('WAIT')).length;
+      let totalConf = confirmedBookings.length;
+      let totalWait = scopedBookings.filter(b => String(b.status || '').toUpperCase().includes('WAIT')).length;
 
       let totalPres = 0;
       confirmedBookings.forEach(b => {
-        let formattedStamp = formatFullTimestamp(b.attendance);
-        if (formattedStamp && formattedStamp !== "No Show") {
-          totalPres++;
-        }
+        if (formatFullTimestamp(b.attendance) !== "No Show") totalPres++;
       });
 
       document.getElementById('dash-txt-cap').textContent = totalCap;
       document.getElementById('dash-txt-conf').textContent = totalConf;
       document.getElementById('dash-txt-wait').textContent = totalWait;
-      document.getElementById('dash-txt-pres').textContent = `${totalPres} /${totalCap}`;        
+      document.getElementById('dash-txt-pres').textContent = `${totalPres} / ${totalCap}`;        
       document.getElementById("matrixFilterActiveLabel").innerHTML = `${labelScope} <span class="matrix-title-badge">${badgeScope}</span>`;
     }
 
@@ -1197,24 +807,20 @@
           let indicatorHTML = "";
 
           if (shiftsToday.length > 0) {
-              let totalMetric = 0;
               let todayBookings = cachedBookings.filter(b => shiftsToday.some(s => s.id === b.shift_id));
-              let confirmedToday = todayBookings.filter(b => {
-                const st = String(b.status || '').toUpperCase();
-                return st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS';
-              });
+              let confirmedToday = todayBookings.filter(b => ['SUBMITTED', 'CONFIRMED', 'SUBNS'].includes(b.status.toUpperCase()));
 
               if (currentActiveFilter === 'ALL') {
-                   totalMetric = shiftsToday.reduce((sum, s) => sum + Number(s.slots || s.totalSlots || s.Slots || 0), 0);
-                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:#e2e8f0; color:var(--text-main);">Req ${totalMetric}</div>`;
+                   let totalMetric = shiftsToday.reduce((sum, s) => sum + Number(s.slots || 0), 0);
+                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:#e2e8f0; color:#1d1d1f;">Req ${totalMetric}</div>`;
               } else if (currentActiveFilter === 'CONF') {
-                   totalMetric = confirmedToday.length;
-                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-teal-bg); color:var(--pill-teal-text);">+${totalMetric}</div>`;
+                   let totalMetric = confirmedToday.length;
+                   if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:#f3f9e9; color:#598522;">+${totalMetric}</div>`;
               } else if (currentActiveFilter === 'WAIT') {
-                   totalMetric = todayBookings.filter(b => String(b.status || '').toUpperCase().includes('WAIT')).length;
+                   let totalMetric = todayBookings.filter(b => b.status.toUpperCase().includes('WAIT')).length;
                    if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-amber-bg); color:var(--pill-amber-text);">+${totalMetric}</div>`;
               } else if (currentActiveFilter === 'PRES') {
-                   totalMetric = confirmedToday.filter(b => formatFullTimestamp(b.attendance) && formatFullTimestamp(b.attendance) !== "No Show").length;
+                   let totalMetric = confirmedToday.filter(b => formatFullTimestamp(b.attendance) !== "No Show").length;
                    if(totalMetric > 0) indicatorHTML = `<div class="cal-indicator" style="background:var(--pill-emerald-bg); color:var(--pill-emerald-text);">+${totalMetric}</div>`;
               }
               if (indicatorHTML !== "") cellClass += " has-shifts";
@@ -1241,24 +847,15 @@
           let visibleCards = 0;
           shiftsToday.forEach(s => {
               const shiftBookings = cachedBookings.filter(b => b.shift_id === s.id);
-              const confirmedBookings = shiftBookings.filter(b => {
-                const st = String(b.status || '').toUpperCase();
-                return st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS';
-              });
+              const confirmedBookings = shiftBookings.filter(b => ['SUBMITTED', 'CONFIRMED', 'SUBNS'].includes(b.status.toUpperCase()));
               const confirmedCount = confirmedBookings.length;
-              const waitlistCount = shiftBookings.filter(b => String(b.status || '').toUpperCase().includes('WAIT')).length;
-              const cancelledCount = shiftBookings.filter(b => String(b.status || '').toUpperCase() === 'CANCELLED').length;
+              const waitlistCount = shiftBookings.filter(b => b.status.toUpperCase().includes('WAIT')).length;
+              const cancelledCount = shiftBookings.filter(b => b.status.toUpperCase() === 'CANCELLED').length;
 
-              let presCount = 0;
-              let noShowCount = 0;
-
+              let presCount = 0, noShowCount = 0;
               confirmedBookings.forEach(b => {
-                let formattedStamp = formatFullTimestamp(b.attendance);
-                if (formattedStamp && formattedStamp !== "No Show") {
-                  presCount++;
-                } else if (isPastOrToday(s.date)) {
-                  noShowCount++;
-                }
+                if (formatFullTimestamp(b.attendance) !== "No Show") presCount++;
+                else if (isPastOrToday(s.date)) noShowCount++;
               });
 
               let shouldDisplay = true;
@@ -1269,24 +866,24 @@
               if (shouldDisplay) {
                   visibleCards++;
                   let displayTime = formatAttendanceTime(s.time);
-                  let maxCapacitySlots = s.slots || s.totalSlots || s.Slots || 0;
+                  let maxCapacitySlots = s.slots || 0;
                   let isSelectedClass = (calSelectedShiftId === s.id) ? "selected-card" : "";
 
                   detailsHTML += `
                     <div class="stat-row-card ${isSelectedClass}" onclick="selectShiftCard('${s.id}')">
                       <div class="stat-info">
-                        <h3><span>${s.dept}</span></h3>
+                        <h3>${s.dept} <small style="font-size:11px; color:var(--mitec-blue);">(${s.id})</small></h3>
                         <p>
-                          <span class="meta-data-line"><i class="ph ph-clock"></i> ${displayTime}</span>
-                          <span class="meta-data-line"><i class="ph ph-user-list"></i> Capacity: <b>${maxCapacitySlots} Slots</b></span>
+                          <span><i class="ph ph-clock"></i> ${displayTime}</span>
+                          <span><i class="ph ph-user-list"></i> Capacity: <b>${maxCapacitySlots} Slots</b></span>
                         </p>
                       </div>
                       <div class="metrics-pill-pack">
-                        <span class="mini-badge" style="background:#e2e8f0; color:#1e293b; border: 1px solid ${currentActiveFilter === 'ALL' ? 'var(--mitec-blue)' : 'transparent'}">Cap: ${maxCapacitySlots}</span>
-                        <span class="mini-badge pill-sub" style="border-width: ${currentActiveFilter === 'CONF' ? '2px' : '1px'}">Conf: ${confirmedCount}</span>
-                        <span class="mini-badge pill-pres" style="border-width: ${currentActiveFilter === 'PRES' ? '2px' : '1px'}">Pres: ${presCount}</span>
+                        <span class="mini-badge" style="background:#e2e8f0; color:#1e293b;">Cap: ${maxCapacitySlots}</span>
+                        <span class="mini-badge pill-sub">Conf: ${confirmedCount}</span>
+                        <span class="mini-badge pill-pres">Pres: ${presCount}</span>
                         <span class="mini-badge pill-noshow">NoShow: ${noShowCount}</span>
-                        <span class="mini-badge pill-wait" style="border-width: ${currentActiveFilter === 'WAIT' ? '2px' : '1px'}">Wait: ${waitlistCount}</span>
+                        <span class="mini-badge pill-wait">Wait: ${waitlistCount}</span>
                         <span class="mini-badge pill-cancelled">Drop: ${cancelledCount}</span>
                       </div>
                     </div>`;
@@ -1295,7 +892,7 @@
           if (visibleCards === 0) detailsHTML += `<p style="text-align:center; padding:10px; color:var(--text-muted); font-style:italic;">No shifts match filters.</p>`;
       }
       if (isFutureOrToday(calSelectedDateStr)) {
-          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #ffffff; color: var(--text-main); border: 2px dashed var(--mitec-blue);" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="font-size: 18px; color: var(--mitec-blue);"></i> Deploy New Shift Here</button>`;
+          detailsHTML += `<button class="btn-submit-shift" style="margin-top: 15px; background: #fff; color: var(--text-main); border: 2px dashed var(--mitec-blue);" onclick="openCreateShift()"><i class="ph ph-plus-circle" style="color: var(--mitec-blue);"></i> Deploy New Shift Here</button>`;
       }
       listContainer.innerHTML = detailsHTML;
     }
@@ -1304,27 +901,22 @@
       editModeShift = false; editingShiftId = null;
       document.getElementById('shift-creation-form').reset();
       document.getElementById('form-shift-id').disabled = false;
-      document.getElementById('shift-id-hint').textContent = "Shift ID sequence auto-assignment applied.";
       document.getElementById('shift-drawer-title').textContent = "Deploy New Shift";
-      document.getElementById('btn-submit-shift-action').innerHTML = "<i class='ph ph-paper-plane-right'></i> Append & Deploy";
+      document.getElementById('btn-submit-shift-action').textContent = "Append & Deploy Shift";
 
       if (calSelectedDateStr) {
           let parts = calSelectedDateStr.split('.');
           document.getElementById('form-date').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
       }
 
-      let nextShiftNumber = 1;
-      if (cachedShifts.length > 0) {
-        let maxFoundNumber = 0;
-        cachedShifts.forEach(shift => {
-          if (shift.id && String(shift.id).toUpperCase().startsWith("S")) {
-            let numericPart = parseInt(String(shift.id).substring(1), 10);
-            if (!isNaN(numericPart) && numericPart > maxFoundNumber) maxFoundNumber = numericPart;
-          }
-        });
-        nextShiftNumber = maxFoundNumber + 1;
-      }
-      document.getElementById('form-shift-id').value = "S" + String(nextShiftNumber).padStart(3, '0');
+      let maxNum = 0;
+      cachedShifts.forEach(s => {
+        if (s.id && String(s.id).toUpperCase().startsWith("S")) {
+          let num = parseInt(String(s.id).substring(1), 10);
+          if (!isNaN(num) && num > maxNum) maxNum = num;
+        }
+      });
+      document.getElementById('form-shift-id').value = "S" + String(maxNum + 1).padStart(3, '0');
       document.getElementById('shift-drawer').style.display = 'flex';
     }
 
@@ -1334,7 +926,7 @@
       if(!shift) return;
 
       document.getElementById('shift-drawer-title').textContent = "Edit Shift Parameters";
-      document.getElementById('btn-submit-shift-action').innerHTML = "<i class='ph ph-floppy-disk'></i> Overwrite & Update";
+      document.getElementById('btn-submit-shift-action').textContent = "Overwrite & Update";
       document.getElementById('form-shift-id').value = shift.id;
       document.getElementById('form-shift-id').disabled = true;
 
@@ -1346,159 +938,100 @@
       let timeSelect = document.getElementById('form-time');
       if (Array.from(timeSelect.options).some(opt => opt.value === vTime)) timeSelect.value = vTime;
 
-      document.getElementById('form-slots').value = shift.slots || shift.totalSlots;
+      document.getElementById('form-slots').value = shift.slots;
       document.getElementById('form-notes').value = shift.notes || "";
       document.getElementById('shift-drawer').style.display = 'flex';
     }
 
     function closeShiftDrawer() { document.getElementById('shift-drawer').style.display = 'none'; }
 
-    // DIRECT SUPABASE WRITE FOR SHIFT CREATION / UPDATE
     async function handleFormSubmission(event) {
       event.preventDefault();
-      const idField = document.getElementById('form-shift-id');
-      const sId = idField.value.trim();
-      const rawDate = document.getElementById('form-date').value.trim(); // YYYY-MM-DD
+      const sId = document.getElementById('form-shift-id').value.trim();
+      const rawDate = document.getElementById('form-date').value.trim();
       const sDept = document.getElementById('form-dept').value.trim();
       const sTime = formatAttendanceTime(document.getElementById('form-time').value.trim());
       const sSlots = parseInt(document.getElementById('form-slots').value.trim()) || 0;
       const sNotes = document.getElementById('form-notes').value.trim();
 
       closeShiftDrawer();
+      document.getElementById('loader-text-msg').textContent = "Saving Shift Parameters...";
       document.getElementById('sync-loader').style.display = 'flex';
 
-      const payload = {
-        shift_id: sId,
-        date: rawDate,
-        dept: sDept,
-        time: sTime,
-        slots: sSlots,
-        notes: sNotes
-      };
-
       try {
-        let res;
-        if (editModeShift) {
-          res = await fetch(`${SUPABASE_URL}/rest/v1/shift_master?shift_id=eq.${encodeURIComponent(sId)}`, {
-            method: "PATCH",
-            headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": `Bearer ${SUPABASE_KEY}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              date: rawDate,
-              dept: sDept,
-              time: sTime,
-              slots: sSlots,
-              notes: sNotes
-            })
-          });
-        } else {
-          res = await fetch(`${SUPABASE_URL}/rest/v1/shift_master`, {
-            method: "POST",
-            headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": `Bearer ${SUPABASE_KEY}`,
-              "Content-Type": "application/json",
-              "Prefer": "resolution=merge-duplicates"
-            },
-            body: JSON.stringify([payload])
-          });
-        }
-
-        if (res.ok) {
-          document.getElementById('shift-creation-form').reset();
-          loadAdminDataSuite();
-        } else {
-          const errData = await res.json();
-          alert("Shift operation failed: " + (errData.message || "Database error"));
-          document.getElementById('sync-loader').style.display = 'none';
-        }
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: editModeShift ? "editShift" : "createShift",
+            shift_id: sId,
+            date: rawDate,
+            dept: sDept,
+            time: sTime,
+            slots: sSlots,
+            notes: sNotes
+          })
+        });
+        loadAdminDataSuite("Updating Shift Matrix...");
       } catch (err) {
-        alert("Network error: " + err.message);
+        alert("Shift save error: " + err.message);
         document.getElementById('sync-loader').style.display = 'none';
       }
     }
 
-    /* Tab 2: Database Table Console (With Date Pickers, Defaulting to Today) */
     function populateDatabaseConsoleFilters() {
       const deptSelect = document.getElementById('db-dept-filter');
       const fromDateInput = document.getElementById('db-from-date');
       const toDateInput = document.getElementById('db-to-date');
-
       const todayStr = new Date().toISOString().split('T')[0];
+
       if (fromDateInput && !fromDateInput.value) fromDateInput.value = todayStr;
       if (toDateInput && !toDateInput.value) toDateInput.value = todayStr;
-
       if (!deptSelect) return;
 
       const uniqueDepts = [...new Set(cachedShifts.map(s => s.dept))].filter(Boolean).sort();
-      let currentVal = deptSelect.value;
-
       deptSelect.innerHTML = `<option value="ALL">ALL DEPARTMENTS</option>` + uniqueDepts.map(d => `<option value="${d}">${d}</option>`).join('');
-      if (uniqueDepts.includes(currentVal)) {
-        deptSelect.value = currentVal;
-      }
     }
 
     function renderDatabaseTableConsole() {
-      const searchInput = document.getElementById('db-search-input');
-      const deptFilter = document.getElementById('db-dept-filter');
-      const fromDateInput = document.getElementById('db-from-date');
-      const toDateInput = document.getElementById('db-to-date');
+      const searchTerm = document.getElementById('db-search-input').value.trim().toLowerCase();
+      const selectedDept = document.getElementById('db-dept-filter').value;
+      const fromVal = document.getElementById('db-from-date').value;
+      const toVal = document.getElementById('db-to-date').value;
 
-      const chkConf = document.getElementById('chk-stat-conf') ? document.getElementById('chk-stat-conf').checked : true;
-      const chkWait = document.getElementById('chk-stat-wait') ? document.getElementById('chk-stat-wait').checked : true;
-      const chkCanc = document.getElementById('chk-stat-canc') ? document.getElementById('chk-stat-canc').checked : true;
-
-      const chkIC = document.getElementById('chk-doc-ic') ? document.getElementById('chk-doc-ic').checked : true;
-      const chkPassport = document.getElementById('chk-doc-passport') ? document.getElementById('chk-doc-passport').checked : true;
+      const chkConf = document.getElementById('chk-stat-conf').checked;
+      const chkWait = document.getElementById('chk-stat-wait').checked;
+      const chkCanc = document.getElementById('chk-stat-canc').checked;
+      const chkIC = document.getElementById('chk-doc-ic').checked;
+      const chkPassport = document.getElementById('chk-doc-passport').checked;
 
       const tableRoot = document.getElementById('database-table-root');
       const totalBadge = document.getElementById('db-total-badge');
-
       if (!tableRoot) return;
 
-      const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
-      const selectedDept = deptFilter ? deptFilter.value : 'ALL';
-      const fromVal = fromDateInput ? fromDateInput.value : '';
-      const toVal = toDateInput ? toDateInput.value : '';
-
       let filtered = cachedBookings.filter(b => {
-        const workerName = String(b.worker_name || b.name || '').toLowerCase();
-        const userId = String(b.user_id || b.doc_no || '').toLowerCase();
+        const workerName = String(b.worker_name || '').toLowerCase();
+        const userId = String(b.user_id || '').toLowerCase();
         const shiftId = String(b.shift_id || '').toLowerCase();
-        const shiftObj = cachedShifts.find(s => s.id === b.shift_id) || {};
-        const dept = String(b.dept || shiftObj.dept || '').toUpperCase();
+        const dept = String(b.dept || '').toUpperCase();
         const status = String(b.status || '').toUpperCase();
         const isPassport = isPassportHolder(userId);
 
-        if (searchTerm && !workerName.includes(searchTerm) && !userId.includes(searchTerm) && !shiftId.includes(searchTerm)) {
-          return false;
-        }
+        if (searchTerm && !workerName.includes(searchTerm) && !userId.includes(searchTerm) && !shiftId.includes(searchTerm)) return false;
+        if (selectedDept !== 'ALL' && dept !== selectedDept.toUpperCase()) return false;
 
-        if (selectedDept !== 'ALL' && dept !== selectedDept.toUpperCase()) {
-          return false;
-        }
-
-        // Date Range Filtering
-        const recordDateStr = b.date || shiftObj.date || '';
-        const recordYYYYMMDD = parseRecordDateToYYYYMMDD(recordDateStr);
+        const recordYYYYMMDD = parseRecordDateToYYYYMMDD(b.date);
         if (fromVal && recordYYYYMMDD && recordYYYYMMDD < fromVal) return false;
         if (toVal && recordYYYYMMDD && recordYYYYMMDD > toVal) return false;
 
-        // Status Tickbox Filtering
-        const isConfirmedStatus = (status === 'CONFIRMED' || status === 'SUBNS' || status === 'SUBMITTED');
-        const isWaitlistStatus = (status.includes('WAIT'));
-        const isCancelledStatus = (status === 'CANCELLED');
+        const isConf = ['CONFIRMED', 'SUBNS', 'SUBMITTED'].includes(status);
+        const isWait = status.includes('WAIT');
+        const isCanc = status === 'CANCELLED';
 
-        if (isConfirmedStatus && !chkConf) return false;
-        if (isWaitlistStatus && !chkWait) return false;
-        if (isCancelledStatus && !chkCanc) return false;
-        if (!isConfirmedStatus && !isWaitlistStatus && !isCancelledStatus && !chkConf) return false;
+        if (isConf && !chkConf) return false;
+        if (isWait && !chkWait) return false;
+        if (isCanc && !chkCanc) return false;
+        if (!isConf && !isWait && !isCanc && !chkConf) return false;
 
-        // Doc Type Tickbox Filtering
         if (isPassport && !chkPassport) return false;
         if (!isPassport && !chkIC) return false;
 
@@ -1507,392 +1040,232 @@
 
       if (totalBadge) totalBadge.textContent = `${filtered.length} Records`;
 
-      let html = `
-        <div class="db-table-wrapper">
-          <table class="sheets-db-table">
-            <thead>
-              <tr>
-                <th style="width:40px; text-align:center;">#</th>
-                <th>Shift ID</th>
-                <th>Date / Time</th>
-                <th>Casual Labour Name</th>
-                <th>MyKad / Passport ID</th>
-                <th style="text-align:center;">Status</th>
-                <th style="text-align:center;">Attendance</th>
-              </tr>
-            </thead>
-            <tbody>`;
+      let html = `<div class="db-table-wrapper"><table class="sheets-db-table"><thead><tr>
+        <th style="width:40px; text-align:center;">#</th><th>Shift ID</th><th>Date / Time</th><th>Casual Labour Name</th><th>MyKad / Passport ID</th><th style="text-align:center;">Status</th><th style="text-align:center;">Attendance</th>
+      </tr></thead><tbody>`;
 
       if (filtered.length === 0) {
-        html += `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No records found matching filters.</td></tr>`;
+        html += `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No records found.</td></tr>`;
       } else {
         filtered.forEach((b, idx) => {
-          const targetUserId = b.user_id || b.doc_no;
-          const targetWorkerName = b.worker_name || b.name || "Casual Worker";
-          const rawStatus = String(b.status || '').toUpperCase();
-          const isConfirmed = (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED' || rawStatus === 'SUBNS');
-          const isCancelled = (rawStatus === 'CANCELLED');
+          const st = String(b.status || '').toUpperCase();
+          const isConf = ['SUBMITTED', 'CONFIRMED', 'SUBNS'].includes(st);
+          const isCanc = st === 'CANCELLED';
+          let statusTextClass = isCanc ? "cancelled" : isConf ? "confirmed" : "waitlist";
+          let statusDisplayLabel = isCanc ? "CANCELLED" : isConf ? "CONFIRMED" : "WAITLIST";
 
-          let statusTextClass = "confirmed";
-          let statusDisplayLabel = "CONFIRMED";
-          if (isCancelled) {
-            statusTextClass = "cancelled";
-            statusDisplayLabel = "CANCELLED";
-          } else if (!isConfirmed) {
-            statusTextClass = "waitlist";
-            statusDisplayLabel = "WAITLIST";
-          }
-
-          const shiftObj = cachedShifts.find(s => s.id === b.shift_id) || {};
-          const displayTime = formatAttendanceTime(b.time || shiftObj.time);
-          const displayDate = b.date || shiftObj.date || '';
-
-          let attStamp = b.attendance || "";
-          let isPresent = (attStamp && attStamp.toLowerCase() !== "no show" && attStamp !== "0" && attStamp !== "-");
-          let attBadgeHTML = isPresent 
-            ? `<span class="att-badge present"><i class="ph ph-check-circle"></i> ${formatFullTimestamp(attStamp)}</span>`
+          let attStamp = formatFullTimestamp(b.attendance);
+          let attBadgeHTML = attStamp !== "No Show"
+            ? `<span class="att-badge present"><i class="ph ph-check-circle"></i> ${attStamp}</span>`
             : `<span class="att-badge noshow"><i class="ph ph-x-circle"></i> No Show</span>`;
 
-          html += `
-            <tr>
-              <td style="text-align:center; font-family:monospace; color:#64748b; background:#f8fafc;">${idx + 1}</td>
-              <td class="sheet-cell-id">${b.shift_id}</td>
-              <td>${displayDate} <span class="sheet-cell-sub">(${displayTime})</span></td>
-              <td class="sheet-cell-name">
-                <span class="view-drawable-name" onclick="openWorkerProfileDrawer('${targetUserId}', '${targetWorkerName.replace(/'/g, "\\'")}')">${targetWorkerName}</span>
-              </td>
-              <td class="sheet-cell-sub">${targetUserId}</td>
-              <td style="text-align:center;">
-                <span class="status-text-badge ${statusTextClass}">${statusDisplayLabel}</span>
-              </td>
-              <td style="text-align:center;">${attBadgeHTML}</td>
-            </tr>`;
+          html += `<tr>
+            <td style="text-align:center; font-family:monospace; color:#64748b; background:#f8fafc;">${idx + 1}</td>
+            <td class="sheet-cell-id">${b.shift_id}</td>
+            <td>${b.date} <span class="sheet-cell-sub">(${formatAttendanceTime(b.time)})</span></td>
+            <td class="sheet-cell-name"><button class="view-drawable-name" onclick="openWorkerProfileDrawer('${b.user_id}', '${b.worker_name.replace(/'/g, "\\'")}')">${b.worker_name}</button></td>
+            <td class="sheet-cell-sub">${b.user_id}</td>
+            <td style="text-align:center;"><span class="status-text-badge ${statusTextClass}">${statusDisplayLabel}</span></td>
+            <td style="text-align:center;">${attBadgeHTML}</td>
+          </tr>`;
         });
       }
-
       html += `</tbody></table></div>`;
       tableRoot.innerHTML = html;
     }
 
-    /* Tab 3: Worker Manager / Staffing Manager (With WhatsApp Style Photo Lightbox) */
     function populateWorkerManagerShifts() {
       const selectEl = document.getElementById('wm-shift-select');
       if (!selectEl) return;
 
       let today = new Date(); today.setHours(0,0,0,0);
       const upcomingShifts = cachedShifts.filter(s => getShiftDateObj(s.date) >= today);
+      upcomingShifts.sort((a, b) => getShiftDateObj(a.date) - getShiftDateObj(b.date));
 
       if (upcomingShifts.length === 0) {
         selectEl.innerHTML = '<option value="">No upcoming shifts found</option>';
-        document.getElementById('worker-manager-root').innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No upcoming shift parameters registered.</p>';
+        document.getElementById('worker-manager-root').innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">No upcoming shifts registered.</p>';
         return;
       }
 
-      upcomingShifts.sort((a, b) => getShiftDateObj(a.date) - getShiftDateObj(b.date));
-
       let currentSelection = selectEl.value;
-      selectEl.innerHTML = upcomingShifts.map(s => `
-        <option value="${s.id}">[${s.dept}] ${s.date} (${formatAttendanceTime(s.time)}) — ID: ${s.id}</option>
-      `).join('');
-
-      if (currentSelection && upcomingShifts.some(s => s.id === currentSelection)) {
-        selectEl.value = currentSelection;
-      } else {
-        selectEl.value = upcomingShifts[0].id;
-      }
-
+      selectEl.innerHTML = upcomingShifts.map(s => `<option value="${s.id}">[${s.dept}] ${s.date} (${formatAttendanceTime(s.time)}) — ID: ${s.id}</option>`).join('');
+      selectEl.value = upcomingShifts.some(s => s.id === currentSelection) ? currentSelection : upcomingShifts[0].id;
       renderWorkerManagerTable();
     }
 
     function renderWorkerManagerTable() {
-      const selectEl = document.getElementById('wm-shift-select');
-      const filterEl = document.getElementById('wm-status-filter');
-      const rootEl = document.getElementById('worker-manager-root');
-      const topScorecardEl = document.getElementById('top-scorecard-root');
-      if (!selectEl || !rootEl) return;
-
-      const shiftId = selectEl.value;
-      const statusFilter = filterEl ? filterEl.value : 'ALL';
-
-      const showIC = document.getElementById('wm-doc-ic') ? document.getElementById('wm-doc-ic').checked : true;
-      const showPassport = document.getElementById('wm-doc-passport') ? document.getElementById('wm-doc-passport').checked : true;
-
+      const shiftId = document.getElementById('wm-shift-select').value;
+      const statusFilter = document.getElementById('wm-status-filter').value;
+      const showIC = document.getElementById('wm-doc-ic').checked;
+      const showPassport = document.getElementById('wm-doc-passport').checked;
       const shift = cachedShifts.find(s => s.id === shiftId);
 
-      if (!shift) {
-        rootEl.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">Please select a shift above.</p>';
-        if (topScorecardEl) topScorecardEl.innerHTML = '';
-        return;
-      }
+      if (!shift) return;
 
-      const shiftBookings = cachedBookings.filter(b => 
-        b.shift_id === shift.id && 
-        String(b.status).toUpperCase() !== 'CANCELLED'
-      );
+      const shiftBookings = cachedBookings.filter(b => b.shift_id === shift.id && String(b.status).toUpperCase() !== 'CANCELLED');
+      const totalApproved = shiftBookings.filter(b => ['SUBMITTED', 'CONFIRMED', 'SUBNS'].includes(b.status.toUpperCase())).length;
+      const totalWaitlist = shiftBookings.filter(b => b.status.toUpperCase().includes('WAIT')).length;
 
-      const totalApproved = shiftBookings.filter(b => {
-        const status = String(b.status).toUpperCase();
-        return status === 'SUBMITTED' || status === 'CONFIRMED' || status === 'SUBNS';
-      }).length;
-
-      const totalWaitlist = shiftBookings.filter(b => {
-        const status = String(b.status).toUpperCase();
-        return status.includes('WAIT');
-      }).length;
-
-      const totalCL = totalApproved + totalWaitlist;
-      const totalSlots = shift.slots || shift.totalSlots || shift.Slots || 0;
-
-      if (topScorecardEl) {
-        topScorecardEl.innerHTML = `
-          <div class="wm-scorecard-grid">
-            <div class="wm-stat-card">
-              <span class="wm-stat-label">Total CL Approved</span>
-              <span class="wm-stat-value">${totalApproved}</span>
-            </div>
-            <div class="wm-stat-card">
-              <span class="wm-stat-label">Total Waiting List</span>
-              <span class="wm-stat-value">${totalWaitlist}</span>
-            </div>
-            <div class="wm-stat-card">
-              <span class="wm-stat-label">Total CL</span>
-              <span class="wm-stat-value">${totalCL}</span>
-            </div>
-          </div>`;
-      }
+      document.getElementById('top-scorecard-root').innerHTML = `
+        <div class="wm-scorecard-grid">
+          <div class="wm-stat-card"><span class="wm-stat-label">Total CL Approved</span><span class="wm-stat-value">${totalApproved}</span></div>
+          <div class="wm-stat-card"><span class="wm-stat-label">Total Waiting List</span><span class="wm-stat-value">${totalWaitlist}</span></div>
+          <div class="wm-stat-card"><span class="wm-stat-label">Total CL</span><span class="wm-stat-value">${totalApproved + totalWaitlist}</span></div>
+        </div>`;
 
       let displayedBookings = shiftBookings.filter(b => {
-        const targetUserId = b.user_id || b.doc_no;
         const st = String(b.status).toUpperCase();
-        const isConfirmed = (st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS');
-        if (statusFilter === 'CONFIRMED' && !isConfirmed) return false;
-        if (statusFilter === 'WAITLIST' && isConfirmed) return false;
+        const isConf = ['SUBMITTED', 'CONFIRMED', 'SUBNS'].includes(st);
+        if (statusFilter === 'CONFIRMED' && !isConf) return false;
+        if (statusFilter === 'WAITLIST' && isConf) return false;
 
-        const isPassport = isPassportHolder(targetUserId);
-        if (isPassport && !showPassport) return false;
-        if (!isPassport && !showIC) return false;
-
+        const isPass = isPassportHolder(b.user_id);
+        if (isPass && !showPassport) return false;
+        if (!isPass && !showIC) return false;
         return true;
       });
 
-      let html = `
-        <div class="wm-card">
-          <div class="wm-card-header">
-            <div>
-              <h2 class="wm-header-title" style="margin: 0 0 6px 0;">${shift.dept}</h2>
-              <div class="wm-meta-line"><i class="ph ph-fingerprint"></i> Shift ID: <b>${shift.id}</b></div>
-              <div class="wm-meta-line"><i class="ph ph-calendar"></i> Date: <b>${shift.date} (${formatAttendanceTime(shift.time)})</b></div>
-              <div class="wm-meta-line"><i class="ph ph-users-three"></i> Capacity: <b>${totalSlots} Slots</b></div>
-            </div>
-            <button class="btn-download-roster" onclick="downloadRosterCSV('${shift.id}')" title="Download Roster">
-              <i class="ph ph-download-simple"></i>
-            </button>
+      let html = `<div class="wm-card">
+        <div class="wm-card-header">
+          <div>
+            <h2 class="wm-header-title" style="margin:0 0 6px 0;">${shift.dept}</h2>
+            <div class="wm-meta-line"><i class="ph ph-fingerprint"></i> Shift ID: <b>${shift.id}</b></div>
+            <div class="wm-meta-line"><i class="ph ph-calendar"></i> Date: <b>${shift.date} (${formatAttendanceTime(shift.time)})</b></div>
+            <div class="wm-meta-line"><i class="ph ph-users-three"></i> Capacity: <b>{shift.slots} Slots</b></div>
           </div>
-
-          <div style="overflow-x:auto; margin-top:15px;">
-            <table class="wm-table">
-              <thead>
-                <tr>
-                  <th>Casual Labour Name</th>
-                  <th style="text-align:center; width:135px;">Status</th>
-                  <th style="text-align:center; width:100px;">Action</th>
-                </tr>
-              </thead>
-              <tbody>`;
+          <button class="btn-download-roster" onclick="downloadRosterCSV('${shift.id}')"><i class="ph ph-download-simple"></i></button>
+        </div>
+        <div style="overflow-x:auto; margin-top:15px;"><table class="wm-table"><thead><tr>
+          <th>Casual Labour Name</th><th style="text-align:center; width:135px;">Status</th><th style="text-align:center; width:160px;">Action</th>
+        </tr></thead><tbody>`;
 
       if (displayedBookings.length === 0) {
-        html += `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No casual workers found matching current filters.</td></tr>`;
+        html += `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">No casual workers found.</td></tr>`;
       } else {
-        const defaultRacerSilhouette = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><rect width='100%' height='100%' fill='%231a1a1a'/><path d='M50 22c-12 0-22 10-22 22 0 9 5.5 16.7 13.3 20.1C25 69 15 80 15 95h70c0-15-10-26-26.3-30.9C66.5 60.7 72 53 72 44c0-12-10-22-22-22z' fill='%23444444'/><path d='M50 28c-8.8 0-16 7.2-16 16 0 8.8 7.2 16 16 16s16-7.2 16-16c0-8.8-7.2-16-16-16z' fill='%23555555'/></svg>`;
+        const defaultSilhouette = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><rect width='100%' height='100%' fill='%231a1a1a'/><path d='M50 22c-12 0-22 10-22 22 0 9 5.5 16.7 13.3 20.1C25 69 15 80 15 95h70c0-15-10-26-26.3-30.9C66.5 60.7 72 53 72 44c0-12-10-22-22-22z' fill='%23444444'/></svg>`;
 
         displayedBookings.forEach(w => {
-          const targetUserId = w.user_id || w.doc_no;
-          const targetWorkerName = w.worker_name || w.name || "Casual Worker";
           const st = String(w.status).toUpperCase();
-          const isConfirmed = (st === 'SUBMITTED' || st === 'CONFIRMED' || st === 'SUBNS');
-          const selectClass = isConfirmed ? "status-confirmed" : "status-waitlist";
+          const isConf = ['SUBMITTED', 'CONFIRMED', 'SUBNS'].includes(st);
+          const selectClass = isConf ? "status-confirmed" : "status-waitlist";
+          const photoUrl = w.photo_url || defaultSilhouette;
+          const dialable = formatPhoneForDialing(w.phone);
+          const isClockedIn = formatFullTimestamp(w.attendance) !== "No Show";
+          const safeName = w.worker_name.replace(/'/g, "\\'");
 
-          const photoUrl = w.photo_url || w.photo || defaultRacerSilhouette;
-          const dialablePhone = formatPhoneForDialing(w.phone);
-          const callLink = dialablePhone ? `tel:${dialablePhone}` : `javascript:alert('No phone number on record');`;
-          const docTypeLabel = isPassportHolder(targetUserId) ? "Passport" : "MyKad";
-
-          const safeWorkerNameEscaped = targetWorkerName.replace(/'/g, "\\'");
-          const safePhotoUrlEscaped = photoUrl.replace(/'/g, "\\'");
-
-          html += `
-            <tr>
-              <td>
-                <div class="worker-profile-cell">
-                  <div class="worker-avatar-frame" onclick="openImageLightbox('${safePhotoUrlEscaped}', '${safeWorkerNameEscaped}', '${targetUserId}')" title="Click to view large profile photo">
-                    <img src="${photoUrl}" class="worker-avatar" alt="Photo" onerror="this.onerror=null; this.src='${defaultRacerSilhouette}';" />
-                  </div>
-                  <div>
-                    <div class="view-drawable-name" style="font-size:11px; font-weight:800; text-transform:uppercase; line-height:1.2; cursor:pointer;" onclick="openWorkerProfileDrawer('${targetUserId}', '${safeWorkerNameEscaped}')">${targetWorkerName}</div>
-                    <div style="font-size:9px; color:var(--text-muted); margin-top:2px; font-family:monospace; font-weight:600;">${docTypeLabel}: ${targetUserId}</div>
-                  </div>
-                </div>
-              </td>
-              <td style="text-align:center;">
-                <div class="wm-status-select-wrapper">
-                  <select class="wm-status-select ${selectClass}" onchange="toggleWorkerStatus('${shift.id}', '${targetUserId}', this.value === 'WAITLIST' ? 'true' : 'false')">
-                    <option value="CONFIRMED" ${isConfirmed ? 'selected' : ''}>CONFIRMED</option>
-                    <option value="WAITLIST" ${!isConfirmed ? 'selected' : ''}>WAITLIST</option>
-                  </select>
-                  <i class="ph ph-caret-down wm-status-chevron"></i>
-                </div>
-              </td>
-              <td style="text-align:center;">
-                <a href="${callLink}" class="btn-call-action">
-                  <i class="ph ph-phone"></i> CALL
-                </a>
-              </td>
-            </tr>`;
+          html += `<tr><td>
+            <div class="worker-profile-cell">
+              <div class="worker-avatar-frame" onclick="openImageLightbox('${photoUrl}', '${safeName}', '${w.user_id}')">
+                <img src="${photoUrl}" class="worker-avatar" onerror="this.onerror=null; this.src='${defaultSilhouette}';" />
+              </div>
+              <div>
+                <button class="view-drawable-name" onclick="openWorkerProfileDrawer('${w.user_id}', '${safeName}')">${w.worker_name}</button>
+                <div style="font-size:9px; color:var(--text-muted); font-family:monospace;">${isPassportHolder(w.user_id) ? 'Passport' : 'MyKad'}: ${w.user_id}</div>
+              </div>
+            </div>
+          </td><td style="text-align:center;">
+            <div class="wm-status-select-wrapper">
+              <select class="wm-status-select ${selectClass}" onchange="toggleWorkerStatus('${shift.id}', '${w.user_id}', this.value)">
+                <option value="CONFIRMED" ${isConf ? 'selected' : ''}>CONFIRMED</option>
+                <option value="WAITLIST" ${!isConf ? 'selected' : ''}>WAITLIST</option>
+              </select>
+            </div>
+          </td><td style="text-align:center;">
+            <div style="display:flex; gap:6px; justify-content:center;">
+              ${dialable ? `<a href="tel:${dialable}" class="btn-call-action"><i class="ph ph-phone"></i> CALL</a>` : ''}
+              ${isConf ? `<button class="btn-checkin ${isClockedIn ? 'clocked' : ''}" onclick="logWorkerAttendance('${shift.id}', '${w.user_id}', '${safeName}', '${shift.dept}', '${w.phone}')"><i class="ph ph-check-square"></i> ${isClockedIn ? 'IN' : 'CLOCK IN'}</button>` : ''}
+            </div>
+          </td></tr>`;
         });
       }
-
       html += `</tbody></table></div></div>`;
-      rootEl.innerHTML = html;
+      document.getElementById('worker-manager-root').innerHTML = html;
     }
 
-    /* WHATSAPP-STYLE LIGHTBOX HANDLERS */
-    function openImageLightbox(imgUrl, workerName, docId) {
-      const modal = document.getElementById('image-lightbox-modal');
-      const imgEl = document.getElementById('lightbox-img-element');
-      const captionEl = document.getElementById('lightbox-caption-text');
-      const subtextEl = document.getElementById('lightbox-subtext-element');
-
-      if (!modal || !imgEl) return;
-
-      imgEl.src = imgUrl;
-      captionEl.textContent = workerName;
-      subtextEl.textContent = `ID / Passport: ${docId}`;
-
-      modal.style.display = 'flex';
-    }
-
-    function closeImageLightbox() {
-      const modal = document.getElementById('image-lightbox-modal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    function downloadRosterCSV(shiftId) {
-      const shift = cachedShifts.find(s => s.id === shiftId);
-      const bookings = cachedBookings.filter(b => 
-        b.shift_id === shiftId && 
-        String(b.status).toUpperCase() !== 'CANCELLED'
-      );
-
-      if (!bookings || bookings.length === 0) {
-        alert("No casual workers available to download.");
-        return;
-      }
-
-      let csvContent = "\uFEFF Worker Name,MyKad/Passport ID,Doc Type,Status,Phone\n";
-      bookings.forEach(b => {
-        const targetUserId = b.user_id || b.doc_no;
-        const targetWorkerName = b.worker_name || b.name || "Casual Worker";
-        const docType = isPassportHolder(targetUserId) ? "Passport" : "MyKad";
-        csvContent += `"${targetWorkerName}","${targetUserId}","${docType}","${b.status}","${b.phone || ''}"\n`;
-      });
-
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Roster_${shiftId}_${shift ? shift.dept : ''}.csv`);
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
-
-    async function toggleWorkerStatus(shiftId, workerId, targetToWaitlist) {
-      const promptMsg = targetToWaitlist === 'true' 
-        ? `Demote Worker ID: ${workerId} back to Standby Waitlist?` 
-        : `Promote & Confirm registration for Worker ID: ${workerId}?`;
-
-      if (!confirm(promptMsg)) return;
-
-      document.getElementById('sync-loader').querySelector('.loader-text').textContent = "SYNCHRONIZING STATUS TRANSACTION...";
-      document.getElementById('sync-loader').style.display = 'flex';
-
-      const cleanDocNo = String(workerId).trim().replace(/^'/, '');
-      const docWithQuote = `'${cleanDocNo}`;
-      const newStatus = targetToWaitlist === 'true' ? "WAITLIST" : "CONFIRMED";
-
+    async function toggleWorkerStatus(shiftId, userId, newStatus) {
+      if (!confirm(`Update status to ${newStatus}?`)) return;
+      loadAdminDataSuite("Synchronizing Status...");
       try {
-        const url = `${SUPABASE_URL}/rest/v1/booking_record?shift_id=eq.${encodeURIComponent(shiftId)}&doc_no=in.("${encodeURIComponent(cleanDocNo)}","${encodeURIComponent(docWithQuote)}")`;
-        const res = await fetch(url, {
-          method: "PATCH",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ 
-            status: newStatus, 
-            updated_at: new Date().toISOString()
-          })
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "updateStatus", shiftId, userId, status: newStatus })
         });
-
-        if (res.ok) {
-          loadAdminDataSuite();
-        } else {
-          const errData = await res.json();
-          alert("Update Failed: " + (errData.message || "Matching record not found."));
-          document.getElementById('sync-loader').style.display = 'none';
-        }
+        loadAdminDataSuite();
       } catch (err) {
-        document.getElementById('sync-loader').style.display = 'none';
-        alert("An error occurred while transmitting transaction variables: " + err.message);
+        alert("Status update failed: " + err.message);
       }
     }
+
+    async function logWorkerAttendance(shiftId, userId, name, dept, phone) {
+      if (!confirm(`Log live clock-in attendance for ${name}?`)) return;
+      loadAdminDataSuite("Logging Attendance...");
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "logAttendance", shiftId, userId, name, department: dept, phone })
+        });
+        loadAdminDataSuite();
+      } catch (err) {
+        alert("Attendance log failed: " + err.message);
+      }
+    }
+
+    function openImageLightbox(url, name, id) {
+      document.getElementById('lightbox-img-element').src = url;
+      document.getElementById('lightbox-caption-text').textContent = name;
+      document.getElementById('lightbox-subtext-element').textContent = `ID / Passport: ${id}`;
+      document.getElementById('image-lightbox-modal').style.display = 'flex';
+    }
+    function closeImageLightbox() { document.getElementById('image-lightbox-modal').style.display = 'none'; }
 
     function openWorkerProfileDrawer(workerId, workerName) {
       document.getElementById('wp-drawer-name').textContent = workerName;
-      let totalConfirmed = 0, noShows = 0, profileRowsMarkup = "";
-      const cleanTargetId = String(workerId).trim().replace(/^'/, '');
+      let totalConfirmed = 0, noShows = 0, markup = "";
+      let cleanId = String(workerId).trim().replace(/^'/, '');
 
-      const historySubset = cachedBookings.filter(b => String(b.user_id || b.doc_no).trim().replace(/^'/, '') === cleanTargetId);
-      historySubset.sort((a, b) => getShiftDateObj(b.date) - getShiftDateObj(a.date));
+      let history = cachedBookings.filter(b => String(b.user_id).trim().replace(/^'/, '') === cleanId);
+      history.sort((a, b) => getShiftDateObj(b.date) - getShiftDateObj(a.date));
 
-      historySubset.forEach(b => {
-        const rawStatus = String(b.status).toUpperCase();
-        const attendanceStr = String(b.attendance || "").trim().toLowerCase();
-        if (rawStatus === 'SUBMITTED' || rawStatus === 'CONFIRMED' || rawStatus === 'SUBNS') totalConfirmed++;
-        if (attendanceStr === 'no show') noShows++;
+      history.forEach(b => {
+        const st = String(b.status).toUpperCase();
+        if (['SUBMITTED', 'CONFIRMED', 'SUBNS'].includes(st)) totalConfirmed++;
+        if (String(b.attendance).toLowerCase() === 'no show') noShows++;
 
-        let matchingShift = cachedShifts.find(s => String(s.id).toUpperCase() === String(b.shift_id).toUpperCase());
-        let finalDisplayDate = b.date || (matchingShift ? matchingShift.date : "N/A");
-        let finalDisplayDept = b.dept || (matchingShift ? matchingShift.dept : "N/A");
+        let pill = st === 'CANCELLED' ? '<span class="status-pill pill-cancelled">Cancelled</span>' : (st.includes('WAIT') ? '<span class="status-pill pill-wait">Waitlist</span>' : '<span class="status-pill pill-sub">Confirmed</span>');
+        let att = (st === 'CANCELLED' || st.includes('WAIT')) ? '-' : formatFullTimestamp(b.attendance);
 
-        let statusPill = (rawStatus === 'CANCELLED') ? '<span class="status-pill pill-cancelled">Cancelled</span>' : (rawStatus.includes('WAIT') ? '<span class="status-pill pill-wait">Waitlist</span>' : '<span class="status-pill pill-sub">Confirmed</span>');
-        let attendanceDisplay = (rawStatus === 'CANCELLED' || rawStatus.includes('WAIT')) ? `<span style="color:var(--text-muted); font-weight:700;">-</span>` : ((attendanceStr === "no show" || attendanceStr === "" || attendanceStr === "0") ? `<span style="color:var(--accent-warn); font-weight:800; text-transform:uppercase;">No Show</span>` : `<span style="color:var(--text-main); font-weight:800; font-family:monospace;">${formatFullTimestamp(b.attendance)}</span>`);
-
-        profileRowsMarkup += `
-          <tr>
-            <td>
-              <div style="font-weight:700; color:var(--text-main);">${finalDisplayDate}</div>
-              <div style="font-size:11px; color:var(--text-muted); font-weight:600; margin-top:2px;">${finalDisplayDept}</div>
-            </td>
-            <td style="text-align:center;">${statusPill}</td>
-            <td style="text-align:center;">${attendanceDisplay}</td>
-          </tr>`;
+        markup += `<tr>
+          <td><b>${b.date}</b><div style="font-size:11px; color:var(--text-muted);">${b.dept}</div></td>
+          <td style="text-align:center;">${pill}</td>
+          <td style="text-align:center; font-family:monospace; font-size:11px;">${att}</td>
+        </tr>`;
       });
 
-      const docTypeStr = isPassportHolder(cleanTargetId) ? "Passport" : "MyKad";
-
-      document.getElementById('wp-drawer-meta').innerHTML = `
-        <span><i class="ph ph-identification-card"></i> ${docTypeStr} ID: <b>${cleanTargetId}</b></span>
-        <span><i class="ph ph-shield-warning"></i> Matrix Analytics: <b>${noShows} No-Shows</b> out of <b>${totalConfirmed} Confirmed</b></span>`;
-      document.getElementById('wp-drawer-table-body').innerHTML = profileRowsMarkup || `<tr><td colspan="3" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">No logged history discovered.</td></tr>`;
+      document.getElementById('wp-drawer-meta').innerHTML = `<span>${isPassportHolder(cleanId) ? 'Passport' : 'MyKad'} ID: <b>${cleanId}</b></span><span><b>{noShows} No-Shows</b> out of <b>{totalConfirmed} Confirmed</b></span>`;
+      document.getElementById('wp-drawer-table-body').innerHTML = markup || `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">No history found.</td></tr>`;
       document.getElementById('worker-profile-drawer').style.display = 'flex';
     }
-
     function closeWorkerProfileDrawer() { document.getElementById('worker-profile-drawer').style.display = 'none'; }
-  </script>
 
+    function downloadRosterCSV(shiftId) {
+      const shift = cachedShifts.find(s => s.id === shiftId);
+      const bookings = cachedBookings.filter(b => b.shift_id === shiftId && String(b.status).toUpperCase() !== 'CANCELLED');
+      if (!bookings.length) return alert("No workers to download.");
+
+      let csv = "\uFEFFWorker Name,MyKad/Passport ID,Doc Type,Status,Phone\n";
+      bookings.forEach(b => {
+        csv += `"${b.worker_name}","${b.user_id}","${isPassportHolder(b.user_id) ? 'Passport' : 'MyKad'}","${b.status}","${b.phone || ''}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Roster_${shiftId}_${shift ? shift.dept : ''}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
 </body>
 </html>
