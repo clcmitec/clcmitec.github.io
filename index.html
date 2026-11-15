@@ -11,8 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
-  <!-- Load Supabase Library Synchronously -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Load Firebase SDKs Compat Layer -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <style>
     :root {
@@ -169,20 +170,20 @@
   </div>
 
   <script>
-    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
-    let supabaseClient = null;
+    // Firebase Configuration for project 'mitec-cl-2027'
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
+      authDomain: "mitec-cl-2027.firebaseapp.com",
+      projectId: "mitec-cl-2027",
+      storageBucket: "mitec-cl-2027.firebasestorage.app",
+      messagingSenderId: "42229239032",
+      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
+    };
 
-    function getSupabase() {
-      if (!supabaseClient) {
-        if (window.supabase && typeof window.supabase.createClient === 'function') {
-          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-        } else {
-          throw new Error("Supabase library not loaded. Ensure internet connection is active.");
-        }
-      }
-      return supabaseClient;
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
+    const db = firebase.firestore();
 
     function showStatus(text, isError = true) {
       const msg = document.getElementById("loginMessage");
@@ -205,25 +206,19 @@
       showStatus("");
 
       try {
-        const client = getSupabase();
+        // Query Firestore collection 'casual_labour_profile' by document ID (doc_no)
+        const docRef = db.collection('casual_labour_profile').doc(docNo);
+        const docSnap = await docRef.get();
 
-        const { data: worker, error } = await client
-          .from('casual_labour_profile')
-          .select('*')
-          .eq('doc_no', docNo)
-          .maybeSingle();
-
-        if (error) {
-          showStatus("DB Error: " + error.message);
-          loginBtn.disabled = false;
-          loginBtn.querySelector('span').textContent = "Access";
-          return;
-        }
-
-        if (worker) {
+        if (docSnap.exists) {
+          const worker = docSnap.data();
           showStatus("Identity Verified. Entering...", false);
+          
+          // Save worker session locally for dashboard.html and other views
           localStorage.setItem("mitecWorkerRecord", JSON.stringify(worker));
           localStorage.setItem("mcl_doc_no", docNo);
+          localStorage.setItem("workerDocNo", docNo);
+
           setTimeout(() => { window.location.href = "dashboard.html"; }, 150);
         } else {
           showStatus("Record not found for doc_no: " + docNo);
@@ -231,7 +226,7 @@
           loginBtn.querySelector('span').textContent = "Access";
         }
       } catch (err) {
-        showStatus(err.message);
+        showStatus("System Error: " + err.message);
         loginBtn.disabled = false;
         loginBtn.querySelector('span').textContent = "Access";
       }
