@@ -937,7 +937,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
       <span class="nav-label">Services</span>
     </a>
-    <a href="javascript:void(0)" onclick="goToPage('booking.html')" class="nav-item">
+    <a href="javascript:void(0)" onclick="goToPage('booking2027.html')" class="nav-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span class="nav-label">Schedule</span>
     </a>
@@ -953,14 +953,14 @@
 
   <!-- FIREBASE DASHBOARD SCRIPT LOGIC -->
   <script>
-    // Firebase Configuration for project 'mitec-cl-2027'
+    // 1. Real Firebase Configuration for project 'mitec-cl-2027'
     const firebaseConfig = {
-      apiKey: "YOUR_FIREBASE_API_KEY",
+      apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
       authDomain: "mitec-cl-2027.firebaseapp.com",
       projectId: "mitec-cl-2027",
-      storageBucket: "mitec-cl-2027.appspot.com",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      storageBucket: "mitec-cl-2027.firebasestorage.app",
+      messagingSenderId: "42229239032",
+      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
     };
 
     if (!firebase.apps.length) {
@@ -987,13 +987,24 @@
     }
 
     function getStoredWorker() { return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}"); }
-    function toProperCase(str) { return str ? str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : ""; }
+    function toProperCase(str) { return str ? String(str).toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : ""; }
+
+    function convertToDirectLink(url) {
+      if (!url) return "";
+      let stringUrl = String(url);
+      if (stringUrl.includes("drive.google.com")) {
+        const match = stringUrl.match(/\/file\/d\/([^/?]+)/) || stringUrl.match(/id=([^&]+)/);
+        if (match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=s160`;
+      }
+      return stringUrl;
+    }
 
     function setImageWithFallback(imgId, src, fallback) {
       const imgEl = document.getElementById(imgId);
       if (!imgEl) return;
       imgEl.onerror = function() { this.onerror = null; this.src = fallback; };
-      if (src && src.length > 5) imgEl.src = src;
+      const finalSrc = convertToDirectLink(src);
+      if (finalSrc && finalSrc.length > 5) imgEl.src = finalSrc;
     }
 
     async function fillWorkerData() {
@@ -1010,10 +1021,6 @@
 
       const loaderState = document.getElementById("loaderState");
       const summaryGrid = document.getElementById("summaryGrid");
-      const inVal = document.getElementById("dashSignIn");
-      const outVal = document.getElementById("dashSignOut");
-      const vouchVal = document.getElementById("dashVoucher");
-      const hoursVal = document.getElementById("dashHours");
 
       if (!docNo) {
         loaderState.style.display = "none";
@@ -1021,9 +1028,10 @@
         return;
       }
 
-      // Check cache
-      const cachedSummary = sessionStorage.getItem(`dash_summary_cache_${docNo}`);
-      const cachedTime = sessionStorage.getItem(`dash_summary_time_${docNo}`);
+      const cleanDocNo = String(docNo).trim().replace(/^'/, '');
+
+      const cachedSummary = sessionStorage.getItem(`dash_summary_cache_${cleanDocNo}`);
+      const cachedTime = sessionStorage.getItem(`dash_summary_time_${cleanDocNo}`);
       const nowTime = Date.now();
 
       if (cachedSummary && cachedTime && (nowTime - Number(cachedTime) < 120000)) {
@@ -1032,10 +1040,8 @@
       }
 
       try {
-        // 1. Fetch worker profile from Firestore if needed
         if (!worker.photo_link || !worker.name_mykad) {
-          const docRef = db.collection('casual_labour_profile').doc(String(docNo).trim());
-          const docSnap = await docRef.get();
+          const docSnap = await db.collection('casual_labour_profile').doc(cleanDocNo).get();
 
           if (docSnap.exists) {
             const profile = docSnap.data();
@@ -1051,55 +1057,57 @@
           }
         }
 
-        // 2. Fetch today's attendance record from Firestore collection 'attendance_records'
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const todayDateString = `${year}-${month}-${day}`;
 
-        const attQuery = await db.collection('attendance_records')
-          .where('doc_no', '==', String(docNo).trim())
-          .where('working_date', '==', todayDateString)
-          .get();
-
         let summary = null;
-        if (!attQuery.empty) {
-          // Grab the latest record
-          let records = [];
-          attQuery.forEach(doc => records.push(doc.data()));
-          records.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
-          summary = records[0];
+        const directAttSnap = await db.collection('attendance_records').doc(`${cleanDocNo}_${todayDateString}`).get();
+
+        if (directAttSnap.exists) {
+          summary = directAttSnap.data();
+        } else {
+          const attQuery = await db.collection('attendance_records')
+            .where('doc_no', '==', cleanDocNo)
+            .where('working_date', '==', todayDateString)
+            .get();
+
+          if (!attQuery.empty) {
+            let records = [];
+            attQuery.forEach(doc => records.push(doc.data()));
+            records.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+            summary = records[0];
+          }
         }
 
-        sessionStorage.setItem(`dash_summary_cache_${docNo}`, JSON.stringify(summary || {}));
-        sessionStorage.setItem(`dash_summary_time_${docNo}`, String(nowTime));
+        sessionStorage.setItem(`dash_summary_cache_${cleanDocNo}`, JSON.stringify(summary || {}));
+        sessionStorage.setItem(`dash_summary_time_${cleanDocNo}`, String(nowTime));
         renderShiftSummary(summary);
 
-        // Load Announcements and Birthdays from Firestore collections
-        loadAnnouncementsFromFirestore();
-        loadBirthdaysFromFirestore();
-
       } catch (e) { 
-        console.error("Dashboard Firestore Sync Error:", e);
+        console.error("Dashboard Shift Sync Error:", e);
         renderShiftSummary(null);
-        showAnnouncementFallback();
       }
     }
 
     async function loadAnnouncementsFromFirestore() {
       try {
-        const snapshot = await db.collection('announcements')
-          .where('active', '==', true)
-          .orderBy('created_at', 'desc')
-          .limit(5)
-          .get();
-
+        const snapshot = await db.collection('announcements').get();
         const announcements = [];
-        snapshot.forEach(doc => announcements.push(doc.data()));
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.is_active === true || data.active === true || data.is_active === undefined) {
+            announcements.push(data);
+          }
+        });
+
+        announcements.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
         if (announcements.length > 0) {
-          renderAnnouncements(announcements);
+          renderAnnouncements(announcements.slice(0, 5));
         } else {
           showAnnouncementFallback();
         }
@@ -1111,21 +1119,39 @@
 
     async function loadBirthdaysFromFirestore() {
       const spinWindow = document.getElementById("spinWindow");
-      try {
-        const today = new Date();
-        const mmdd = String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      const today = new Date();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mmdd = `${mm}-${dd}`;
+      const icMmDd = `${mm}${dd}`;
 
-        // Query profiles whose birthday matches today (assuming a birth_date field exists or similar)
+      const cachedBdays = sessionStorage.getItem(`dash_bdays_${icMmDd}`);
+      if (cachedBdays) {
+        renderBirthdays(JSON.parse(cachedBdays));
+        return;
+      }
+
+      try {
         const snapshot = await db.collection('casual_labour_profile').get();
         const bdayList = [];
-        
+
         snapshot.forEach(doc => {
           const data = doc.data();
-          if (data.birth_date && String(data.birth_date).includes(mmdd)) {
-            bdayList.push(data);
+          const cleanId = String(data.doc_no || doc.id || "").trim().replace(/[^0-9A-Za-z]/g, "");
+          const dobField = String(data.birth_date || data.dob || data.date_of_birth || "");
+
+          const matchesDob = dobField && (dobField.includes(mmdd) || dobField.includes(`${dd}/${mm}`) || dobField.includes(`${dd}-${mm}`));
+          const isMyKad = /^\d{12}$/.test(cleanId);
+          const matchesMyKad = isMyKad && cleanId.substring(2, 6) === icMmDd;
+
+          if ((matchesDob || matchesMyKad) && (data.name_mykad || data.full_name)) {
+            bdayList.push({
+              name_mykad: data.name_mykad || data.full_name
+            });
           }
         });
 
+        sessionStorage.setItem(`dash_bdays_${icMmDd}`, JSON.stringify(bdayList));
         renderBirthdays(bdayList);
       } catch (err) {
         console.error("Failed to load birthdays:", err);
@@ -1150,7 +1176,7 @@
       const year = now.getFullYear();
       const todayFormattedDate = `${day}/${month}/${year}`;
 
-      if (summary) {
+      if (summary && Object.keys(summary).length > 0) {
         let formattedClockIn = "--:--";
         if (summary.clock_in) {
           formattedClockIn = `${todayFormattedDate}<br>${summary.clock_in}`;
@@ -1212,9 +1238,11 @@
       if (bdayList && bdayList.length > 0) {
         let bdayListHtml = "";
         bdayList.forEach(item => {
-          bdayListHtml += `<div class="person"><span class="person-name">${toProperCase(item.name_mykad)}</span></div>`;
+          bdayListHtml += `<div class="person"><span class="person-name">💎 ${toProperCase(item.name_mykad)}</span></div>`;
         });
-        spinWindow.innerHTML = `<div class="spin-list animate-spin">${bdayListHtml}${bdayListHtml}</div>`;
+        const listMarkup = bdayList.length > 2 ? `${bdayListHtml}${bdayListHtml}` : bdayListHtml;
+        const animClass = bdayList.length > 2 ? "animate-spin" : "";
+        spinWindow.innerHTML = `<div class="spin-list ${animClass}">${listMarkup}</div>`;
       } else {
         spinWindow.innerHTML = `<div class="person" style="width:100%; justify-content:center;"><span class="person-name">No birthdays scheduled today 🎉</span></div>`;
       }
@@ -1231,7 +1259,6 @@
 
     function showAnnouncementFallback() {
       document.getElementById("announcementTrack").innerHTML = `<div class="announcement-card"><div class="announcement-tag">NOTICE</div><p class="announcement-body">No active updates listed for today.</p></div>`;
-      document.getElementById("spinWindow").innerHTML = `<div class="person" style="width:100%; justify-content:center;"><span class="person-name">Records offline</span></div>`;
     }
 
     function setupCarouselDotTriggers(totalCards) {
@@ -1246,7 +1273,6 @@
 
     function goToPage(url) { window.location.href = url; }
 
-    // Register PWA Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
@@ -1256,10 +1282,12 @@
     }
 
     function initDashboard() {
-      if (!localStorage.getItem("mitecWorkerRecord") && !localStorage.getItem("workerDocNo")) {
-        window.location.href = "signin.html";
+      if (!localStorage.getItem("mitecWorkerRecord") && !localStorage.getItem("workerDocNo") && !localStorage.getItem("mcl_doc_no")) {
+        window.location.href = "index.html";
       } else {
         fillWorkerData();
+        loadAnnouncementsFromFirestore();
+        loadBirthdaysFromFirestore();
       }
     }
 
