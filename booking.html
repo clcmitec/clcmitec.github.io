@@ -18,81 +18,46 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Phosphor Icons (Deferred) -->
+  <!-- Phosphor Icons -->
   <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <!-- Bootstrap 5.3 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+  <!-- Firebase SDKs Compat Layer (For casual_labour_profile) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
   <style>
-    /* SHADCN OKLCH + 3D ELEVATION COLOR SYSTEM */
     :root {
       --background: #eef2f7;
       --foreground: oklch(0.147 0.004 49.3);
       --card: #ffffff;
       --card-foreground: oklch(0.147 0.004 49.3);
-      --popover: #ffffff;
-      --popover-foreground: oklch(0.147 0.004 49.3);
       --primary: #063e99;
       --primary-foreground: #ffffff;
-      --secondary: #e2e8f0;
-      --secondary-foreground: #1e293b;
-      --muted: #f1f5f9;
       --muted-foreground: #64748b;
-      --accent: #e2e8f0;
-      --accent-foreground: #0f172a;
-      --destructive: #dc2626;
       --border: #cad5e2;
-      --input: #cbd5e1;
-      --ring: #3b82f6;
       --radius: 0.75rem;
-
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    .dark {
-      --background: #0f172a;
-      --foreground: #f8fafc;
-      --card: #1e293b;
-      --card-foreground: #f8fafc;
-      --popover: #1e293b;
-      --popover-foreground: #f8fafc;
-      --primary: #2563eb;
-      --primary-foreground: #ffffff;
-      --secondary: #334155;
-      --secondary-foreground: #f8fafc;
-      --muted: #334155;
-      --muted-foreground: #94a3b8;
-      --accent: #334155;
-      --accent-foreground: #f8fafc;
-      --destructive: #ef4444;
-      --border: rgba(255, 255, 255, 0.12);
-      --input: rgba(255, 255, 255, 0.15);
-      --ring: #60a5fa;
-    }
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; font-family: var(--font-sans); }
 
-    * { 
-      box-sizing: border-box; 
-      -webkit-font-smoothing: antialiased; 
-      font-family: var(--font-sans); 
-    }
-
-    body { 
+    body {
       background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #e2e8f0 100%);
-      color: var(--foreground); 
-      padding-bottom: 90px; 
+      color: var(--foreground);
+      padding-bottom: 90px;
       min-height: 100vh;
-      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* FLOATING 3D HEADER */
-    .header { 
+    .header {
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       height: 58px;
       border-bottom: 1px solid rgba(203, 213, 225, 0.8);
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), inset 0 -1px 0 rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
     }
 
     .back-action-arrow {
@@ -104,384 +69,107 @@
       border-radius: var(--radius);
       border: 1px solid rgba(0,0,0,0.1);
       background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08), inset 0 1px 0 #ffffff;
-      transition: all 0.15s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .back-action-arrow:hover { 
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 #ffffff;
-    }
-    .back-action-arrow:active { 
-      transform: translateY(1px);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(0,0,0,0.15);
-    }
-    .brand-img { height: 22px; width: auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); }
 
+    .brand-img { height: 22px; width: auto; }
     .portal-container { max-width: 440px; margin: 0 auto; padding: 16px; }
 
-    /* 1. 3D GLOSSY PROFILE HEADER CARD */
-    .profile-card { 
-      background: linear-gradient(135deg, #094ebf 0%, #063e99 65%, #03245c 100%); 
-      border-radius: var(--radius); 
+    .profile-card {
+      background: linear-gradient(135deg, #094ebf 0%, #063e99 65%, #03245c 100%);
+      border-radius: var(--radius);
       color: var(--primary-foreground);
       border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 12px 28px -6px rgba(6, 62, 153, 0.38), 0 4px 10px -2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-      position: relative;
-      overflow: hidden;
-    }
-    .profile-card::after {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .avatar { 
-      width: 44px; 
-      height: 44px; 
-      border-radius: 50%; 
-      border: 2px solid rgba(255, 255, 255, 0.8); 
-      object-fit: cover; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      box-shadow: 0 12px 28px -6px rgba(6, 62, 153, 0.38);
     }
 
-    /* CAVEAT FONT STYLING FOR WORKER NAME */
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.8); object-fit: cover;
+    }
+
     #userNameDisplay {
       font-family: 'Caveat', cursive !important;
       font-size: 1.05rem !important;
       font-weight: 700 !important;
-      line-height: 1.1;
-      letter-spacing: 0.02em;
       color: var(--primary-foreground);
     }
 
-    /* FILTER CHIPS (TACTILE EMBOSSED) */
     .filter-chips-container {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 6px 2px 14px 2px;
-      scrollbar-width: none;
+      display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px 14px 2px; scrollbar-width: none;
     }
     .filter-chips-container::-webkit-scrollbar { display: none; }
 
     .filter-chip-btn {
-      font-size: 12px;
-      font-weight: 600;
-      border-radius: 20px !important;
-      padding: 7px 16px !important;
-      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-      white-space: nowrap;
+      font-size: 12px; font-weight: 600; border-radius: 20px !important; padding: 7px 16px !important; white-space: nowrap;
     }
-    .filter-chip-btn.active-chip {
-      background: linear-gradient(180deg, #094ebf 0%, #063e99 100%) !important;
-      color: #ffffff !important;
-      border: 1px solid #042d70 !important;
-      box-shadow: 0 4px 12px rgba(6, 62, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-    }
-    .filter-chip-btn.inactive-chip {
-      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
-      color: #334155 !important;
-      border: 1px solid rgba(0, 0, 0, 0.1) !important;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05), inset 0 1px 0 #ffffff !important;
-    }
-    .filter-chip-btn.inactive-chip:hover {
-      transform: translateY(-1px);
-      background: #ffffff !important;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 #ffffff !important;
-    }
-    .filter-chip-btn:active {
-      transform: translateY(1px) !important;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
-    }
+    .filter-chip-btn.active-chip { background: #063e99 !important; color: #ffffff !important; }
+    .filter-chip-btn.inactive-chip { background: #ffffff !important; color: #334155 !important; border: 1px solid rgba(0,0,0,0.1) !important; }
 
-    /* DATE SECTION HEADERS - SIGNIFICANT SPACING */
-    .date-label { 
-      font-size: 12px; 
-      font-weight: 700; 
-      color: #334155; 
-      margin-top: 68px; 
-      margin-bottom: 16px;
-      margin-left: 2px;
-      text-transform: uppercase; 
-      letter-spacing: 0.12em;
-      display: flex; 
-      align-items: center; 
-      gap: 15px;
-      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    .date-label {
+      font-size: 12px; font-weight: 700; color: #334155; margin-top: 68px; margin-bottom: 16px;
+      text-transform: uppercase; letter-spacing: 0.12em; display: flex; align-items: center; gap: 15px;
     }
     .date-label.first-date { margin-top: 10px; }
-    .date-label::after { 
-      content: ""; 
-      flex: 1; 
-      height: 2px; 
-      background: linear-gradient(90deg, var(--border) 0%, rgba(202, 213, 226, 0.2) 100%); 
-      border-radius: 1px;
-    }
+    .date-label::after { content: ""; flex: 1; height: 2px; background: var(--border); }
 
-    /* 3D RAISED SHIFT CARDS */
     .card-shift {
       background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
       border: 1px solid rgba(6, 62, 153, 0.12) !important;
       border-radius: var(--radius) !important;
-      color: var(--card-foreground);
-      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-      margin-bottom: 12px !important; 
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-    }
-    .card-shift:hover {
-      transform: translateY(-3px) scale(1.008);
-      box-shadow: 0 14px 28px -6px rgba(6, 62, 153, 0.14), 0 6px 12px -2px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
-      border-color: rgba(6, 62, 153, 0.25) !important;
+      margin-bottom: 12px !important;
+      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.06);
     }
 
     .card.locked { opacity: 0.35; filter: grayscale(0.8); pointer-events: none; }
+    .card.full-shift { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%); }
 
-    .card.full-shift {
-      background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
-      border-color: rgba(0,0,0,0.08) !important;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.6);
-    }
+    .badge-shadcn-full { background: #dc2626 !important; color: #ffffff !important; font-size: 10px; font-weight: 700; border-radius: 6px; padding: 4px 9px; }
+    .badge-shadcn-left { background: #f1f5f9 !important; color: #1e293b !important; border: 1px solid rgba(0,0,0,0.12) !important; font-size: 10px; font-weight: 700; border-radius: 6px; padding: 4px 9px; }
+    .badge-shadcn-wait { background: #fef3c7 !important; color: #92400e !important; border: 1px solid #fcd34d !important; font-size: 10px; font-weight: 700; border-radius: 6px; padding: 4px 9px; }
+    .badge-shadcn-confirmed { background: #dcfce7 !important; color: #14532d !important; border: 1px solid #86efac !important; font-size: 10px; font-weight: 700; border-radius: 6px; padding: 4px 9px; }
 
-    /* 3D BADGES */
-    .badge-shadcn-full {
-      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%) !important;
-      color: #ffffff !important;
-      font-size: 10px;
-      font-weight: 700;
-      border-radius: calc(var(--radius) - 0.3rem);
-      padding: 4px 9px;
-      box-shadow: 0 2px 5px rgba(220, 38, 38, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-    .badge-shadcn-left {
-      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
-      color: #1e293b !important;
-      border: 1px solid rgba(0,0,0,0.12) !important;
-      font-size: 10px;
-      font-weight: 700;
-      border-radius: calc(var(--radius) - 0.3rem);
-      padding: 4px 9px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), inset 0 1px 0 #ffffff;
-    }
-    .badge-shadcn-wait {
-      background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%) !important;
-      color: #92400e !important;
-      border: 1px solid #fcd34d !important;
-      font-size: 10px;
-      font-weight: 700;
-      border-radius: calc(var(--radius) - 0.3rem);
-      padding: 4px 9px;
-      box-shadow: 0 2px 5px rgba(217, 119, 6, 0.18), inset 0 1px 0 #ffffff;
-    }
-    .badge-shadcn-confirmed {
-      background: linear-gradient(180deg, #dcfce7 0%, #bbf7d0 100%) !important;
-      color: #14532d !important;
-      border: 1px solid #86efac !important;
-      font-size: 10px;
-      font-weight: 700;
-      border-radius: calc(var(--radius) - 0.3rem);
-      padding: 4px 9px;
-      box-shadow: 0 2px 5px rgba(22, 101, 52, 0.15), inset 0 1px 0 #ffffff;
-    }
-
-    /* SPOTLIGHT BANNER */
     .spotlight-banner {
-      background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
-      border: 1px solid #fde68a;
-      color: #92400e;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 8px 12px;
-      border-radius: calc(var(--radius) - 0.3rem);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.1), inset 0 1px 0 #ffffff;
+      background: #fef3c7; border: 1px solid #fde68a; color: #92400e; font-size: 11px; font-weight: 600;
+      padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
     }
 
-    /* TACTILE 3D BUTTONS */
-    .btn-shadcn-primary {
-      background: linear-gradient(180deg, #1b63d7 0%, #063e99 100%) !important;
-      color: #ffffff !important;
-      border: 1px solid #05337e !important;
-      font-weight: 600 !important;
-      font-size: 13px !important;
-      border-radius: calc(var(--radius) - 0.15rem) !important;
-      padding: 10px 16px !important;
-      box-shadow: 0 4px 12px rgba(6, 62, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-      transition: all 0.15s ease !important;
-    }
-    .btn-shadcn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(6, 62, 153, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
-    }
-    .btn-shadcn-primary:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 4px rgba(6, 62, 153, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
-    }
+    .btn-shadcn-primary { background: linear-gradient(180deg, #1b63d7 0%, #063e99 100%) !important; color: #ffffff !important; font-weight: 600 !important; font-size: 13px !important; border-radius: 8px !important; padding: 10px 16px !important; border: none; }
+    .btn-shadcn-outline-waitlist { background: #ffffff !important; color: #4b6b94 !important; border: 1px solid rgba(6, 62, 153, 0.28) !important; font-weight: 600 !important; font-size: 13px !important; border-radius: 8px !important; padding: 10px 16px !important; }
+    .btn-shadcn-filled-muted { background: #f1f5f9 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important; font-weight: 600 !important; font-size: 13px !important; border-radius: 8px !important; padding: 10px 16px !important; }
+    .btn-shadcn-filled-cancel { background: #fef2f2 !important; color: #991b1b !important; border: 1px solid #fca5a5 !important; font-weight: 600 !important; font-size: 13px !important; border-radius: 8px !important; padding: 10px 16px !important; }
+    .btn-shadcn-filled-whatsapp { background: #f0fdf4 !important; color: #166534 !important; border: 1px solid #86efac !important; font-weight: 600 !important; font-size: 13px !important; border-radius: 8px !important; padding: 10px 16px !important; }
 
-    /* SUBTLE MUTED WAITLIST BUTTON */
-    .btn-shadcn-outline-waitlist {
-      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-      color: #4b6b94 !important;
-      border: 1px solid rgba(6, 62, 153, 0.28) !important;
-      font-weight: 600 !important;
-      font-size: 13px !important;
-      border-radius: calc(var(--radius) - 0.15rem) !important;
-      padding: 10px 16px !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 #ffffff;
-      transition: all 0.15s ease !important;
+    nav.bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 62px;
+      background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(20px); z-index: 1000;
+      border-top: 1px solid rgba(203, 213, 225, 0.8);
     }
-    .btn-shadcn-outline-waitlist:hover {
-      background: linear-gradient(180deg, #f0f5ff 0%, #e6efff 100%) !important;
-      color: #063e99 !important;
-      border-color: rgba(6, 62, 153, 0.5) !important;
-      box-shadow: 0 2px 6px rgba(6, 62, 153, 0.12), inset 0 1px 0 #ffffff !important;
-      transform: translateY(-1px);
-    }
-    .btn-shadcn-outline-waitlist:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 2px rgba(0, 0, 0, 0.06) !important;
-    }
+    .bottom-nav .nav-link { color: #64748b; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+    .bottom-nav .nav-link.active { color: var(--primary) !important; }
 
-    .btn-shadcn-filled-muted {
-      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
-      color: #334155 !important;
-      border: 1px solid #cbd5e1 !important;
-      font-weight: 600 !important;
-      font-size: 13px !important;
-      border-radius: calc(var(--radius) - 0.15rem) !important;
-      padding: 10px 16px !important;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05), inset 0 1px 0 #ffffff;
-      transition: all 0.15s ease !important;
+    #sync-loader {
+      position: fixed; inset: 0; background: rgba(238, 242, 247, 0.85); backdrop-filter: blur(12px);
+      z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center;
     }
-    .btn-shadcn-filled-muted:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 5px 12px rgba(0,0,0,0.08), inset 0 1px 0 #ffffff !important;
+    .loader-spinner {
+      width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 12px;
     }
-    .btn-shadcn-filled-muted:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 2px 3px rgba(0, 0, 0, 0.08) !important;
-    }
-
-    .btn-shadcn-filled-cancel {
-      background: linear-gradient(180deg, #fef2f2 0%, #fecaca 100%) !important;
-      color: #991b1b !important;
-      border: 1px solid #fca5a5 !important;
-      font-weight: 600 !important;
-      font-size: 13px !important;
-      border-radius: calc(var(--radius) - 0.15rem) !important;
-      padding: 10px 16px !important;
-      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15), inset 0 1px 0 #ffffff;
-      transition: all 0.15s ease !important;
-    }
-    .btn-shadcn-filled-cancel:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 3px rgba(220, 38, 38, 0.2), inset 0 2px 3px rgba(0,0,0,0.1) !important;
-    }
-
-    .btn-shadcn-filled-whatsapp {
-      background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%) !important;
-      color: #166534 !important;
-      border: 1px solid #86efac !important;
-      font-weight: 600 !important;
-      font-size: 13px !important;
-      border-radius: calc(var(--radius) - 0.15rem) !important;
-      padding: 10px 16px !important;
-      box-shadow: 0 4px 10px rgba(22, 101, 52, 0.15), inset 0 1px 0 #ffffff;
-      transition: all 0.15s ease !important;
-    }
-    .btn-shadcn-filled-whatsapp:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 3px rgba(22, 101, 52, 0.2), inset 0 2px 3px rgba(0,0,0,0.1) !important;
-    }
-
-    /* BOTTOM NAV 3D ELEVATION */
-    nav.bottom-nav { 
-      position: fixed; 
-      bottom: 0; 
-      left: 0; 
-      right: 0; 
-      width: 100%; 
-      height: 62px;
-      background: rgba(255, 255, 255, 0.88); 
-      backdrop-filter: blur(20px); 
-      -webkit-backdrop-filter: blur(20px); 
-      z-index: 1000; 
-      border-top: 1px solid rgba(203, 213, 225, 0.8); 
-      padding: 0; 
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08); 
-    }
-
-    .bottom-nav .nav-link {
-      color: #64748b;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border: none;
-      background: transparent;
-      padding: 6px 0;
-      transition: color 0.15s ease;
-    }
-
-    .bottom-nav .nav-link.active {
-      color: var(--primary) !important;
-      background: transparent !important;
-      filter: drop-shadow(0 2px 4px rgba(6, 62, 153, 0.25));
-    }
-
-    /* LOADER */
-    #sync-loader { 
-      position: fixed; 
-      inset: 0; 
-      background: rgba(238, 242, 247, 0.85); 
-      color: var(--foreground);
-      backdrop-filter: blur(12px);
-      z-index: 9999; 
-      display: none; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-    }
-    .loader-spinner { 
-      width: 36px; 
-      height: 36px; 
-      border: 3px solid #cbd5e1; 
-      border-top-color: var(--primary); 
-      border-radius: 50%; 
-      animation: spin 0.7s linear infinite; 
-      margin-bottom: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    .loader-text { 
-      font-size: 12px; 
-      font-weight: 700; 
-      color: #334155; 
-      letter-spacing: 0.05em; 
-    }
-
+    .loader-text { font-size: 12px; font-weight: 700; color: #334155; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-  <!-- SYNC LOADER -->
   <div id="sync-loader">
     <div class="loader-spinner"></div>
     <div class="loader-text">Processing Request...</div>
   </div>
 
-  <!-- FIXED HEADER -->
   <header class="header sticky-top d-flex align-items-center justify-content-center px-3">
     <div class="position-absolute start-0 ms-3">
       <a href="javascript:void(0)" onclick="goToPage('dashboard.html')" class="back-action-arrow" title="Return to Dashboard">
@@ -492,25 +180,21 @@
   </header>
 
   <div class="portal-container">
-    <!-- 1. BLUE PROFILE CARD -->
     <div class="profile-card p-3 mb-3 d-flex align-items-center gap-3">
       <img id="userAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23ffffff'/></svg>" alt="User Profile">
       <div class="profile-info">
-        <span class="d-block text-uppercase fw-semibold" style="letter-spacing: 0.08em; font-size: 10px; opacity: 0.85; color: var(--primary-foreground);">Logged in as </span>
+        <span class="d-block text-uppercase fw-semibold" style="letter-spacing: 0.08em; font-size: 10px; opacity: 0.85;">Logged in as </span>
         <h2 id="userNameDisplay" class="mb-0">MITEC Casual Labour</h2>
       </div>
     </div>
 
-    <!-- BAN WARNING BANNER (Renders dynamically if user is temp banned) -->
     <div id="bannedAlertBox" class="alert alert-danger shadow-sm border-danger align-items-center gap-2 mb-3" style="display: none; font-size: 12px;">
       <i class="ph ph-warning-circle fs-5"></i>
       <div><b>Booking Restricted:</b> Your account is temporarily suspended from booking new shifts. Please contact HR for assistance.</div>
     </div>
 
-    <!-- FILTER CHIPS ROW -->
     <div id="filter-container" class="filter-chips-container" style="display:none;"></div>
 
-    <!-- TAB CONTENT PANES -->
     <div class="tab-content">
       <div class="tab-pane fade show active" id="available-view" role="tabpanel"></div>
       <div class="tab-pane fade" id="booked-view" role="tabpanel"></div>
@@ -518,7 +202,6 @@
     </div>
   </div>
 
-  <!-- DOCKED BOTTOM NAVIGATION BAR -->
   <nav class="bottom-nav">
     <div class="nav nav-pills nav-justified h-100" id="portalTabs" role="tablist">
       <button class="nav-link active d-flex flex-column align-items-center justify-content-center" id="tab-available" data-bs-toggle="tab" data-bs-target="#available-view" type="button" role="tab" onclick="handleTabSwitch(0)">
@@ -536,12 +219,24 @@
     </div>
   </nav>
 
-  <!-- JS Logic -->
   <script>
-    const REQUIRED_APP_VERSION = "v2.3"; 
+    const REQUIRED_APP_VERSION = "v2.3";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjXs1JPXirpNXduua4I9fH4sdOyByebou8ZOP744S2quQHJAWXeF58-aHzT8ue5f08/exec";
 
-    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
+    // Firebase Configuration (For casual_labour_profile)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
+      authDomain: "mitec-cl-2027.firebaseapp.com",
+      projectId: "mitec-cl-2027",
+      storageBucket: "mitec-cl-2027.firebasestorage.app",
+      messagingSenderId: "42229239032",
+      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
 
     function goToPage(url) { window.location.href = url; }
 
@@ -549,11 +244,10 @@
       localStorage.removeItem("mcl_doc_no");
       localStorage.removeItem("mitecWorkerRecord");
       localStorage.setItem("mcl_app_version", REQUIRED_APP_VERSION);
-      window.location.href = "index.html"; 
+      window.location.href = "index.html";
     }
 
     let isRequestInProgress = false;
-    let activeController = null; 
     let cachedShifts = [];
     let cachedBookings = [];
     let accessControlMap = {};
@@ -561,48 +255,40 @@
 
     function toTitleCase(str) {
       if (!str) return "";
-      return String(str)
-        .toLowerCase()
-        .replace(/(^|\s)\S/g, match => match.toUpperCase());
+      return String(str).toLowerCase().replace(/(^|\s)\S/g, match => match.toUpperCase());
     }
 
-    window.onload = () => {
+    window.onload = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const userDocNo = urlParams.get('id') || localStorage.getItem("mcl_doc_no");
 
-      if (!userDocNo) { 
-        window.location.href = "index.html"; 
-        return; 
+      if (!userDocNo) {
+        window.location.href = "index.html";
+        return;
       }
 
-      const docNo = String(userDocNo).trim();
+      const docNo = String(userDocNo).trim().replace(/^'/, '');
       localStorage.setItem("mcl_doc_no", docNo);
 
-      const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
-      const rawName = record.full_name || record.name_mykad || "MITEC Casual Labour";
-
-      document.getElementById("userNameDisplay").textContent = toTitleCase(rawName);
-      if (record.photo_link) document.getElementById("userAvatar").src = record.photo_link;
-
-      const cleanKey = docNo.replace(/[']/g, '');
-      const cachedDataStr = sessionStorage.getItem(`mcl_portal_cache_${cleanKey}`);
-      if (cachedDataStr) {
+      let record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+      if (!record.name_mykad || !record.document_type) {
         try {
-          const cachedData = JSON.parse(cachedDataStr);
-          cachedShifts = cachedData.allShifts || [];
-          cachedBookings = cachedData.myUpcomingEvents || [];
-          accessControlMap = cachedData.accessControlMap || {};
-          checkUserBanStatus(docNo);
-          renderDepartmentChips(cachedShifts);
-          renderAvailable(cachedShifts, cachedBookings);
-          renderBooked(cachedBookings);
-          renderHistoryLog(cachedBookings);
+          const profSnap = await db.collection('casual_labour_profile').doc(docNo).get();
+          if (profSnap.exists) {
+            record = { ...record, ...profSnap.data() };
+            localStorage.setItem("mitecWorkerRecord", JSON.stringify(record));
+          }
         } catch (e) {
-          console.warn("Cache parse error", e);
+          console.warn("Firestore profile check skipped:", e);
         }
       }
 
-      refreshData(docNo, !cachedDataStr);
+      const rawName = record.full_name || record.name_mykad || "MITEC Casual Labour";
+      document.getElementById("userNameDisplay").textContent = toTitleCase(rawName);
+      if (record.photo_link) document.getElementById("userAvatar").src = record.photo_link;
+
+      // Always force a fresh fetch or clear stale session cache on initial load to ensure bookings appear immediately
+      refreshData(docNo, true);
     };
 
     function checkUserBanStatus(docNo) {
@@ -618,84 +304,31 @@
     }
 
     async function refreshData(docNo, showOverlay = true) {
-      if (activeController) activeController.abort(); 
-      activeController = new AbortController();
-
       if (showOverlay) showLoader("Syncing Master Timelines...");
 
       try {
-        const headers = { 
-          "apikey": SUPABASE_KEY, 
-          "Authorization": `Bearer ${SUPABASE_KEY}` 
-        };
+        const cleanDocNo = String(docNo).trim().replace(/^'/, '');
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=getData&doc_no=${encodeURIComponent(cleanDocNo)}`);
+        const resData = await response.json();
 
-        const rawDoc = String(docNo).trim().replace(/^'/, '');
-        const docWithQuote = `'${rawDoc}`;
+        accessControlMap = resData.accessControl || {};
+        checkUserBanStatus(cleanDocNo);
 
-        const shiftsPromise = fetch(`${SUPABASE_URL}/rest/v1/shift_master?select=*&order=date.asc`, { headers, signal: activeController.signal }).then(r => r.json());
-        const userBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=*,shift_master(date,dept,time,wa_link)&doc_no=in.("${encodeURIComponent(rawDoc)}","${encodeURIComponent(docWithQuote)}")`, { headers, signal: activeController.signal }).then(r => r.json());
-        const allBookingsPromise = fetch(`${SUPABASE_URL}/rest/v1/booking_record?select=shift_id,status&limit=50000`, { headers, signal: activeController.signal }).then(r => r.json());
-        const accessPromise = fetch(`${SUPABASE_URL}/rest/v1/worker_access_control?select=*`, { headers, signal: activeController.signal }).then(r => r.json()).catch(() => []);
+        cachedShifts = (resData.shifts || []).map(s => ({
+          id: s.shift_id,
+          date: s.date || '',
+          dept: s.dept || '',
+          time: s.time || '',
+          totalSlots: parseInt(s.slots) || 0,
+          slotsLeft: parseInt(s.slotsLeft) || 0,
+          notes: s.notes || '',
+          status: s.status || 'OPEN',
+          wa_link: s.wa_link || ''
+        }));
 
-        const [shiftsRes, userBookingsRes, allBookingsRes, accessRes] = await Promise.all([
-          shiftsPromise, 
-          userBookingsPromise, 
-          allBookingsPromise,
-          accessPromise
-        ]);
+        cachedBookings = resData.bookings || [];
 
-        accessControlMap = {};
-        if (Array.isArray(accessRes)) {
-          accessRes.forEach(row => {
-            const cleanDoc = String(row.doc_no || '').trim().replace(/^'/, '').toUpperCase();
-            accessControlMap[cleanDoc] = { is_priority: !!row.is_priority, is_banned: !!row.is_banned };
-          });
-        }
-
-        checkUserBanStatus(docNo);
-
-        const bookingCounts = {};
-        (allBookingsRes || []).forEach(b => {
-          const st = String(b.status || '').trim().toUpperCase();
-          if (b.shift_id && st !== 'CANCELLED') {
-            bookingCounts[b.shift_id] = (bookingCounts[b.shift_id] || 0) + 1;
-          }
-        });
-
-        cachedShifts = (shiftsRes || []).map(s => {
-          const totalCapacity = parseInt(s.slots) || 0;
-          const activeBooked = bookingCounts[s.shift_id] || 0;
-          const remainingSlots = Math.max(0, totalCapacity - activeBooked);
-
-          return {
-            id: s.shift_id,
-            date: s.date ? s.date.split('-').reverse().join('.') : '',
-            dept: s.dept || '',
-            time: s.time || '',
-            totalSlots: totalCapacity,
-            slotsLeft: remainingSlots,
-            notes: s.notes || '',
-            status: s.status || 'OPEN',
-            wa_link: s.wa_link || ''
-          };
-        });
-
-        cachedBookings = (userBookingsRes || []).map(b => {
-          const shiftData = b.shift_master || {};
-          const rawShiftDate = shiftData.date || b.date || '';
-
-          return {
-            shift_id: b.shift_id || '',
-            date: rawShiftDate ? rawShiftDate.split('-').reverse().join('.') : '',
-            dept: shiftData.dept || b.dept || '',
-            time: shiftData.time || b.time || '',
-            status: b.status || '',
-            attendance: b.attendance || '',
-            wa_link: shiftData.wa_link || getWaLinkForShift(cachedShifts, b.shift_id)
-          };
-        });
-
-        sessionStorage.setItem(`mcl_portal_cache_${rawDoc}`, JSON.stringify({
+        sessionStorage.setItem(`mcl_portal_cache_${cleanDocNo}`, JSON.stringify({
           allShifts: cachedShifts,
           myUpcomingEvents: cachedBookings,
           accessControlMap: accessControlMap
@@ -706,15 +339,10 @@
         renderBooked(cachedBookings);
         renderHistoryLog(cachedBookings);
       } catch (err) {
-        if (err.name !== 'AbortError') console.error("Supabase direct fetch error:", err);
+        console.error("Google Sheets fetch error:", err);
       } finally {
         document.getElementById('sync-loader').style.display = 'none';
       }
-    }
-
-    function getWaLinkForShift(shifts, shiftId) {
-      const match = shifts.find(s => s.id === shiftId);
-      return match ? match.wa_link : '';
     }
 
     function renderDepartmentChips(shifts) {
@@ -728,11 +356,9 @@
 
       filterContainer.style.display = 'flex';
       let chipsHtml = `<button class="btn btn-sm filter-chip-btn ${activeFilterDept === 'ALL' ? 'active-chip' : 'inactive-chip'}" onclick="applyDeptFilter('ALL')">ALL</button>`;
-
       depts.forEach(d => {
         chipsHtml += `<button class="btn btn-sm filter-chip-btn ${activeFilterDept === d ? 'active-chip' : 'inactive-chip'}" onclick="applyDeptFilter('${d}')">${d}</button>`;
       });
-
       filterContainer.innerHTML = chipsHtml;
     }
 
@@ -744,65 +370,18 @@
 
     function handleTabSwitch(index) {
       const filterContainer = document.getElementById('filter-container');
-      if (index === 0 && cachedShifts.length > 0) {
-        filterContainer.style.display = 'flex';
-      } else {
-        filterContainer.style.display = 'none';
-      }
+      filterContainer.style.display = (index === 0 && cachedShifts.length > 0) ? 'flex' : 'none';
     }
 
     function parseDateString(dateStr) {
       if (!dateStr) return new Date(0);
       let clean = String(dateStr).trim().split(' ')[0].replace(/[\/\-]/g, '.');
-
-      if (clean.includes('Mon') || clean.includes('Tue') || clean.includes('Wed') || clean.includes('Thu') || clean.includes('Fri') || clean.includes('Sat') || clean.includes('Sun') || clean.length > 10) {
-        const d = new Date(dateStr);
-        if (!isNaN(d.getTime())) return d;
-      }
-
       const parts = clean.split('.');
       if (parts.length !== 3) {
         const standardDate = new Date(dateStr);
-        if(!isNaN(standardDate.getTime())) return standardDate;
-        return new Date(0);
+        return !isNaN(standardDate.getTime()) ? standardDate : new Date(0);
       }
       return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-    }
-
-    function formatAttendanceTime(timeVal) {
-      if (!timeVal) return "";
-      let str = String(timeVal).trim();
-
-      if (str.includes('Dec 30 1899') || str.includes('1899')) {
-        let matchedTime = str.match(/(\d{2}:\d{2})(:\d{2})?/);
-        if (matchedTime) return matchedTime[1];
-      }
-
-      if (str.includes('GMT') || str.includes('2026')) {
-        try {
-          const d = new Date(timeVal);
-          if (!isNaN(d.getTime())) {
-            if (d.getFullYear() === 1899) {
-              let hh = String(d.getHours()).padStart(2, '0');
-              let mm = String(d.getMinutes()).padStart(2, '0');
-              return `${hh}:${mm}`;
-            }
-            let dd = String(d.getDate()).padStart(2, '0');
-            let mth = String(d.getMonth() + 1).padStart(2, '0');
-            let yyyy = d.getFullYear();
-            let hh = String(d.getHours()).padStart(2, '0');
-            let mm = String(d.getMinutes()).padStart(2, '0');
-            let ss = String(d.getSeconds()).padStart(2, '0');
-            return `${dd}.${mth}.${yyyy} ${hh}:${mm}:${ss}`;
-          }
-        } catch (e) {}
-      }
-
-      let cleanDigits = str.replace(/[^0-9]/g, "");
-      if (cleanDigits.length === 4 && !str.includes(":")) {
-        return cleanDigits.substring(0, 2) + ":" + cleanDigits.substring(2, 4);
-      }
-      return str;
     }
 
     function toggleInstructions(btnEl) {
@@ -838,55 +417,41 @@
 
       upcomingShifts.sort((a, b) => parseDateString(a.date) - parseDateString(b.date));
       const dates = [...new Set(upcomingShifts.map(s => s.date))];
-
       let htmlBuffer = '';
 
       dates.forEach((date, dateIndex) => {
-        const isFirst = dateIndex === 0;
-        htmlBuffer += `<div class="date-label ${isFirst ? 'first-date' : ''}">${date}</div>`;
+        htmlBuffer += `<div class="date-label ${dateIndex === 0 ? 'first-date' : ''}">${date}</div>`;
         const hasBookingToday = bookings.some(b => b.date === date && String(b.status).toUpperCase() !== 'CANCELLED');
 
         upcomingShifts.filter(s => s.date === date).forEach(s => {
           const isFull = s.slotsLeft <= 0;
           const isLockedByPolicy = hasBookingToday;
-
           const hasSpotlight = s.notes && String(s.notes).trim() !== "";
 
           let badgeMarkup = `<span class="badge-shadcn-left">${s.slotsLeft} LEFT</span>`;
           if (isFull) badgeMarkup = `<span class="badge-shadcn-full">FULL</span>`;
+          if (isLockedByPolicy) badgeMarkup = `<span class="badge-shadcn-full">LOCKED</span>`;
 
-          if (isLockedByPolicy) {
-            badgeMarkup = `<span class="badge-shadcn-full">LOCKED</span>`;
-          }
-
-          let displayTime = formatAttendanceTime(s.time);
-
-          let spotlightHtml = '';
-          if (hasSpotlight && !isLockedByPolicy) {
-            spotlightHtml = `
-              <div class="spotlight-banner">
-                <i class="ph ph-lightning fs-6 text-warning"></i>
-                <span>${s.notes}</span>
-              </div>`;
-          }
+          let spotlightHtml = (hasSpotlight && !isLockedByPolicy)
+            ? `<div class="spotlight-banner"><i class="ph ph-lightning fs-6 text-warning"></i><span>${s.notes}</span></div>`
+            : '';
 
           htmlBuffer += `
             <div class="card card-shift p-3 ${isFull && !isLockedByPolicy ? 'full-shift' : ''} ${isLockedByPolicy ? 'locked' : ''}">
               ${spotlightHtml}
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <h3 class="h6 fw-semibold mb-0" style="color: var(--card-foreground);">${s.dept}</h3>
+                <h3 class="h6 fw-semibold mb-0">${s.dept}</h3>
                 ${badgeMarkup}
               </div>
               <div class="small text-muted mb-3">
-                <div class="d-flex align-items-center gap-2 fw-normal"><i class="ph ph-clock fs-6"></i> ${displayTime}</div>
+                <div class="d-flex align-items-center gap-2"><i class="ph ph-clock fs-6"></i> ${s.time}</div>
               </div>
-
-              ${isLockedByPolicy ? 
-                `<button class="btn btn-shadcn-filled-muted w-100 opacity-50" disabled>Locked</button>` :
-                (isFull ? 
-                  `<button class="btn btn-shadcn-outline-waitlist w-100 d-flex align-items-center justify-content-center gap-2" onclick="handleBooking('${s.id}', '${s.date}', '${s.dept}', '${s.time}', true, this)"><i class="ph ph-clock-afternoon"></i> Join Waitlist</button>` : 
-                  `<button class="btn btn-shadcn-primary w-100" onclick="handleBooking('${s.id}', '${s.date}', '${s.dept}', '${s.time}', false, this)">Book Now</button>`
-                )
+              ${isLockedByPolicy
+                ? `<button class="btn btn-shadcn-filled-muted w-100 opacity-50" disabled>Locked</button>`
+                : (isFull
+                    ? `<button class="btn btn-shadcn-outline-waitlist w-100 d-flex align-items-center justify-content-center gap-2" onclick="handleBooking('${s.id}', '${s.date}', '${s.dept}', '${s.time}', true, this)"><i class="ph ph-clock-afternoon"></i> Join Waitlist</button>`
+                    : `<button class="btn btn-shadcn-primary w-100" onclick="handleBooking('${s.id}', '${s.date}', '${s.dept}', '${s.time}', false, this)">Book Now</button>`
+                  )
               }
             </div>`;
         });
@@ -900,19 +465,19 @@
       let htmlBuffer = '<div class="date-label first-date">My Registered Schedule</div>';
 
       htmlBuffer += `
-        <div class="card border p-3 mb-3" style="background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border-color: rgba(6, 62, 153, 0.15) !important; border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0,0,0,0.04), inset 0 1px 0 #ffffff;">
+        <div class="card border p-3 mb-3" style="background: #ffffff; border-color: rgba(6, 62, 153, 0.15) !important; border-radius: var(--radius);">
           <div class="d-flex align-items-center gap-2 mb-2">
             <i class="ph ph-info fs-6" style="color: var(--primary);"></i>
-            <span class="fw-bold" style="font-size: 12px; color: var(--card-foreground);">Duty Attendance Guidelines</span>
+            <span class="fw-bold" style="font-size: 12px;">Duty Attendance Guidelines</span>
           </div>
-          <div class="d-flex align-items-start gap-2" style="font-size: 11px; color: var(--card-foreground);">
+          <div class="d-flex align-items-start gap-2" style="font-size: 11px;">
             <i class="ph ph-check-circle text-success fs-6 mt-0.5"></i>
             <div><b>Confirmed:</b> Attendance is <b>compulsory</b>. You must attend this shift slot.</div>
           </div>
-          <div id="instructionsContent" style="display: none; font-size: 11px; color: var(--card-foreground);" class="mt-2 pt-2 border-top">
+          <div id="instructionsContent" style="display: none; font-size: 11px;" class="mt-2 pt-2 border-top">
             <div class="d-flex align-items-start gap-2">
               <i class="ph ph-clock text-warning fs-6 mt-0.5"></i>
-              <div><b>Waiting List:</b> Please check your status regularly. If you are committed to attend, you may request HR to upgrade your status to confirmed.</div>
+              <div><b>Waiting List:</b> Please check your status regularly.</div>
             </div>
           </div>
           <div class="mt-1 pt-1">
@@ -920,16 +485,15 @@
           </div>
         </div>`;
 
-      const now = new Date(); 
+      const now = new Date();
       const today = new Date(); today.setHours(0,0,0,0);
 
-      const activeBookings = bookings.filter(b => String(b.status).toUpperCase() !== 'CANCELLED');
-      const upcomingBookings = activeBookings.filter(b => parseDateString(b.date) >= today);
+      const upcomingBookings = bookings.filter(b => String(b.status).toUpperCase() !== 'CANCELLED' && parseDateString(b.date) >= today);
 
-      if (upcomingBookings.length === 0) { 
-        htmlBuffer += '<p class="text-center py-5 text-muted small">No upcoming duties registered.</p>'; 
+      if (upcomingBookings.length === 0) {
+        htmlBuffer += '<p class="text-center py-5 text-muted small">No upcoming duties registered.</p>';
         container.innerHTML = htmlBuffer;
-        return; 
+        return;
       }
 
       upcomingBookings.sort((a, b) => parseDateString(a.date) - parseDateString(b.date));
@@ -941,48 +505,33 @@
 
         let isLockActive = false;
         try {
-          let dateStr = String(b.date).trim().replace(/[\/\-]/g, '.');
-          const dateParts = dateStr.split('.');
-          let startTimeStr = "00:00";
-          if (b.time) startTimeStr = formatAttendanceTime(String(b.time).split('-')[0].trim());
-
-          let shiftHours = 0, shiftMinutes = 0;
+          const dateParts = String(b.date).trim().replace(/[\/\-]/g, '.').split('.');
+          const startTimeStr = b.time ? String(b.time).split('-')[0].trim() : "00:00";
           const timeMatch = startTimeStr.match(/^(\d+):(\d+)$/);
-          if (timeMatch) {
-            shiftHours = parseInt(timeMatch[1]); shiftMinutes = parseInt(timeMatch[2]);
-          }
-
+          const shiftHours = timeMatch ? parseInt(timeMatch[1]) : 0;
+          const shiftMinutes = timeMatch ? parseInt(timeMatch[2]) : 0;
           const shiftStartDateTime = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]), shiftHours, shiftMinutes, 0, 0);
           if ((shiftStartDateTime.getTime() - now.getTime()) / (1000 * 60 * 60) < 12) isLockActive = true;
         } catch (e) {}
 
-        let cleanedShiftTime = formatAttendanceTime(b.time);
-
-        let waGroupBtnHtml = '';
-        if (!isWait && b.wa_link && String(b.wa_link).trim() !== "") {
-          waGroupBtnHtml = `
-            <a href="${b.wa_link}" target="_blank" class="btn btn-shadcn-filled-whatsapp w-100 my-2 d-flex align-items-center justify-content-center gap-2">
-              <i class="ph ph-whatsapp-logo fs-5"></i>
-              Join WhatsApp Group
-            </a>`;
-        }
+        let waGroupBtnHtml = (!isWait && b.wa_link && String(b.wa_link).trim() !== "")
+          ? `<a href="${b.wa_link}" target="_blank" class="btn btn-shadcn-filled-whatsapp w-100 my-2 d-flex align-items-center justify-content-center gap-2"><i class="ph ph-whatsapp-logo fs-5"></i> Join WhatsApp Group</a>`
+          : '';
 
         htmlBuffer += `
           <div class="card card-shift p-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <h3 class="h6 fw-semibold mb-0" style="color: var(--card-foreground);">${b.dept}</h3>
+              <h3 class="h6 fw-semibold mb-0">${b.dept}</h3>
               ${badgeMarkup}
             </div>
             <div class="small text-muted mb-2">
               <div class="d-flex align-items-center gap-2 mb-1"><i class="ph ph-calendar fs-6"></i> ${b.date}</div>
-              <div class="d-flex align-items-center gap-2"><i class="ph ph-clock fs-6"></i> ${cleanedShiftTime}</div>
+              <div class="d-flex align-items-center gap-2"><i class="ph ph-clock fs-6"></i> ${b.time}</div>
             </div>
-            
             ${waGroupBtnHtml}
-
-            ${isLockActive ? 
-              `<div class="btn btn-shadcn-filled-muted w-100 small mt-2 d-flex align-items-center justify-content-center gap-2" disabled><i class="ph ph-lock-keyhole"></i> Cancellation Locked (Within 12 Hours)</div>` :
-              `<button class="btn btn-shadcn-filled-cancel w-100 mt-2" onclick="cancelBooking('${b.shift_id}', '${localStorage.getItem('mcl_doc_no')}', this)">Request Cancel</button>`
+            ${isLockActive
+              ? `<div class="btn btn-shadcn-filled-muted w-100 small mt-2 d-flex align-items-center justify-content-center gap-2" disabled><i class="ph ph-lock-keyhole"></i> Cancellation Locked (Within 12 Hours)</div>`
+              : `<button class="btn btn-shadcn-filled-cancel w-100 mt-2" onclick="cancelBooking('${b.shift_id}', '${localStorage.getItem('mcl_doc_no')}', this)">Request Cancel</button>`
             }
           </div>`;
       });
@@ -993,7 +542,6 @@
     function renderHistoryLog(bookings) {
       const container = document.getElementById('history-view');
       let htmlBuffer = '<div class="date-label first-date">Attendance History Ledger</div>';
-
       const today = new Date(); today.setHours(0,0,0,0);
 
       const pastBookings = bookings.filter(b => {
@@ -1009,62 +557,24 @@
 
       pastBookings.sort((a, b) => parseDateString(a.date) - parseDateString(b.date));
 
-      htmlBuffer += `
-        <div class="table-responsive rounded-3 border shadow-sm mt-2" style="background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border-color: rgba(6, 62, 153, 0.15) !important;">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="small text-uppercase fw-semibold" style="color: var(--muted-foreground); background: #f1f5f9;">
-              <tr>
-                <th scope="col" class="py-3 px-3">Date / Dept</th>
-                <th scope="col" class="py-3 px-3 text-center" style="width: 140px;">Attendance Status</th>
-              </tr>
-            </thead>
-            <tbody>`;
-
+      htmlBuffer += `<div class="table-responsive rounded-3 border shadow-sm mt-2 bg-white"><table class="table table-hover align-middle mb-0"><thead class="small text-uppercase fw-semibold" style="background: #f1f5f9;"><tr><th class="py-3 px-3">Date / Dept</th><th class="py-3 px-3 text-center" style="width: 140px;">Attendance Status</th></tr></thead><tbody>`;
       pastBookings.forEach(b => {
         let rawAttendance = String(b.attendance || "").trim();
-
-        if (rawAttendance.includes("GMT")) {
-          try {
-            let d = new Date(rawAttendance);
-            if (!isNaN(d.getTime())) {
-              let dd = String(d.getDate()).padStart(2, '0');
-              let mo = String(d.getMonth() + 1).padStart(2, '0');
-              let yy = d.getFullYear();
-              let hh = String(d.getHours()).padStart(2, '0');
-              let mi = String(d.getMinutes()).padStart(2, '0');
-              let ss = String(d.getSeconds()).padStart(2, '0');
-              rawAttendance = `${dd}.${mo}.${yy} ${hh}:${mi}:${ss}`;
-            }
-          } catch(e) {}
-        }
-
         let isNoShow = rawAttendance.toLowerCase() === "no show" || rawAttendance === "" || rawAttendance === "-" || rawAttendance === "0";
         let statusDisplayMarkup = isNoShow ? `<span class="badge-shadcn-full">NO SHOW</span>` : `<span class="badge-shadcn-confirmed">${rawAttendance}</span>`;
 
-        htmlBuffer += `
-          <tr>
-            <td class="px-3 py-3">
-              <div class="fw-semibold small" style="color: var(--card-foreground);">${b.date}</div>
-              <div class="text-muted small">${b.dept}</div>
-            </td>
-            <td class="px-3 py-3 text-center">${statusDisplayMarkup}</td>
-          </tr>`;
+        htmlBuffer += `<tr><td class="px-3 py-3"><div class="fw-semibold small">${b.date}</div><div class="text-muted small">${b.dept}</div></td><td class="px-3 py-3 text-center">${statusDisplayMarkup}</td></tr>`;
       });
-
       htmlBuffer += `</tbody></table></div>`;
       container.innerHTML = htmlBuffer;
     }
 
     async function handleBooking(id, date, dept, time, waitlist, element) {
       if (isRequestInProgress) return;
+      const docNo = String(localStorage.getItem("mcl_doc_no") || "").trim().replace(/^'/, '');
+      if (!docNo) { alert("Session invalid. Please log in again."); return; }
 
-      const rawDocNo = String(localStorage.getItem("mcl_doc_no") || "").trim();
-      if (!rawDocNo) { alert("Session invalid. Please log in again."); return; }
-
-      const docNo = rawDocNo.replace(/^'/, ''); 
       const cleanDocNum = docNo.toUpperCase();
-
-      // BAN CHECK: Block booking if user is temp banned
       if (accessControlMap[cleanDocNum] && accessControlMap[cleanDocNum].is_banned) {
         alert("Booking Restricted: Your account is temporarily suspended from booking shifts. Please contact HR.");
         return;
@@ -1073,6 +583,7 @@
       const workerRecord = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       const docType = String(workerRecord.document_type || "MYKAD").trim().toUpperCase();
       const rawFullName = workerRecord.full_name || workerRecord.name_mykad || "MITEC Casual Labour";
+      const phone = workerRecord.phone_no || workerRecord.phone || "";
 
       if (!confirm(waitlist ? `Join waitlist for ${dept}?` : `Book shift for ${dept}?`)) return;
 
@@ -1091,58 +602,30 @@
         status = (docType === "MYKAD" || isPriority) ? "CONFIRMED" : "WAITLIST";
       }
 
-      const cleanDate = String(date).trim().replace(/\//g, '.'); 
-      const rawTime = String(time).trim();
-      const hourPart = rawTime.includes(':') ? rawTime.split(':')[0] : rawTime.substring(0, 2);
-
-      const shiftTimevalue = `${cleanDate}${dept}${hourPart}${docNo}`;
-      const cleanTime = rawTime.replace(/[^0-9]/g, "");
-      const bookingId = `${cleanDate}${dept}${cleanTime}${docNo}`;
-
       try {
-        const safeguardRes = await fetch(`${SUPABASE_URL}/rest/v1/casual_labour_profile?on_conflict=doc_no`, {
+        const res = await fetch(APPS_SCRIPT_URL, {
           method: "POST",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "resolution=ignore-duplicates"
-          },
-          body: JSON.stringify([{
+          body: JSON.stringify({
+            action: "bookShift",
             doc_no: docNo,
-            name_mykad: rawFullName,
-            document_type: docType
-          }])
+            shift_id: id,
+            date: date,
+            dept: dept,
+            time: time,
+            status: status,
+            is_waitlist: waitlist,
+            document_type: docType,
+            name: rawFullName,
+            phone: phone
+          })
         });
+        const result = await res.json();
 
-        const payload = [{
-          booking_id: bookingId,
-          timestamp: new Date().toISOString(),
-          shift_id: id,
-          doc_no: docNo,
-          status: status,
-          shift_timevalue: shiftTimevalue,
-          document_type: docType,
-          updated_at: new Date().toISOString()
-        }];
-
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/booking_record?on_conflict=booking_id`, {
-          method: "POST",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "resolution=merge-duplicates"
-          },
-          body: JSON.stringify(payload)
-        });
- 
-        if (res.ok) {
+        if (result.success) {
           sessionStorage.removeItem(`mcl_portal_cache_${docNo}`);
           window.location.reload();
         } else {
-          const errData = await res.json();
-          alert("Booking failed: " + (errData.message || "Database error"));
+          alert("Booking failed: " + (result.message || "Sheet error"));
           if (element) { element.disabled = false; element.style.opacity = "1"; element.innerText = "Book Now"; }
         }
       } catch (err) {
@@ -1156,9 +639,7 @@
 
     async function cancelBooking(shiftId, docNo, element) {
       if (isRequestInProgress) return;
-      const rawDocNo = String(docNo || localStorage.getItem("mcl_doc_no") || "").trim();
-      const docNoWithQuote = rawDocNo.startsWith("'") ? rawDocNo : `'${rawDocNo}`;
-      const docNoWithoutQuote = rawDocNo.replace(/^'/, '');
+      const cleanDoc = String(docNo || localStorage.getItem("mcl_doc_no") || "").trim().replace(/^'/, '');
 
       if (!confirm("Are you sure you want to request cancellation for this duty registration?")) return;
 
@@ -1167,26 +648,21 @@
       showLoader("Processing Cancellation Request...");
 
       try {
-        const url = `${SUPABASE_URL}/rest/v1/booking_record?shift_id=eq.${encodeURIComponent(shiftId)}&doc_no=in.("${encodeURIComponent(docNoWithoutQuote)}","${encodeURIComponent(docNoWithQuote)}")`;
-        const res = await fetch(url, {
-          method: "PATCH",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ 
-            status: "CANCELLED", 
-            cancel_time: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "cancelBooking",
+            doc_no: cleanDoc,
+            shift_id: shiftId
           })
         });
+        const result = await res.json();
 
-        if (res.ok) {
-          sessionStorage.removeItem(`mcl_portal_cache_${docNoWithoutQuote}`);
+        if (result.success) {
+          sessionStorage.removeItem(`mcl_portal_cache_${cleanDoc}`);
           window.location.reload();
         } else {
-          alert("Cancellation failed.");
+          alert("Cancellation failed: " + (result.message || ""));
           if (element) { element.disabled = false; element.style.opacity = "1"; element.innerText = "Request Cancel"; }
         }
       } catch (err) {
@@ -1198,9 +674,6 @@
       }
     }
   </script>
-
-  <!-- Bootstrap 5.3 JavaScript Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
