@@ -11,24 +11,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
+  <!-- Firebase App (compat) & Firestore SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
-      /* MITEC Light Executive & Deep Sapphire Palette */
       --md-surface: #f4f6f9;
       --md-surface-container: #ffffff;
       --md-on-surface: #1d1d1f;
       --md-on-surface-variant: #51525c;
       --md-outline: #e1e4ea; 
-
       --mitec-blue: #1B365D;         
       --mitec-blue-hover: #2D68C4;   
       --mitec-accent: #0f4a82;
-
       --danger: #EF4444;
       --danger-bg: rgba(239, 68, 68, 0.08);
       --ok: #10B981;
       --ok-bg: rgba(16, 185, 129, 0.08);
-
       --radius: 16px;
       --shadow-card: 0 6px 20px rgba(9, 34, 83, 0.04);
       --font-stack: 'Inter', -apple-system, sans-serif;
@@ -53,7 +53,6 @@
       padding: 0 16px 40px;
     }
 
-    /* Executive Branding Header */
     .topbar {
       display: flex;
       align-items: center;
@@ -92,7 +91,6 @@
       color: var(--md-on-surface-variant);
     }
 
-    /* Step Indicator Pill */
     .chip {
       font-size: 12px;
       font-weight: 700;
@@ -106,7 +104,6 @@
       box-shadow: 0 2px 8px rgba(9, 34, 83, 0.05);
     }
 
-    /* Main Card Container */
     .card {
       background: var(--md-surface-container);
       border: 1px solid rgba(9, 34, 83, 0.08);
@@ -115,7 +112,6 @@
       overflow: hidden;
     }
 
-    /* Luxurious Deep Sapphire Header Container */
     .about-header {
       background-color: #0e3581;
       background-image: 
@@ -143,7 +139,6 @@
       color: rgba(255, 255, 255, 0.9);
     }
 
-    /* Progress Bar */
     .progressWrap { padding: 0; }
     .progressLine {
       height: 4px;
@@ -188,7 +183,6 @@
       .about-header { padding: 20px; }
     }
 
-    /* Input Controls */
     label {
       display: block;
       font-size: 13px;
@@ -217,7 +211,6 @@
     }
 
     textarea { resize: vertical; min-height: 80px; }
-
     input::placeholder, textarea::placeholder { color: #a1a5b7; }
 
     input:focus, select:focus, textarea:focus {
@@ -233,17 +226,7 @@
       cursor: not-allowed;
     }
 
-    select option {
-      background: #ffffff;
-      color: var(--md-on-surface);
-    }
-
-    /* Hints & Alerts */
-    #lookupDocNo {
-      font-size: 15px;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
+    select option { background: #ffffff; color: var(--md-on-surface); }
 
     .hint {
       display: none;
@@ -254,7 +237,6 @@
     }
     .hint.show { display: block; }
 
-    /* Custom Radio & Checkbox Containers */
     .radioRow, .checkRow {
       display: flex;
       flex-wrap: wrap;
@@ -291,7 +273,6 @@
       cursor: pointer;
     }
 
-    /* File Upload Box */
     .fileBox {
       border: 1.5px dashed var(--md-outline);
       border-radius: var(--radius);
@@ -332,7 +313,6 @@
       font-weight: 500;
     }
 
-    /* Navigation Buttons */
     .nav {
       display: flex;
       gap: 12px;
@@ -381,7 +361,6 @@
       box-shadow: none;
     }
 
-    /* Alerts */
     .alert {
       margin: 16px 0 0;
       padding: 14px 16px;
@@ -428,7 +407,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Summary Presentation */
     .summaryBox {
       border: 1px solid var(--md-outline);
       border-radius: var(--radius);
@@ -452,7 +430,6 @@
     .summaryLabel { color: var(--md-on-surface-variant); font-weight: 500; }
     .summaryValue { font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; color: var(--mitec-blue); }
 
-    /* Footer */
     .footer {
       text-align: center;
       padding: 24px 0 0;
@@ -503,7 +480,7 @@
           <div class="summaryBox" style="margin-bottom: 24px;">
             <p class="sectionDesc" style="margin:0; font-size: 13px; color: var(--md-on-surface);">
               <b style="color: var(--mitec-blue);">Private &amp; Confidential (P&amp;C)</b><br><br>
-              Information is strictly accessible only to authorized MITEC personnel for official coordination and administration. Your data is processed via secure Workspace infrastructure.
+              Information is strictly accessible only to authorized MITEC personnel for official coordination and administration. Your data is processed via secure Firebase infrastructure.
             </p>
           </div>
 
@@ -788,7 +765,6 @@
         </section>
 
         <section class="step" data-title="Final Submission" data-sub="Review and finalize your registry input.">
-
           <div class="sectionTitle">Registry Summary</div>
           <div class="summaryBox" id="summaryBox" style="margin-bottom: 24px;"></div>
 
@@ -821,678 +797,596 @@
   </div>
 
   <script>
-  // 🔗 DIRECT SUPABASE CONFIGURATION
-  const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
-  const SUPABASE_TABLE = "casual_labour_profile";
+    const firebaseConfig = {
+  apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
+  authDomain: "mitec-cl-2027.firebaseapp.com",
+  projectId: "mitec-cl-2027",
+  storageBucket: "mitec-cl-2027.firebasestorage.app",
+  messagingSenderId: "42229239032",
+  appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
+};
 
-  const form = document.getElementById("appForm");
-  const steps = Array.from(document.querySelectorAll(".step"));
-  const stepHeading = document.getElementById("stepHeading");
-  const stepSub = document.getElementById("stepSub");
-  const chipStep = document.getElementById("chipStep");
-  const bar = document.getElementById("bar");
-  const submitBtn = document.getElementById("submitBtn");
-  const submitStatusBox = document.getElementById("submitStatusBox");
-  const formMode = document.getElementById("formMode");
-  const existingRow = document.getElementById("existingRow");
-  const icCopy = document.getElementById("icCopy");
-  const lookupStatusNote = document.getElementById("lookupStatusNote");
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const COLLECTION_NAME = "casual_labour_profile";
 
-  const cameraFeed = document.getElementById("cameraFeed");
-  const cameraPreview = document.getElementById("cameraPreview");
-  const startCameraBtn = document.getElementById("startCameraBtn");
-  const captureBtn = document.getElementById("captureBtn");
-  const retakeBtn = document.getElementById("retakeBtn");
-  const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-  const cameraControls = document.getElementById("cameraControls");
-  const previewControls = document.getElementById("previewControls");
-  const capturedPhotoData = document.getElementById("capturedPhotoData");
-  const gambarHint = document.getElementById("gambarHint");
-  const cameraMetaText = document.getElementById("cameraMetaText");
+    const form = document.getElementById("appForm");
+    const steps = Array.from(document.querySelectorAll(".step"));
+    const stepHeading = document.getElementById("stepHeading");
+    const stepSub = document.getElementById("stepSub");
+    const chipStep = document.getElementById("chipStep");
+    const bar = document.getElementById("bar");
+    const submitBtn = document.getElementById("submitBtn");
+    const submitStatusBox = document.getElementById("submitStatusBox");
+    const formMode = document.getElementById("formMode");
+    const icCopy = document.getElementById("icCopy");
+    const lookupStatusNote = document.getElementById("lookupStatusNote");
 
-  let current = 0;
-  let cameraStream = null;
-  let globalCachedRecord = null;
+    const cameraFeed = document.getElementById("cameraFeed");
+    const cameraPreview = document.getElementById("cameraPreview");
+    const startCameraBtn = document.getElementById("startCameraBtn");
+    const captureBtn = document.getElementById("captureBtn");
+    const retakeBtn = document.getElementById("retakeBtn");
+    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+    const cameraControls = document.getElementById("cameraControls");
+    const previewControls = document.getElementById("previewControls");
+    const capturedPhotoData = document.getElementById("capturedPhotoData");
+    const gambarHint = document.getElementById("gambarHint");
+    const cameraMetaText = document.getElementById("cameraMetaText");
 
-  function stopCamera() {
-    if (cameraStream) {
-      cameraStream.getTracks().forEach(track => track.stop());
-      cameraStream = null;
-    }
-  }
+    let current = 0;
+    let cameraStream = null;
+    let globalCachedRecord = null;
 
-  startCameraBtn.addEventListener("click", async () => {
-    try {
-      cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: false
-      });
-      cameraFeed.srcObject = cameraStream;
-      cameraPlaceholder.style.display = "none";
-      cameraFeed.style.display = "block";
-      cameraControls.style.display = "flex";
-      showHint(gambarHint, false);
-    } catch (err) {
-      alert("Camera access denied. Please ensure you have granted browser permissions and are using a secure HTTPS connection.");
-    }
-  });
-
-  captureBtn.addEventListener("click", () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = cameraFeed.videoWidth;
-    canvas.height = cameraFeed.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
-
-    const base64 = canvas.toDataURL("image/jpeg", 0.85);
-    cameraPreview.src = base64;
-    capturedPhotoData.value = base64;
-
-    // Create a customized, unique filename using the Document Number and timestamp
-    const docNo = safeVal("docNumber") || "USER";
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const uniquePhotoName = `photo_${docNo}_${timestamp}.jpg`;
-    
-    // Store it in a hidden data attribute or attach it directly to your payload logic
-    document.getElementById("capturedPhotoData").dataset.filename = uniquePhotoName;
-
-    cameraFeed.style.display = "none";
-    cameraControls.style.display = "none";
-    cameraPreview.style.display = "block";
-    previewControls.style.display = "flex";
-
-    stopCamera();
-  });
-
-
-  retakeBtn.addEventListener("click", () => {
-    cameraPreview.style.display = "none";
-    previewControls.style.display = "none";
-    capturedPhotoData.value = "";
-    startCameraBtn.click();
-  });
-
-  function updateHeader() {
-    const step = steps[current];
-    stepHeading.textContent = step.dataset.title || "Application Form";
-    stepSub.textContent = step.dataset.sub || "";
-
-    const sectionNo = current + 1;
-    chipStep.textContent = `STEP ${sectionNo} OF ${steps.length}`;
-    bar.style.width = Math.round((sectionNo / steps.length) * 100) + "%";
-  }
-
-  function showStep(index) {
-    steps.forEach((step, i) => step.classList.toggle("active", i === index));
-    current = index;
-    updateHeader();
-
-    if (current === 1 && formMode.value === "update" && globalCachedRecord) {
-      fillRecord(globalCachedRecord);
-    }
-
-    if (current === steps.length - 1) buildSummary();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function showHint(el, show = true) {
-    if (el) el.classList.toggle("show", show);
-  }
-
-  function clearHints(step) {
-    step.querySelectorAll(".hint").forEach(h => h.classList.remove("show"));
-  }
-
-  function normalizeDigitsOnly(value) {
-    return String(value || "").replace(/[^\d]/g, "");
-  }
-
-  function clearFormFieldsForCreate() {
-    document.getElementById("nameMykad").value = "";
-    document.getElementById("phoneNumber").value = "";
-    document.getElementById("email").value = "";
-    document.querySelector('input[name="doc_type"][value="MYKAD"]').checked = true;
-    document.getElementById("docNumber").value = document.getElementById("lookupDocNo").value.trim();
-    document.getElementById("alamat").value = "";
-    document.querySelectorAll('input[name="gender"]').forEach(el => el.checked = false);
-    document.querySelectorAll('input[name="status_perkahwinan"]').forEach(el => el.checked = false);
-    document.getElementById("namaWaris").value = "";
-    document.getElementById("hubungan").value = "";
-    document.getElementById("emergencyNumber").value = "";
-    document.getElementById("kebolehan").value = "";
-    document.querySelectorAll('input[name="typhoid"]').forEach(el => el.checked = false);
-    document.querySelectorAll('input[name="transportation"]').forEach(el => el.checked = false);
-    document.querySelectorAll('input[name="sejarah"]').forEach(el => el.checked = false);
-    document.getElementById("sejarahOther").value = "";
-    document.getElementById("sejarahOtherWrap").style.display = "none";
-    document.getElementById("sejarahOther").removeAttribute("required");
-    document.getElementById("bank").value = "";
-    document.getElementById("accountNo").value = "";
-    document.getElementById("accountName").value = "";
-    icCopy.value = "";
-    capturedPhotoData.value = "";
-    cameraPreview.src = "";
-    cameraPreview.style.display = "none";
-    previewControls.style.display = "none";
-    cameraFeed.style.display = "none";
-    cameraControls.style.display = "none";
-    cameraPlaceholder.style.display = "block";
-    stopCamera();
-    updateDocTypeUI("MYKAD");
-  }
-
-  function applyEntryMode(mode) {
-    formMode.value = mode;
-    const docNumber = document.getElementById("docNumber");
-    const docLockedHint = document.getElementById("docLockedHint");
-
-    if (mode === "update") {
-      docNumber.readOnly = true;
-      if (docLockedHint) docLockedHint.classList.add("show");
-      icCopy.removeAttribute("required");
-      document.getElementById("icCopyHint").textContent = "Optional for profile update.";
-      cameraMetaText.textContent = "Live capture optional for profile update.";
-    } else {
-      docNumber.readOnly = false;
-      if (docLockedHint) docLockedHint.classList.remove("show");
-      icCopy.setAttribute("required", "required");
-      document.getElementById("icCopyHint").textContent = "Document upload required.";
-      cameraMetaText.textContent = "Live capture required for identity verification.";
-    }
-
-    submitBtn.textContent = mode === "update" ? "Update Registry" : "Submit Registry";
-  }
-
-  function setLookupStatus(text, ok = false) {
-    lookupStatusNote.textContent = text;
-    lookupStatusNote.style.color = ok ? "var(--ok)" : "var(--steel)";
-  }
-
-  function fillRadio(name, value) {
-    if (!value) return;
-    const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
-    if (radio) radio.checked = true;
-  }
-
-  function fillRecord(record) {
-    if (!record) return;
-    if (record.name_mykad) {
-      document.getElementById("nameMykad").value = String(record.name_mykad).toUpperCase();
-    }
-    if (record.phone) document.getElementById("phoneNumber").value = normalizeDigitsOnly(record.phone);
-    if (record.email) document.getElementById("email").value = record.email;
-    if (record.doc_no) document.getElementById("docNumber").value = record.doc_no;
-    if (record.alamat) document.getElementById("alamat").value = record.alamat;
-    if (record.gender) fillRadio("gender", record.gender);
-    if (record.status_perkahwinan) fillRadio("status_perkahwinan", record.status_perkahwinan);
-    if (record.nama_waris) document.getElementById("namaWaris").value = String(record.nama_waris).toUpperCase();
-    if (record.hubungan) document.getElementById("hubungan").value = String(record.hubungan).toUpperCase();
-    if (record.emergency_no) document.getElementById("emergencyNumber").value = normalizeDigitsOnly(record.emergency_no);
-    if (record.kebolehan) {
-      document.getElementById("kebolehan").value = record.kebolehan;
-    }
-    if (record.bank) document.getElementById("bank").value = record.bank;
-    if (record["Column 19"]) document.getElementById("accountNo").value = record["Column 19"];
-    if (record["Column 20"]) document.getElementById("accountName").value = String(record["Column 20"]).toUpperCase();
-
-    if (record.doc_type) {
-      fillRadio("doc_type", record.doc_type);
-      updateDocTypeUI(record.doc_type); 
-    }
-
-    if (record.sejarah) {
-      fillRadio("sejarah", record.sejarah);
-      const wrap = document.getElementById("sejarahOtherWrap");
-      const otherInput = document.getElementById("sejarahOther");
-
-      if (record.sejarah === "OTHER") {
-        wrap.style.display = "block";
-        otherInput.setAttribute("required", "required");
-        if (record.sejarah_other) {
-          otherInput.value = record.sejarah_other;
-        }
-      } else {
-        wrap.style.display = "none";
-        otherInput.removeAttribute("required");
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
       }
     }
-  }
 
-  function showLookupPreview(record) {
-    const card = document.getElementById("lookupPreviewCard");
-    const photo = document.getElementById("lookupPreviewPhoto");
-    if (!card) return;
+    startCameraBtn.addEventListener("click", async () => {
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: false
+        });
+        cameraFeed.srcObject = cameraStream;
+        cameraPlaceholder.style.display = "none";
+        cameraFeed.style.display = "block";
+        cameraControls.style.display = "flex";
+        showHint(gambarHint, false);
+      } catch (err) {
+        alert("Camera access denied. Please ensure you have granted browser permissions.");
+      }
+    });
 
-    document.getElementById("previewName").textContent = record?.name_mykad || "-";
-    document.getElementById("previewDocNo").textContent = record?.doc_no || "-";
+    captureBtn.addEventListener("click", () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = cameraFeed.videoWidth;
+      canvas.height = cameraFeed.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
 
-    if (record?.photo_link) {
-      photo.src = record.photo_link;
-      photo.style.display = "block";
-    } else {
-      photo.style.display = "none";
+      const base64 = canvas.toDataURL("image/jpeg", 0.85);
+      cameraPreview.src = base64;
+      capturedPhotoData.value = base64;
+
+      const docNo = safeVal("docNumber") || "USER";
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      capturedPhotoData.dataset.filename = `photo_${docNo}_${timestamp}.jpg`;
+
+      cameraFeed.style.display = "none";
+      cameraControls.style.display = "none";
+      cameraPreview.style.display = "block";
+      previewControls.style.display = "flex";
+
+      stopCamera();
+    });
+
+    retakeBtn.addEventListener("click", () => {
+      cameraPreview.style.display = "none";
+      previewControls.style.display = "none";
+      capturedPhotoData.value = "";
+      startCameraBtn.click();
+    });
+
+    function updateHeader() {
+      const step = steps[current];
+      stepHeading.textContent = step.dataset.title || "Application Form";
+      stepSub.textContent = step.dataset.sub || "";
+
+      const sectionNo = current + 1;
+      chipStep.textContent = `STEP ${sectionNo} OF ${steps.length}`;
+      bar.style.width = Math.round((sectionNo / steps.length) * 100) + "%";
     }
 
-    card.style.display = "block";
-  }
+    function showStep(index) {
+      steps.forEach((step, i) => step.classList.toggle("active", i === index));
+      current = index;
+      updateHeader();
 
-  function hideLookupPreview() {
-    const card = document.getElementById("lookupPreviewCard");
-    if (card) card.style.display = "none";
-  }
-
-  async function lookupExistingRecord() {
-    const docNo = document.getElementById("lookupDocNo").value.trim();
-    const docHint = document.getElementById("lookupDocHint");
-    showHint(docHint, false);
-
-    setLookupStatus("Initiating secure profile scan...");
-    hideLookupPreview();
-
-    try {
-      const fetchUrl = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?doc_no=eq.${encodeURIComponent(docNo)}&select=*`;
-      const res = await fetch(fetchUrl, {
-        method: "GET",
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        }
-      });
-      const data = await res.json();
-
-      document.getElementById("docNumber").value = docNo;
-
-      if (data && data.length > 0) {
-        globalCachedRecord = data[0];
+      if (current === 1 && formMode.value === "update" && globalCachedRecord) {
         fillRecord(globalCachedRecord);
-        applyEntryMode("update");
-        showLookupPreview(globalCachedRecord);
-        setLookupStatus("Profile verified. Initializing update protocol.", true);
-      } else {
-        globalCachedRecord = null;
-        clearFormFieldsForCreate();
-        applyEntryMode("create");
-        hideLookupPreview();
-        setLookupStatus("No profile detected. Initializing new registry protocol.");
       }
 
-      return true;
-    } catch (err) {
-      globalCachedRecord = null;
-      hideLookupPreview();
-      setLookupStatus("System connection interrupted. Please attempt again.");
-      return false;
+      if (current === steps.length - 1) buildSummary();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }
 
-  function validateStep(index) {
-    const step = steps[index];
-    let ok = true;
-    clearHints(step);
+    function showHint(el, show = true) {
+      if (el) el.classList.toggle("show", show);
+    }
 
-    if (index === 0) {
-      if (!document.getElementById("lookupDocNo").value.trim()) {
-        showHint(document.getElementById("lookupDocHint"), true);
-        ok = false;
+    function clearHints(step) {
+      step.querySelectorAll(".hint").forEach(h => h.classList.remove("show"));
+    }
+
+    function normalizeDigitsOnly(value) {
+      return String(value || "").replace(/[^\d]/g, "");
+    }
+
+    function clearFormFieldsForCreate() {
+      document.getElementById("nameMykad").value = "";
+      document.getElementById("phoneNumber").value = "";
+      document.getElementById("email").value = "";
+      document.querySelector('input[name="doc_type"][value="MYKAD"]').checked = true;
+      document.getElementById("docNumber").value = document.getElementById("lookupDocNo").value.trim();
+      document.getElementById("alamat").value = "";
+      document.querySelectorAll('input[name="gender"]').forEach(el => el.checked = false);
+      document.querySelectorAll('input[name="status_perkahwinan"]').forEach(el => el.checked = false);
+      document.getElementById("namaWaris").value = "";
+      document.getElementById("hubungan").value = "";
+      document.getElementById("emergencyNumber").value = "";
+      document.getElementById("kebolehan").value = "";
+      document.querySelectorAll('input[name="typhoid"]').forEach(el => el.checked = false);
+      document.querySelectorAll('input[name="transportation"]').forEach(el => el.checked = false);
+      document.querySelectorAll('input[name="sejarah"]').forEach(el => el.checked = false);
+      document.getElementById("sejarahOther").value = "";
+      document.getElementById("sejarahOtherWrap").style.display = "none";
+      document.getElementById("sejarahOther").removeAttribute("required");
+      document.getElementById("bank").value = "";
+      document.getElementById("accountNo").value = "";
+      document.getElementById("accountName").value = "";
+      icCopy.value = "";
+      capturedPhotoData.value = "";
+      cameraPreview.src = "";
+      cameraPreview.style.display = "none";
+      previewControls.style.display = "none";
+      cameraFeed.style.display = "none";
+      cameraControls.style.display = "none";
+      cameraPlaceholder.style.display = "block";
+      stopCamera();
+      updateDocTypeUI("MYKAD");
+    }
+
+    function applyEntryMode(mode) {
+      formMode.value = mode;
+      const docNumber = document.getElementById("docNumber");
+      const docLockedHint = document.getElementById("docLockedHint");
+
+      if (mode === "update") {
+        docNumber.readOnly = true;
+        if (docLockedHint) docLockedHint.classList.add("show");
+        icCopy.removeAttribute("required");
+        document.getElementById("icCopyHint").textContent = "Optional for profile update.";
+        cameraMetaText.textContent = "Live capture optional for profile update.";
+      } else {
+        docNumber.readOnly = false;
+        if (docLockedHint) docLockedHint.classList.remove("show");
+        icCopy.setAttribute("required", "required");
+        document.getElementById("icCopyHint").textContent = "Document upload required.";
+        cameraMetaText.textContent = "Live capture required for identity verification.";
       }
-      if (!document.getElementById("agreeProceed").checked) {
-        showHint(document.getElementById("proceedHint"), true);
-        ok = false;
+
+      submitBtn.textContent = mode === "update" ? "Update Registry" : "Submit Registry";
+    }
+
+    function setLookupStatus(text, ok = false) {
+      lookupStatusNote.textContent = text;
+      lookupStatusNote.style.color = ok ? "var(--ok)" : "var(--md-on-surface-variant)";
+    }
+
+    function fillRadio(name, value) {
+      if (!value) return;
+      const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+      if (radio) radio.checked = true;
+    }
+
+    function fillRecord(record) {
+      if (!record) return;
+      if (record.name_mykad) document.getElementById("nameMykad").value = String(record.name_mykad).toUpperCase();
+      if (record.phone) document.getElementById("phoneNumber").value = normalizeDigitsOnly(record.phone);
+      if (record.email) document.getElementById("email").value = record.email;
+      if (record.doc_no) document.getElementById("docNumber").value = record.doc_no;
+      if (record.alamat) document.getElementById("alamat").value = record.alamat;
+      if (record.gender) fillRadio("gender", record.gender);
+      if (record.status_perkahwinan) fillRadio("status_perkahwinan", record.status_perkahwinan);
+      if (record.nama_waris) document.getElementById("namaWaris").value = String(record.nama_waris).toUpperCase();
+      if (record.hubungan) document.getElementById("hubungan").value = String(record.hubungan).toUpperCase();
+      if (record.emergency_no) document.getElementById("emergencyNumber").value = normalizeDigitsOnly(record.emergency_no);
+      if (record.kebolehan) document.getElementById("kebolehan").value = record.kebolehan;
+      if (record.bank) document.getElementById("bank").value = record.bank;
+      if (record.account_no) document.getElementById("accountNo").value = record.account_no;
+      if (record.accountName) document.getElementById("accountName").value = String(record.accountName).toUpperCase();
+
+      if (record.doc_type) {
+        fillRadio("doc_type", record.doc_type);
+        updateDocTypeUI(record.doc_type); 
       }
+
+      if (record.sejarah) {
+        fillRadio("sejarah", record.sejarah);
+        const wrap = document.getElementById("sejarahOtherWrap");
+        const otherInput = document.getElementById("sejarahOther");
+
+        if (record.sejarah === "OTHER") {
+          wrap.style.display = "block";
+          otherInput.setAttribute("required", "required");
+          if (record.sejarah_other) otherInput.value = record.sejarah_other;
+        } else {
+          wrap.style.display = "none";
+          otherInput.removeAttribute("required");
+        }
+      }
+    }
+
+    function showLookupPreview(record) {
+      const card = document.getElementById("lookupPreviewCard");
+      const photo = document.getElementById("lookupPreviewPhoto");
+      if (!card) return;
+
+      document.getElementById("previewName").textContent = record?.name_mykad || "-";
+      document.getElementById("previewDocNo").textContent = record?.doc_no || "-";
+
+      if (record?.photo_link) {
+        photo.src = record.photo_link;
+        photo.style.display = "block";
+      } else {
+        photo.style.display = "none";
+      }
+      card.style.display = "block";
+    }
+
+    function hideLookupPreview() {
+      const card = document.getElementById("lookupPreviewCard");
+      if (card) card.style.display = "none";
+    }
+
+    // 🔍 FIRESTORE PROFILE LOOKUP
+    async function lookupExistingRecord() {
+      const docNo = document.getElementById("lookupDocNo").value.trim();
+      const docHint = document.getElementById("lookupDocHint");
+      showHint(docHint, false);
+
+      setLookupStatus("Initiating secure profile scan...");
+      hideLookupPreview();
+
+      try {
+        const docRef = db.collection(COLLECTION_NAME).doc(docNo);
+        const docSnap = await docRef.get();
+
+        document.getElementById("docNumber").value = docNo;
+
+        if (docSnap.exists) {
+          globalCachedRecord = docSnap.data();
+          fillRecord(globalCachedRecord);
+          applyEntryMode("update");
+          showLookupPreview(globalCachedRecord);
+          setLookupStatus("Profile verified. Initializing update protocol.", true);
+        } else {
+          globalCachedRecord = null;
+          clearFormFieldsForCreate();
+          applyEntryMode("create");
+          hideLookupPreview();
+          setLookupStatus("No profile detected. Initializing new registry protocol.");
+        }
+        return true;
+      } catch (err) {
+        globalCachedRecord = null;
+        hideLookupPreview();
+        setLookupStatus("System connection interrupted. Please attempt again.");
+        return false;
+      }
+    }
+
+    function validateStep(index) {
+      const step = steps[index];
+      let ok = true;
+      clearHints(step);
+
+      if (index === 0) {
+        if (!document.getElementById("lookupDocNo").value.trim()) {
+          showHint(document.getElementById("lookupDocHint"), true);
+          ok = false;
+        }
+        if (!document.getElementById("agreeProceed").checked) {
+          showHint(document.getElementById("proceedHint"), true);
+          ok = false;
+        }
+        return ok;
+      }
+
+      const requiredFields = step.querySelectorAll("[required]");
+      requiredFields.forEach(field => {
+        if (field.type === "radio" || field.type === "checkbox") return;
+        const hint = field.parentElement?.querySelector(".hint") || field.nextElementSibling;
+        if (field.type === "file") {
+          if (!field.files || !field.files.length) {
+            if (formMode.value === "create") {
+              ok = false;
+              showHint(hint, true);
+            }
+          }
+          return;
+        }
+        if (!String(field.value || "").trim()) {
+          ok = false;
+          showHint(hint, true);
+        }
+      });
+
+      const radioGroups = new Set();
+      step.querySelectorAll('input[type="radio"][required]').forEach(r => radioGroups.add(r.name));
+      radioGroups.forEach(name => {
+        const selected = step.querySelector(`input[name="${name}"]:checked`);
+        const group = step.querySelector(`input[name="${name}"]`);
+        const hint = group?.closest(".radioRow")?.nextElementSibling;
+        if (!selected) {
+          ok = false;
+          if (hint && hint.classList.contains("hint")) hint.classList.add("show");
+        }
+      });
+
+      if (index === 1) {
+        const email = document.getElementById("email");
+        const phone = document.getElementById("phoneNumber");
+        const docType = document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD";
+        const docNo = document.getElementById("docNumber");
+
+        if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+          ok = false;
+          showHint(email.nextElementSibling, true);
+        }
+
+        if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(phone.value))) {
+          ok = false;
+          showHint(phone.nextElementSibling, true);
+        }
+
+        if (docType === "MYKAD" && !/^\d{12}$/.test((docNo.value || "").trim())) {
+          ok = false;
+          showHint(document.getElementById("docHint"), true);
+        }
+
+        if (formMode.value === "create" && !capturedPhotoData.value) {
+          ok = false;
+          showHint(gambarHint, true);
+        }
+      }
+
+      if (index === steps.length - 1) {
+        ["declareTrue", "declareConsent"].forEach(id => {
+          const checkbox = document.getElementById(id);
+          const labelText = checkbox.closest(".checkItem");
+          if (!checkbox.checked) {
+            ok = false;
+            labelText.style.color = "var(--danger)";
+            labelText.style.borderColor = "var(--danger)";
+          } else {
+            labelText.style.color = "inherit";
+            labelText.style.borderColor = "var(--md-outline)";
+          }
+        });
+      }
+
       return ok;
     }
 
-    const requiredFields = step.querySelectorAll("[required]");
-    requiredFields.forEach(field => {
-      if (field.type === "radio" || field.type === "checkbox") return;
-      const hint = field.parentElement?.querySelector(".hint") || field.nextElementSibling;
-      if (field.type === "file") {
-        if (!field.files || !field.files.length) {
-          if (formMode.value === "create") {
-            ok = false;
-            showHint(hint, true);
-          }
+    document.querySelectorAll(".nextBtn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        if (current === 0) {
+          if (!validateStep(0)) return;
+          const originalText = e.target.textContent;
+          e.target.disabled = true;
+          e.target.textContent = "Verifying...";
+          const ready = await lookupExistingRecord();
+          e.target.disabled = false;
+          e.target.textContent = originalText;
+          if (!ready) return;
+          showStep(current + 1);
+          return;
         }
-        return;
-      }
-      if (!String(field.value || "").trim()) {
-        ok = false;
-        showHint(hint, true);
-      }
+
+        if (!validateStep(current)) return;
+        if (current < steps.length - 1) showStep(current + 1);
+      });
     });
 
-    const radioGroups = new Set();
-    step.querySelectorAll('input[type="radio"][required]').forEach(r => radioGroups.add(r.name));
-    radioGroups.forEach(name => {
-      const selected = step.querySelector(`input[name="${name}"]:checked`);
-      const group = step.querySelector(`input[name="${name}"]`);
-      const hint = group?.closest(".radioRow")?.nextElementSibling;
-      if (!selected) {
-        ok = false;
-        if (hint && hint.classList.contains("hint")) hint.classList.add("show");
-      }
+    document.querySelectorAll(".prevBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (current > 0) showStep(current - 1);
+      });
     });
 
-    if (index === 1) {
-      const email = document.getElementById("email");
-      const phone = document.getElementById("phoneNumber");
-      const docType = document.querySelector('input[name="doc_type"]:checked')?.value || "MYKAD";
-      const docNo = document.getElementById("docNumber");
+    function updateDocTypeUI(value) {
+      const docBadge = document.getElementById("docBadge");
+      const docLabel = document.getElementById("docLabel");
+      const docHint = document.getElementById("docHint");
+      const docNumber = document.getElementById("docNumber");
 
-      if (email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-        ok = false;
-        showHint(email.nextElementSibling, true);
-      }
-
-      if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(phone.value))) {
-        ok = false;
-        showHint(phone.nextElementSibling, true);
-      }
-
-      if (docType === "MYKAD" && !/^\d{12}$/.test((docNo.value || "").trim())) {
-        ok = false;
-        showHint(document.getElementById("docHint"), true);
-      }
-
-      if (docType === "PASSPORT" && !String(docNo.value || "").trim()) {
-        ok = false;
-        showHint(document.getElementById("docHint"), true);
-      }
-
-      if (formMode.value === "create" && !capturedPhotoData.value) {
-        ok = false;
-        showHint(gambarHint, true);
+      if (value === "PASSPORT") {
+        docBadge.textContent = "Passport";
+        docLabel.textContent = "Passport Number";
+        docHint.textContent = "Valid passport format required.";
+        docNumber.placeholder = "Enter Alpha-numeric Passport ID";
+      } else {
+        docBadge.textContent = "MyKAD";
+        docLabel.textContent = "MyKAD Number";
+        docHint.textContent = "Strictly 12 digits (No Dashes).";
+        docNumber.placeholder = "12 digits without dashes";
       }
     }
 
-    if (index === 2) {
-      const emergencyNo = document.getElementById("emergencyNumber");
-      if (!/^601[0-9]{8,9}$/.test(normalizeDigitsOnly(emergencyNo.value))) {
-        ok = false;
-        showHint(emergencyNo.nextElementSibling, true);
-      }
-    }
+    document.querySelectorAll('input[name="doc_type"]').forEach(radio => {
+      radio.addEventListener("change", () => updateDocTypeUI(radio.value));
+    });
 
-    if (index === steps.length - 1) {
-      ["declareTrue", "declareConsent"].forEach(id => {
-        const checkbox = document.getElementById(id);
-        const labelText = checkbox.closest(".checkItem");
-        if (!checkbox.checked) {
-          ok = false;
-          labelText.style.color = "var(--danger)";
-          labelText.style.borderColor = "var(--danger)";
-        } else {
-          labelText.style.color = "inherit";
-          labelText.style.borderColor = "var(--md-outline)";
+    document.querySelectorAll('input[name="sejarah"]').forEach(radio => {
+      radio.addEventListener("change", () => {
+        const wrap = document.getElementById("sejarahOtherWrap");
+        const otherInput = document.getElementById("sejarahOther");
+        if (radio.value === "OTHER" && radio.checked) {
+          wrap.style.display = "block";
+          otherInput.setAttribute("required", "required");
+        } else if (radio.checked) {
+          wrap.style.display = "none";
+          otherInput.removeAttribute("required");
+          otherInput.value = "";
         }
       });
+    });
+
+    ["phoneNumber", "emergencyNumber", "accountNo"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", () => el.value = el.value.replace(/[^\d]/g, ""));
+    });
+
+    ["nameMykad", "namaWaris", "hubungan", "accountName"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", () => el.value = el.value.toUpperCase());
+    });
+
+    function safeVal(id) {
+      return (document.getElementById(id)?.value || "").trim();
     }
 
-    return ok;
-  }
-
-  document.querySelectorAll(".nextBtn").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      if (current === 0) {
-        if (!validateStep(0)) return;
-        const originalText = e.target.textContent;
-        e.target.disabled = true;
-        e.target.textContent = "Verifying...";
-        const ready = await lookupExistingRecord();
-        e.target.disabled = false;
-        e.target.textContent = originalText;
-        if (!ready) return;
-        showStep(current + 1);
-        return;
-      }
-
-      if (!validateStep(current)) return;
-      if (current < steps.length - 1) showStep(current + 1);
-    });
-  });
-
-  document.querySelectorAll(".prevBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (current > 0) showStep(current - 1);
-    });
-  });
-
-  function updateDocTypeUI(value) {
-    const docBadge = document.getElementById("docBadge");
-    const docLabel = document.getElementById("docLabel");
-    const docHint = document.getElementById("docHint");
-    const docNumber = document.getElementById("docNumber");
-
-    if (value === "PASSPORT") {
-      docBadge.textContent = "Passport";
-      docLabel.textContent = "Passport Number";
-      docHint.textContent = "Valid passport format required.";
-      docNumber.placeholder = "Enter Alpha-numeric Passport ID";
-    } else {
-      docBadge.textContent = "MyKAD";
-      docLabel.textContent = "MyKAD Number";
-      docHint.textContent = "Strictly 12 digits (No Dashes).";
-      docNumber.placeholder = "12 digits without dashes";
+    function checkedText(name) {
+      return document.querySelector(`input[name="${name}"]:checked`)?.value || null;
     }
-  }
 
-  document.querySelectorAll('input[name="doc_type"]').forEach(radio => {
-    radio.addEventListener("change", () => updateDocTypeUI(radio.value));
-  });
+    function buildSummary() {
+      const modeLabel = formMode.value === "update" ? "Profile Update" : "New Registration";
+      const summaryBox = document.getElementById("summaryBox");
+      summaryBox.innerHTML = `
+        <div class="summaryGrid">
+          <div class="summaryItem"><span class="summaryLabel">Protocol Type</span><span class="summaryValue">${modeLabel}</span></div>
+          <div class="summaryItem"><span class="summaryLabel">Applicant Name</span><span class="summaryValue">${safeVal("nameMykad") || "-"}</span></div>
+          <div class="summaryItem"><span class="summaryLabel">Identity No.</span><span class="summaryValue">${safeVal("docNumber") || "-"}</span></div>
+          <div class="summaryItem"><span class="summaryLabel">Bank Inst.</span><span class="summaryValue">${safeVal("bank") || "-"}</span></div>
+          <div class="summaryItem"><span class="summaryLabel">Bank Account</span><span class="summaryValue">${safeVal("accountNo") || "-"}</span></div>
+        </div>
+      `;
+    }
 
-  document.querySelectorAll('input[name="sejarah"]').forEach(radio => {
-    radio.addEventListener("change", () => {
-      const wrap = document.getElementById("sejarahOtherWrap");
-      const otherInput = document.getElementById("sejarahOther");
-      if (radio.value === "OTHER" && radio.checked) {
-        wrap.style.display = "block";
-        otherInput.setAttribute("required", "required");
-      } else if (radio.checked) {
-        wrap.style.display = "none";
-        otherInput.removeAttribute("required");
-        otherInput.value = "";
-      }
-    });
-  });
+    function showSubmitMessage(message, ok = false) {
+      submitStatusBox.style.display = "block";
+      submitStatusBox.textContent = message;
+      submitStatusBox.className = ok ? "alert ok" : "alert";
+    }
 
-  ["phoneNumber", "emergencyNumber", "accountNo"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener("input", () => el.value = el.value.replace(/[^\d]/g, ""));
-  });
-
-  ["nameMykad", "namaWaris", "hubungan", "accountName"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener("input", () => el.value = el.value.toUpperCase());
-  });
-
-  function safeVal(id) {
-    return (document.getElementById(id)?.value || "").trim();
-  }
-
-  function checkedText(name) {
-    return document.querySelector(`input[name="${name}"]:checked`)?.value || null;
-  }
-
-  function buildSummary() {
-    const modeLabel = formMode.value === "update" ? "Profile Update" : "New Registration";
-    const summaryBox = document.getElementById("summaryBox");
-    summaryBox.innerHTML = `
-      <div class="summaryGrid">
-        <div class="summaryItem"><span class="summaryLabel">Protocol Type</span><span class="summaryValue">${modeLabel}</span></div>
-        <div class="summaryItem"><span class="summaryLabel">Applicant Name</span><span class="summaryValue">${safeVal("nameMykad") || "-"}</span></div>
-        <div class="summaryItem"><span class="summaryLabel">Identity No.</span><span class="summaryValue">${safeVal("docNumber") || "-"}</span></div>
-        <div class="summaryItem"><span class="summaryLabel">Bank Inst.</span><span class="summaryValue">${safeVal("bank") || "-"}</span></div>
-        <div class="summaryItem"><span class="summaryLabel">Bank Account</span><span class="summaryValue">${safeVal("accountNo") || "-"}</span></div>
-      </div>
-    `;
-  }
-
-  function showSubmitMessage(message, ok = false) {
-    submitStatusBox.style.display = "block";
-    submitStatusBox.textContent = message;
-    submitStatusBox.className = ok ? "alert ok" : "alert";
-  }
-
-  function compressImageFile(file, label) {
-    return new Promise((resolve, reject) => {
-      if (!file) {
-        resolve("");
-        return;
-      }
-
-      const isImage = /^image\//i.test(file.type);
-      if (!isImage) {
+    function compressImageFile(file) {
+      return new Promise((resolve) => {
+        if (!file || !/^image\//i.test(file.type)) {
+          resolve("");
+          return;
+        }
         const reader = new FileReader();
-        reader.onload = function () {
-          if (!reader.result) reject(new Error("Data processing failed for " + label));
-          else resolve(reader.result);
+        reader.onload = function (event) {
+          const img = new Image();
+          img.onload = function () {
+            let width = img.width, height = img.height;
+            const maxDim = 800;
+            if (width > maxDim || height > maxDim) {
+              const ratio = Math.min(maxDim / width, maxDim / height);
+              width = Math.round(width * ratio);
+              height = Math.round(height * ratio);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", 0.75));
+          };
+          img.src = event.target.result;
         };
-        reader.onerror = () => reject(new Error("File integrity compromised for " + label));
-        try {
-          reader.readAsDataURL(file);
-        } catch (err) {
-          reject(new Error("Format unsupported."));
-        }
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // 🚀 FIRESTORE FORM SUBMISSION
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      submitStatusBox.style.display = "none";
+      submitStatusBox.className = "alert";
+
+      if (!validateStep(steps.length - 1)) {
+        showSubmitMessage("Declaration protocols must be verified prior to transmission.");
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const img = new Image();
-        img.onload = function () {
-          let width = img.width, height = img.height;
-          const maxDim = 1200;
-          if (width > maxDim || height > maxDim) {
-            const ratio = Math.min(maxDim / width, maxDim / height);
-            width = Math.round(width * ratio);
-            height = Math.round(height * ratio);
-          }
-          const canvas = document.createElement("canvas");
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, width, height);
-          let quality = 0.8;
-          let result = canvas.toDataURL("image/jpeg", quality);
-          while (result.length > 900000 && quality > 0.4) {
-            quality -= 0.1;
-            result = canvas.toDataURL("image/jpeg", quality);
-          }
-          resolve(result);
-        };
-        img.onerror = () => reject(new Error("Corrupted image stream."));
-        img.src = event.target.result;
-      };
-      reader.onerror = () => reject(new Error("Read execution blocked."));
+      submitBtn.disabled = true;
+      submitBtn.textContent = formMode.value === "update" ? "Executing Update..." : "Transmitting Data...";
+
       try {
-        reader.readAsDataURL(file);
-      } catch (err) {
-        reject(new Error("Stream timeout."));
-      }
-    });
-  }
+        const docNo = safeVal("docNumber");
+        const icFile = icCopy.files && icCopy.files[0] ? icCopy.files[0] : null;
 
-  async function buildPayload() {
-    const icFile = icCopy.files && icCopy.files[0] ? icCopy.files[0] : null;
-    const MAX_SIZE = 5242880;
+        const payload = {
+          doc_no: docNo,
+          timestamp: new Date().toISOString(),
+          name_mykad: safeVal("nameMykad"),
+          phone: safeVal("phoneNumber"),
+          email: safeVal("email"),
+          doc_type: checkedText("doc_type"),
+          alamat: safeVal("alamat"),
+          gender: checkedText("gender"),
+          status_perkahwinan: checkedText("status_perkahwinan"),
+          nama_waris: safeVal("namaWaris"),
+          hubungan: safeVal("hubungan"),
+          emergency_no: safeVal("emergencyNumber"),
+          kebolehan: safeVal("kebolehan"),
+          typhoid: checkedText("typhoid"),
+          transportation: checkedText("transportation"),
+          sejarah: checkedText("sejarah"),
+          sejarah_other: safeVal("sejarahOther") || null,
+          bank: safeVal("bank"),
+          account_no: safeVal("accountNo"),
+          account_name: safeVal("accountName"),
+          updated_at: new Date().toISOString()
+        };
 
-    if (icFile && icFile.size > MAX_SIZE) throw new Error("Document scan exceeds 5MB limit.");
+        if (icFile) {
+          payload.ic_filename = icFile.name;
+          payload.ic_base64 = await compressImageFile(icFile);
+        }
 
-    const payload = {
-      doc_no: safeVal("docNumber"),
-      timestamp: new Date().toISOString(),
-      name_mykad: safeVal("nameMykad"),
-      phone: safeVal("phoneNumber"),
-      email: safeVal("email"),
-      doc_type: checkedText("doc_type"),
-      alamat: safeVal("alamat"),
-      gender: checkedText("gender"),
-      status_perkahwinan: checkedText("status_perkahwinan"),
-      nama_waris: safeVal("namaWaris"),
-      hubungan: safeVal("hubungan"),
-      emergency_no: safeVal("emergencyNumber"),
-      kebolehan: safeVal("kebolehan"),
-      typhoid: checkedText("typhoid"),
-      transportation: checkedText("transportation"),
-      sejarah: checkedText("sejarah"),
-      sejarah_other: safeVal("sejarahOther") || null,
-      bank: safeVal("bank"),
-      "Column 19": safeVal("accountNo"),
-      "Column 20": safeVal("accountName"),
-      source_sheet: "SHEET_A",
-      updated_at: new Date().toISOString()
-    };
+        if (capturedPhotoData.value) {
+          payload.photo_filename = capturedPhotoData.dataset.filename || `photo_${docNo}.jpg`;
+          payload.photo_link = capturedPhotoData.value; // Storing base64 directly or upload URL
+        }
 
-    if (icFile) {
-      payload.ic_filename = icFile.name;
-      payload.ic_base64 = await compressImageFile(icFile, "IC Copy");
-    }
+        // Save directly to Firestore using doc_no as the Document ID for instant lookup
+        await db.collection(COLLECTION_NAME).doc(docNo).set(payload, { merge: true });
 
-     if (capturedPhotoData.value) {
-      // Use the customized filename generated during capture, or fall back to a unique default
-      payload.photo_filename = capturedPhotoData.dataset.filename || `photo_${safeVal("nameMykad")}_${Date.now()}.jpg`;
-      payload.photo_base64 = capturedPhotoData.value;
-    }
-
-
-    return [payload];
-  }
-
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    submitStatusBox.style.display = "none";
-    submitStatusBox.className = "alert";
-
-    if (!validateStep(steps.length - 1)) {
-      showSubmitMessage("Declaration protocols must be verified prior to transmission.");
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = formMode.value === "update" ? "Executing Update..." : "Transmitting Data...";
-
-    try {
-      const payload = await buildPayload();
-      
-      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYmKf44XdtoPmju14rsoRCniGyOMV5hH5_5aXFWnniMqL1uB1g_Qedof1mm8bmkveC/exec";
-
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
         showSubmitMessage("Protocol completed successfully. Registry recorded.", true);
-
-        localStorage.setItem("mcl_doc_no", safeVal("docNumber"));
+        localStorage.setItem("mcl_doc_no", docNo);
 
         setTimeout(() => {
-          if (formMode.value === "update") {
-            window.location.href = "profile.html"; 
-          } else {
-            window.location.href = "dashboard.html";
-          }
+          window.location.href = formMode.value === "update" ? "profile.html" : "dashboard.html";
         }, 1500);
 
-      } else {
-        const errorText = await response.text();
-        showSubmitMessage("Transmission Failed: " + errorText);
+      } catch (error) {
+        showSubmitMessage("Transmission Failed: " + error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = formMode.value === "update" ? "Update Registry" : "Submit Registry";
       }
-    } catch (error) {
-      showSubmitMessage("Network Disconnect: " + error.message);
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = formMode.value === "update" ? "Update Registry" : "Submit Registry";
-    }
-  });
+    });
 
-  updateHeader();
-  updateDocTypeUI("MYKAD");
-  applyEntryMode("create");
-</script>
+    updateHeader();
+    updateDocTypeUI("MYKAD");
+    applyEntryMode("create");
+  </script>
 </body>
 </html>
