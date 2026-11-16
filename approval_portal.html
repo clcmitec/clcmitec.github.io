@@ -3,281 +3,251 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MITEC — Casual Labour Approval Portal</title>
+<title>MITEC — Casual Labour Approvals</title>
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:Arial,sans-serif; background:#f1f5f9; min-height:100vh; padding:20px 12px; color:#0f172a; }
-
-  .top-bar { background:#164B81; color:#fff; padding:12px 18px; display:flex; align-items:center; gap:14px; border-radius:8px; margin-bottom:18px; flex-wrap:wrap; }
-  .top-bar img { height:40px; filter:brightness(0) invert(1); }
-  .top-bar h1 { font-size:1rem; font-weight:900; text-transform:uppercase; }
-  .top-bar p { font-size:0.72rem; opacity:0.8; margin-top:2px; }
-  #userbox { margin-left:auto; display:none; align-items:center; gap:10px; font-size:0.78rem; }
-  #userbox button { background:#fff; color:#164B81; border:none; border-radius:4px; padding:5px 12px; font-weight:700; cursor:pointer; }
-
-  .card { background:#fff; border-radius:8px; padding:22px; max-width:420px; margin:30px auto; box-shadow:0 1px 6px rgba(0,0,0,0.1); }
-  .card h2 { font-size:1.1rem; margin-bottom:6px; }
-  .card p { font-size:0.82rem; color:#475569; margin-bottom:14px; line-height:1.4; }
-  .card input { width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:10px 12px; font-size:0.95rem; margin-bottom:10px; outline:none; }
-  .card input:focus { border-color:#164B81; }
-  .card button { width:100%; background:#164B81; color:#fff; border:none; border-radius:6px; padding:10px; font-size:0.9rem; font-weight:700; cursor:pointer; margin-bottom:8px; }
-  .card button:disabled { opacity:0.5; cursor:not-allowed; }
-  #login-msg { font-size:0.8rem; margin-top:6px; min-height:18px; }
-  #login-msg.err { color:#b91c1c; } #login-msg.ok { color:#166534; }
-
-  .filters { background:#fff; border-radius:8px; padding:12px 16px; margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  .filters label { font-size:0.8rem; font-weight:700; color:#334155; }
-  .filters select { border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:0.8rem; background:#fff; }
-  .btn-refresh { margin-left:auto; background:#164B81; color:#fff; border:none; border-radius:4px; padding:6px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; }
-
-  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
-  .stat { background:#fff; border-radius:8px; padding:12px 14px; border-left:4px solid #cbd5e1; }
-  .stat.mine { border-left-color:#f59e0b; } .stat.ok { border-left-color:#16a34a; } .stat.bad { border-left-color:#dc2626; } .stat.all { border-left-color:#164B81; }
-  .stat .v { font-size:1.5rem; font-weight:900; } .stat .l { font-size:0.7rem; color:#64748b; text-transform:uppercase; margin-top:2px; }
-
-  .batch-grid { display:flex; flex-direction:column; gap:14px; }
-  .batch { background:#fff; border-radius:8px; border:1px solid #e2e8f0; overflow:hidden; }
-  .batch-head { background:#234280; color:#fff; padding:10px 16px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
-  .batch-head .t { font-weight:900; font-size:0.9rem; } .batch-head .m { font-size:0.7rem; opacity:0.85; }
-  .batch-body { padding:12px 16px; }
-  .flow { display:flex; gap:10px; flex-wrap:wrap; }
-  .step { flex:1; min-width:210px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 12px; }
-  .step .st { font-size:0.7rem; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:5px; }
-  .step .em { font-size:0.76rem; color:#334155; margin-bottom:6px; word-break:break-all; }
-  .step .dt { font-size:0.68rem; color:#94a3b8; margin-top:4px; }
-  .badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.68rem; font-weight:700; text-transform:uppercase; }
-  .b-PENDING { background:#fef3c7; color:#92400e; } .b-APPROVED { background:#dcfce7; color:#166534; } .b-REJECTED { background:#fee2e2; color:#991b1b; }
-  .acts { display:flex; gap:8px; margin-top:8px; }
-  .acts button { flex:1; border:none; border-radius:4px; padding:7px; font-size:0.78rem; font-weight:700; cursor:pointer; color:#fff; }
-  .acts .ap { background:#16a34a; } .acts .rj { background:#dc2626; }
-  .acts button:disabled { opacity:0.3; cursor:not-allowed; }
-  .note { font-size:0.68rem; color:#94a3b8; margin-top:6px; }
-
-  table.d { width:100%; border-collapse:collapse; font-size:0.7rem; margin-top:10px; }
-  table.d th { background:#f1f5f9; padding:5px 7px; text-align:left; color:#475569; border-bottom:1px solid #e2e8f0; }
-  table.d td { padding:5px 7px; border-bottom:1px solid #f1f5f9; }
-  .wrap { overflow-x:auto; }
-  .pdf { display:inline-block; margin-top:8px; font-size:0.75rem; color:#2563eb; font-weight:700; text-decoration:none; }
-  .empty { text-align:center; padding:40px; color:#94a3b8; font-size:0.9rem; }
-
-  #toast { display:none; position:fixed; bottom:22px; left:50%; transform:translateX(-50%); padding:11px 22px; border-radius:8px; font-size:0.85rem; font-weight:700; color:#fff; z-index:99; max-width:90%; text-align:center; }
-  .t-ok { background:#16a34a; } .t-err { background:#dc2626; } .t-info { background:#164B81; }
+:root{--bg:#f1f5fb;--ink:#0f2545;--mut:#64748b;--line:#e6ebf3;--pri:#0b5cad;--blue:#2563eb;--green:#0f9d78;--purple:#7c4ddb;--red:#ef4444;--amber:#f59e0b}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+button{font-family:inherit;cursor:pointer}
+.top{display:flex;align-items:center;gap:10px;background:#fff;border-bottom:1px solid var(--line);padding:10px 20px;position:sticky;top:0;z-index:5}
+.brand{color:var(--pri);font-weight:800;letter-spacing:.5px;border-bottom:2px solid var(--pri);padding-bottom:4px}
+.top .sub{color:var(--mut);font-size:.8rem}.sp{flex:1}
+.pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.78rem;font-weight:600;color:var(--ink)}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:.7rem;font-weight:700}
+.body{display:grid;grid-template-columns:230px 1fr;gap:20px;max-width:1500px;margin:0 auto;padding:20px}
+nav{display:flex;flex-direction:column;gap:4px;align-self:start}
+nav .grp{font-size:.66rem;color:var(--mut);letter-spacing:.6px;margin:8px 10px 2px;font-weight:700}
+nav a{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:.85rem;cursor:pointer;border-left:3px solid transparent}
+nav a:hover{background:#e8eef8}
+nav a.on{background:#d9ecfb;border-left-color:var(--pri);font-weight:700}
+nav .cnt{font-size:.68rem;background:#fff;border-radius:999px;padding:1px 8px;color:var(--mut);font-weight:700}
+.crumb{font-size:.82rem;font-weight:600;margin-bottom:6px}
+h1{font-size:1.25rem;margin-bottom:14px}
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 6px rgba(15,37,69,.07);padding:16px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.kpi .v{font-size:1.45rem;font-weight:800}.kpi .l{font-size:.72rem;color:var(--mut);margin-top:4px}
+.kpi.hot .v{color:var(--amber)}
+.charts{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:14px}
+.card h4{font-size:.78rem;color:var(--mut);margin-bottom:10px;font-weight:600}
+.none{color:var(--mut);text-align:center;padding:50px 0;font-size:.85rem}
+.legend{display:flex;flex-direction:column;gap:8px;font-size:.78rem}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+.dn{display:flex;align-items:center;justify-content:space-around;gap:10px;flex-wrap:wrap}
+.tool{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tool h3{font-size:.95rem;margin-right:auto}
+.tool select{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:.78rem;background:#fff;color:var(--ink)}
+.wrap{overflow-x:auto}
+table.g{width:100%;min-width:900px;border-collapse:collapse;font-size:.82rem}
+table.g th{background:#f3f6fb;color:var(--mut);font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+table.g td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.num{text-align:right}
+tr.wk{background:#eef3fb;cursor:pointer;font-weight:700}tr.wk:hover{background:#e3ecf9}
+tr.wk .rg{font-weight:500;color:var(--mut);margin-left:8px;font-size:.74rem}
+tr.wk .hint{font-weight:500;color:var(--mut);font-size:.76rem}
+tr.wk .hot{color:#b45309;font-weight:700}
+tr.bt{cursor:pointer}tr.bt:hover{background:#f8fafd}
+.ar{display:inline-block;width:14px;color:var(--pri);transition:transform .2s}.ar.o{transform:rotate(90deg)}
+.dp{font-weight:800;color:var(--blue)}
+small{color:var(--mut);display:block;font-size:.7rem}
+.chip{display:inline-block;padding:3px 9px;border-radius:999px;font-size:.66rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.c-p{background:#fef3c7;color:#92400e}.c-a{background:#d1fae5;color:#065f46}.c-r{background:#fee2e2;color:#991b1b}
+.pdf{color:var(--blue);font-weight:700;text-decoration:none;font-size:.75rem;white-space:nowrap}
+.act{display:flex;gap:6px}
+.act button{border-radius:8px;padding:5px 11px;font-size:.72rem;font-weight:700}
+.ap{background:var(--pri);color:#fff;border:0}.rj{background:#fff;color:#b91c1c;border:1px solid #fca5a5}
+.act button:disabled{opacity:.4}
+.as{font-size:.64rem;color:var(--mut);margin-top:3px}
+.fin{font-size:.7rem;color:#94a3b8;font-weight:700;text-transform:uppercase}
+tr.dt td{background:#f8fafd;padding:0}
+table.in{width:100%;min-width:720px;border-collapse:collapse;font-size:.76rem}
+table.in th{background:#eef3fb;color:var(--mut);font-size:.64rem;text-transform:uppercase;padding:7px 10px;text-align:left}
+table.in td{padding:7px 10px;border-bottom:1px solid var(--line)}
+.sh{background:#e3ecf9;border-radius:4px;padding:1px 7px;font-weight:700;font-size:.68rem}
+.msg{text-align:center;padding:30px!important;color:var(--mut)}
+.ov{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:20;padding:16px}
+.lg{background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(15,37,69,.12);padding:24px;width:100%;max-width:400px}
+.lg h2{font-size:1.1rem;margin-bottom:6px}.lg p{color:var(--mut);font-size:.82rem;margin-bottom:14px;line-height:1.4}
+.lg input{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.95rem;margin-bottom:10px}
+.lg button{width:100%;background:var(--pri);color:#fff;border:0;border-radius:8px;padding:10px;font-weight:700;margin-bottom:8px}
+.lg button:disabled{opacity:.5}
+#lm{font-size:.8rem;min-height:18px}#lm.e{color:#b91c1c}#lm.k{color:#166534}
+#toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-weight:700;font-size:.82rem;color:#fff;z-index:30;max-width:90%;text-align:center}
+.t1{background:#16a34a}.t2{background:#dc2626}.t3{background:var(--pri)}
+@media(max-width:860px){
+ .body{grid-template-columns:1fr;padding:12px}
+ nav{flex-direction:row;overflow-x:auto;gap:6px}nav .grp{display:none}
+ nav a{white-space:nowrap;border-left:0;border-bottom:3px solid transparent;gap:8px}nav a.on{border-bottom-color:var(--pri)}
+ .kpis{grid-template-columns:1fr 1fr}.charts{grid-template-columns:1fr}.top .sub{display:none}
+}
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <img src="https://mitec.com.my/static/img/logos/logo-footer.png" alt="MiTEC"/>
-  <div>
-    <h1>Casual Labour — Approval Portal</h1>
-    <p>Sign in to review and decide on requisitions assigned to you</p>
-  </div>
-  <div id="userbox"><span id="whoami"></span><button onclick="logout()">Logout</button></div>
-</div>
-
-<!-- LOGIN -->
-<div id="login" class="card">
+<div id="login" class="ov"><div class="lg">
   <h2>🔐 Sign in</h2>
-  <p>Enter your registered work email. We'll send a 6-digit code to that address.</p>
+  <p>Enter your registered work email. A 6-digit code will be sent to that address.</p>
   <input id="email" type="email" placeholder="name@mitec.com.my" autocomplete="email"/>
-  <button id="btn-send" onclick="sendCode()">Send code</button>
-  <div id="step2" style="display:none">
-    <input id="code" inputmode="numeric" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code"/>
-    <button id="btn-verify" onclick="verifyCode()">Verify &amp; sign in</button>
-  </div>
-  <div id="login-msg"></div>
-</div>
+  <button id="b-send">Send code</button>
+  <div id="s2" style="display:none"><input id="code" inputmode="numeric" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code"/><button id="b-ver">Verify &amp; sign in</button></div>
+  <div id="lm"></div>
+</div></div>
 
-<!-- APP -->
-<div id="app" style="display:none">
-  <div class="filters">
-    <label>Department:</label>
-    <select id="f-dept" onchange="render()"><option value="">All</option></select>
-    <label>Week:</label>
-    <select id="f-week" onchange="render()"><option value="">All</option></select>
-    <label>Status:</label>
-    <select id="f-status" onchange="render()">
-      <option value="">All</option>
-      <option value="MINE">Awaiting my action</option>
-      <option value="APPROVED">Fully approved</option>
-      <option value="REJECTED">Rejected</option>
-    </select>
-    <button class="btn-refresh" onclick="loadData()">🔄 Refresh</button>
+<div id="shell" style="display:none">
+  <header class="top">
+    <span class="brand">MITEC</span><span class="sub">Casual Labour Approvals</span><span class="sp"></span>
+    <button class="pill" id="b-ref">↻ Refresh</button><span class="avatar" id="av"></span><button class="pill" id="b-out">Logout</button>
+  </header>
+  <div class="body">
+    <nav id="nav">
+      <div class="grp">REQUISITIONS</div>
+      <a data-view="ALL">📊 Dashboard <span class="cnt" id="c-ALL">0</span></a>
+      <a data-view="MINE">⏳ Awaiting my action <span class="cnt" id="c-MINE">0</span></a>
+      <a data-view="APPROVED">✅ Authorized <span class="cnt" id="c-APPROVED">0</span></a>
+      <a data-view="REJECTED">⛔ Rejected <span class="cnt" id="c-REJECTED">0</span></a>
+    </nav>
+    <main>
+      <div class="crumb">Dashboard</div>
+      <h1 id="greet"></h1>
+      <section class="kpis" id="kpis"></section>
+      <section class="charts">
+        <div class="card"><h4>Wages by department (RM)</h4><div id="bar"></div></div>
+        <div class="card"><h4>Batches by status</h4><div id="donut"></div></div>
+      </section>
+      <section class="card">
+        <div class="tool"><h3>Requisition batches</h3>
+          <select id="f-week"><option value="">All weeks</option></select>
+          <select id="f-dept"><option value="">All departments</option></select>
+        </div>
+        <div class="wrap"><table class="g">
+          <thead><tr><th>Week / Dept</th><th class="num">Wages</th><th class="num">Pax</th><th>HOD</th><th>DCEO</th><th>Status</th><th>PDF</th><th>Action</th></tr></thead>
+          <tbody id="tb"></tbody>
+        </table></div>
+      </section>
+    </main>
   </div>
-  <div class="stats">
-    <div class="stat all"><div class="v" id="s-all">—</div><div class="l">My batches</div></div>
-    <div class="stat mine"><div class="v" id="s-mine">—</div><div class="l">Awaiting my action</div></div>
-    <div class="stat ok"><div class="v" id="s-ok">—</div><div class="l">Fully approved</div></div>
-    <div class="stat bad"><div class="v" id="s-bad">—</div><div class="l">Rejected</div></div>
-  </div>
-  <div id="loading" class="empty">⏳ Loading…</div>
-  <div id="empty" class="empty" style="display:none">📭 No requisitions found.</div>
-  <div class="batch-grid" id="grid"></div>
 </div>
-
 <div id="toast"></div>
 
 <script>
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbx3qDWBhfyeJEEMw4nShZUEztAePxMIWFdE0Lrb_krWJChnjQ6N6zc7x-zrLI3tD3jmSg/exec";
-  let TOKEN = null, ME = "", ROWS = [];
+const GAS_URL="https://script.google.com/macros/s/AKfycbx3qDWBhfyeJEEMw4nShZUEztAePxMIWFdE0Lrb_krWJChnjQ6N6zc7x-zrLI3tD3jmSg/exec";
+const SO={AM:0,PM:1,SUP:2,SUPPER:2};
+const COL={'Pending HOD':'#f59e0b','Pending DCEO':'#2563eb','Authorized':'#0f9d78','Rejected':'#ef4444'};
+let TOKEN=null,ME="",ROWS=[],view="ALL",oW={},oB={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lc=s=>String(s||"").trim().toLowerCase();
+const sg=k=>{try{return sessionStorage.getItem(k)}catch(e){return null}};
+const ss=(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}};
+const sd=k=>{try{sessionStorage.removeItem(k)}catch(e){}};
+const api=p=>fetch(GAS_URL+'?'+new URLSearchParams(p)).then(r=>r.json());
+const rm=n=>'RM '+(+n).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pad=n=>(n<10?'0':'')+n;
+function toast(m,c){const t=$('toast');t.textContent=m;t.className=c||'t3';t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',4500)}
+function lmsg(m,c){const e=$('lm');e.textContent=m;e.className=c||''}
+function fdt(s){if(!s)return '-';s=String(s);return (s.match(/:/g)||[]).length===1?s+':00':s}
+function wr(w){const n=parseInt(w)||1,a=new Date(Date.UTC(2026,0,5)+(n-1)*6048e5),b=new Date(a.getTime()+5184e5);const f=d=>pad(d.getUTCDate())+'/'+pad(d.getUTCMonth()+1);return f(a)+' – '+f(b)+'/'+b.getUTCFullYear()}
+const dk=d=>{const p=String(d).split('/');return p.length===3?p[2]+p[1]+p[0]:String(d)};
 
-  // ---------- helpers ----------
-  function sget(k){ try { return sessionStorage.getItem(k); } catch(e){ return null; } }
-  function sset(k,v){ try { sessionStorage.setItem(k,v); } catch(e){} }
-  function sdel(k){ try { sessionStorage.removeItem(k); } catch(e){} }
-  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
-  function $(id){ return document.getElementById(id); }
-  function api(params){
-    return fetch(GAS_URL + '?' + new URLSearchParams(params).toString()).then(function(r){ return r.json(); });
-  }
-  function toast(msg, cls){
-    var t=$('toast'); t.textContent=msg; t.className=cls||'t-info'; t.style.display='block';
-    clearTimeout(t._t); t._t=setTimeout(function(){ t.style.display='none'; },4500);
-  }
-  function loginMsg(msg, cls){ var m=$('login-msg'); m.textContent=msg; m.className=cls||''; }
+/* login */
+function send(){const e=$('email').value.trim().toLowerCase();if(!e){lmsg('Enter your email.','e');return}
+ $('b-send').disabled=true;lmsg('Sending…');
+ api({action:'requestOtp',email:e}).then(()=>{$('s2').style.display='block';lmsg('If registered, a 6-digit code was sent (valid 10 min).','k');$('code').focus()})
+ .catch(()=>lmsg('Network error.','e')).then(()=>$('b-send').disabled=false)}
+function verify(){const e=$('email').value.trim().toLowerCase(),c=$('code').value.trim();if(!c){lmsg('Enter the code.','e');return}
+ $('b-ver').disabled=true;lmsg('Verifying…');
+ api({action:'verifyOtp',email:e,code:c}).then(r=>{if(r.status==='success'){TOKEN=r.token;ME=e;ss('tok',TOKEN);ss('me',ME);enter()}else lmsg(r.message||'Invalid code.','e')})
+ .catch(()=>lmsg('Network error.','e')).then(()=>$('b-ver').disabled=false)}
+function out(){TOKEN=null;ME="";ROWS=[];oW={};oB={};sd('tok');sd('me');$('shell').style.display='none';$('login').style.display='grid';$('s2').style.display='none';$('code').value='';lmsg('')}
+function enter(){$('login').style.display='none';$('shell').style.display='block';
+ const nm=ME.split('@')[0],h=new Date().getHours();
+ $('av').textContent=nm.slice(0,2).toUpperCase();
+ $('greet').textContent='Good '+(h<12?'morning':h<18?'afternoon':'evening')+', '+nm.charAt(0).toUpperCase()+nm.slice(1);
+ load(true)}
 
-  // ---------- login flow ----------
-  function sendCode(){
-    var email=$('email').value.trim().toLowerCase();
-    if(!email){ loginMsg('Please enter your email.','err'); return; }
-    $('btn-send').disabled=true; loginMsg('Sending…');
-    api({action:'requestOtp', email:email}).then(function(){
-      $('step2').style.display='block';
-      loginMsg('If this email is registered, a 6-digit code has been sent. It expires in 10 minutes.','ok');
-      $('code').focus();
-    }).catch(function(){ loginMsg('Network error. Try again.','err'); })
-      .then(function(){ $('btn-send').disabled=false; });
-  }
-  function verifyCode(){
-    var email=$('email').value.trim().toLowerCase(), code=$('code').value.trim();
-    if(!code){ loginMsg('Enter the 6-digit code.','err'); return; }
-    $('btn-verify').disabled=true; loginMsg('Verifying…');
-    api({action:'verifyOtp', email:email, code:code}).then(function(res){
-      if(res.status==='success'){
-        TOKEN=res.token; ME=email; sset('tok',TOKEN); sset('me',ME); showApp();
-      } else { loginMsg(res.message||'Invalid or expired code.','err'); }
-    }).catch(function(){ loginMsg('Network error. Try again.','err'); })
-      .then(function(){ $('btn-verify').disabled=false; });
-  }
-  function logout(){
-    TOKEN=null; ME=""; ROWS=[]; sdel('tok'); sdel('me');
-    $('app').style.display='none'; $('userbox').style.display='none';
-    $('login').style.display='block'; $('step2').style.display='none';
-    $('code').value=''; loginMsg('');
-  }
-  function showApp(){
-    $('login').style.display='none'; $('app').style.display='block';
-    $('userbox').style.display='flex'; $('whoami').textContent='👤 '+ME;
-    loadData();
-  }
+/* data */
+function load(auto){$('tb').innerHTML='<tr><td colspan="8" class="msg">⌛ Loading…</td></tr>';
+ api({action:'readAll',token:TOKEN}).then(r=>{
+  if(!Array.isArray(r)){if(r&&r.message==='AUTH'){toast('Session expired. Sign in again.','t2');out();return}throw new Error((r&&r.message)||'Load failed')}
+  ROWS=r;
+  const ws=[...new Set(ROWS.map(x=>String(x.week)))].sort((a,b)=>a-b),ds=[...new Set(ROWS.map(x=>x.department))].sort(),cw=$('f-week').value,cd=$('f-dept').value;
+  $('f-week').innerHTML='<option value="">All weeks</option>'+ws.map(w=>'<option value="'+esc(w)+'">Week '+esc(w)+'</option>').join('');
+  $('f-dept').innerHTML='<option value="">All departments</option>'+ds.map(d=>'<option>'+esc(d)+'</option>').join('');
+  $('f-week').value=cw;$('f-dept').value=cd;
+  if(auto)batches(ROWS).forEach(b=>{if(mine(b))oW[b.week]=true});
+  render()}).catch(e=>{$('tb').innerHTML='<tr><td colspan="8" class="msg" style="color:#b91c1c">⚠️ '+esc(e.message)+'</td></tr>'})}
+function batches(rows){const m={},l=[];rows.forEach(r=>{let b=m[r.batchId];if(!b){b=m[r.batchId]={id:r.batchId,week:String(r.week),dept:r.department,wages:0,pax:0,pdf:r.pdfUrl,he:r.hodEmail,de:r.dceoEmail,hs:r.hodStatus,ds:r.dceoStatus,hd:r.hodDate,dd:r.dceoDate,rows:[]};l.push(b)}b.wages+=+r.wages||0;b.pax+=+r.pt||0;b.rows.push(r)});return l}
+const canH=b=>lc(b.he)===ME&&b.hs==='PENDING';
+const canD=b=>lc(b.de)===ME&&b.hs==='APPROVED'&&b.ds==='PENDING';
+const mine=b=>canH(b)||canD(b);
+const rej=b=>b.hs==='REJECTED'||b.ds==='REJECTED';
+const done=b=>rej(b)||b.ds==='APPROVED';
+function life(b){if(rej(b))return['Rejected','c-r'];if(b.ds==='APPROVED')return['Authorized','c-a'];if(b.hs==='APPROVED')return['Pending DCEO','c-p'];return['Pending HOD','c-p']}
+function note(b){if(rej(b))return'Closed — rejected';if(b.ds==='APPROVED')return'Finalized';return b.hs==='PENDING'?'Awaiting HOD':'Awaiting DCEO'}
 
-  // ---------- data ----------
-  function loadData(){
-    $('loading').style.display='block'; $('grid').innerHTML=''; $('empty').style.display='none';
-    api({action:'readAll', token:TOKEN}).then(function(res){
-      if(!Array.isArray(res)){
-        if(res && res.message==='AUTH'){ toast('Session expired. Please sign in again.','t-err'); logout(); return; }
-        throw new Error((res&&res.message)||'Load failed');
-      }
-      ROWS=res; $('loading').style.display='none'; fillFilters(); render();
-    }).catch(function(err){ $('loading').textContent='❌ '+err.message; });
-  }
-  function fillFilters(){
-    var depts=[...new Set(ROWS.map(function(r){return r.department;}))].sort();
-    var weeks=[...new Set(ROWS.map(function(r){return String(r.week);}))].sort();
-    var fd=$('f-dept').value, fw=$('f-week').value;
-    $('f-dept').innerHTML='<option value="">All</option>'+depts.map(function(d){return '<option>'+esc(d)+'</option>';}).join('');
-    $('f-week').innerHTML='<option value="">All</option>'+weeks.map(function(w){return '<option value="'+esc(w)+'">WEEK '+esc(w)+'</option>';}).join('');
-    $('f-dept').value=fd; $('f-week').value=fw;
-  }
-  function group(rows){
-    var m={};
-    rows.forEach(function(r){
-      if(!m[r.batchId]) m[r.batchId]={id:r.batchId,dept:r.department,week:r.week,hodEmail:r.hodEmail,dceoEmail:r.dceoEmail,
-        hodStatus:r.hodStatus,dceoStatus:r.dceoStatus,hodDate:r.hodDate,dceoDate:r.dceoDate,pdf:r.pdfUrl,rows:[]};
-      m[r.batchId].rows.push(r);
-    });
-    return Object.keys(m).map(function(k){return m[k];});
-  }
-  function canHod(b){ return String(b.hodEmail).toLowerCase()===ME && b.hodStatus==='PENDING'; }
-  function canDceo(b){ return String(b.dceoEmail).toLowerCase()===ME && b.hodStatus==='APPROVED' && b.dceoStatus==='PENDING'; }
+/* charts */
+function bar(bs){const m={};bs.forEach(b=>m[b.dept]=(m[b.dept]||0)+b.wages);const k=Object.keys(m).sort();
+ if(!k.length)return'<div class="none">No data</div>';
+ const mx=Math.max(...k.map(x=>m[x]),1),w=Math.max(320,k.length*60),sl=(w-50)/k.length,B=150;
+ let s='<svg viewBox="0 0 '+w+' 185" width="100%" height="185">';
+ [0,.5,1].forEach(f=>{const y=B-f*120;s+='<line x1="46" x2="'+w+'" y1="'+y+'" y2="'+y+'" stroke="#e6ebf3"/><text x="40" y="'+(y+3)+'" font-size="9" fill="#94a3b8" text-anchor="end">'+Math.round(mx*f).toLocaleString()+'</text>'});
+ k.forEach((d,i)=>{const h=Math.round(m[d]/mx*120),x=50+i*sl+(sl-30)/2;
+  s+='<rect x="'+x+'" y="'+(B-h)+'" width="30" height="'+h+'" rx="3" fill="#2563eb"/><text x="'+(x+15)+'" y="'+(B-h-4)+'" font-size="9" fill="#475569" text-anchor="middle">'+Math.round(m[d]).toLocaleString()+'</text><text x="'+(x+15)+'" y="'+(B+15)+'" font-size="10" fill="#64748b" text-anchor="middle">'+esc(d)+'</text>'});
+ return s+'</svg>'}
+function donut(bs){if(!bs.length)return'<div class="none">No data</div>';
+ const c={};Object.keys(COL).forEach(k=>c[k]=0);bs.forEach(b=>c[life(b)[0]]++);
+ const R=42,C=2*Math.PI*R;let off=0,s='<svg viewBox="0 0 120 120" width="140" height="140">',lg='';
+ Object.keys(c).forEach(k=>{if(!c[k])return;const l=c[k]/bs.length*C;
+  s+='<circle cx="60" cy="60" r="'+R+'" fill="none" stroke="'+COL[k]+'" stroke-width="18" stroke-dasharray="'+l+' '+(C-l)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 60 60)"/>';off+=l;
+  lg+='<div><i style="background:'+COL[k]+'"></i>'+k+' ('+c[k]+')</div>'});
+ return'<div class="dn">'+s+'<text x="60" y="65" text-anchor="middle" font-size="18" font-weight="800" fill="#0f2545">'+bs.length+'</text></svg><div class="legend">'+lg+'</div></div>'}
 
-  // ---------- render ----------
-  function render(){
-    var fd=$('f-dept').value, fw=$('f-week').value, fs=$('f-status').value;
-    var batches=group(ROWS.filter(function(r){ return (!fd||r.department===fd)&&(!fw||String(r.week)===fw); }));
-    batches=batches.filter(function(b){
-      if(fs==='MINE') return canHod(b)||canDceo(b);
-      if(fs==='APPROVED') return b.dceoStatus==='APPROVED';
-      if(fs==='REJECTED') return b.hodStatus==='REJECTED'||b.dceoStatus==='REJECTED';
-      return true;
-    });
-    $('s-all').textContent=batches.length;
-    $('s-mine').textContent=batches.filter(function(b){return canHod(b)||canDceo(b);}).length;
-    $('s-ok').textContent=batches.filter(function(b){return b.dceoStatus==='APPROVED';}).length;
-    $('s-bad').textContent=batches.filter(function(b){return b.hodStatus==='REJECTED'||b.dceoStatus==='REJECTED';}).length;
+/* render */
+function detail(b){const by={};b.rows.forEach(r=>(by[r.date]=by[r.date]||[]).push(r));let h='';
+ Object.keys(by).sort((a,c)=>dk(a)<dk(c)?-1:1).forEach(d=>by[d].sort((x,y)=>(SO[x.shift]||0)-(SO[y.shift]||0)).forEach(r=>{
+  h+='<tr><td>'+esc(d)+' · '+esc(String(r.day).slice(0,3))+'</td><td><span class="sh">'+esc(r.shift)+'</span></td><td><b>'+esc(r.pt)+'</b> pax</td><td>'+esc(r.hours)+' hrs</td><td>'+rm(r.rate)+'/hr</td><td class="num"><b>'+rm(r.wages)+'</b></td><td>'+esc(r.payMethod)+'</td></tr>'}));
+ return'<tr class="dt"><td colspan="8"><div class="wrap"><table class="in"><thead><tr><th>Date</th><th>Shift</th><th>Headcount</th><th>Hours</th><th>Rate</th><th class="num">Wages</th><th>Payment</th></tr></thead><tbody>'+h+'</tbody></table></div></td></tr>'}
+function render(){
+ const fd=$('f-dept').value,fw=$('f-week').value;
+ const base=batches(ROWS).filter(b=>(!fd||b.dept===fd)&&(!fw||b.week===fw));
+ const tabs={ALL:()=>true,MINE:mine,APPROVED:b=>b.ds==='APPROVED',REJECTED:rej};
+ Object.keys(tabs).forEach(k=>$('c-'+k).textContent=base.filter(tabs[k]).length);
+ document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.view===view));
+ const sh=base.filter(tabs[view]);
+ const aw=sh.filter(mine).length,tw=sh.reduce((s,b)=>s+b.wages,0),tp=sh.reduce((s,b)=>s+b.pax,0),au=sh.filter(b=>b.ds==='APPROVED').reduce((s,b)=>s+b.wages,0);
+ $('kpis').innerHTML=[[aw,'Awaiting my action',aw?' hot':''],[rm(tw),'Wages requested',''],[tp,'Casual labour (pax)',''],[rm(au),'Authorized value','']].map(k=>'<div class="card kpi'+k[2]+'"><div class="v">'+k[0]+'</div><div class="l">'+k[1]+'</div></div>').join('');
+ $('bar').innerHTML=bar(sh);$('donut').innerHTML=donut(sh);
+ if(!sh.length){$('tb').innerHTML='<tr><td colspan="8" class="msg">📭 No requisitions found.</td></tr>';return}
+ const wk={};sh.forEach(b=>(wk[b.week]=wk[b.week]||[]).push(b));let h='';
+ Object.keys(wk).sort((a,b)=>a-b).forEach(w=>{const l=wk[w].sort((a,b)=>a.dept<b.dept?-1:1),o=!!oW[w],m=l.filter(mine).length;
+  h+='<tr class="wk" data-week="'+esc(w)+'"><td><span class="ar'+(o?' o':'')+'">▶</span>WEEK '+esc(w)+'<span class="rg">'+wr(w)+'</span></td><td class="num">'+rm(l.reduce((s,b)=>s+b.wages,0))+'</td><td class="num">'+l.reduce((s,b)=>s+b.pax,0)+'</td><td colspan="5" class="hint">'+l.length+' batch'+(l.length>1?'es':'')+(m?' · <span class="hot">'+m+' awaiting you</span>':'')+'</td></tr>';
+  if(!o)return;
+  l.forEach(b=>{const lf=life(b),bo=!!oB[b.id],ch=canH(b),cd=canD(b);let a;
+   if(ch||cd){const v=ch?'HOD':'DCEO';a='<div class="act"><button class="ap" data-act="APPROVED" data-level="'+v+'" data-batch="'+esc(b.id)+'">Approve</button><button class="rj" data-act="REJECTED" data-level="'+v+'" data-batch="'+esc(b.id)+'">Reject</button></div><div class="as">as '+v+'</div>'}
+   else a='<span class="fin">'+esc(note(b))+'</span>';
+   h+='<tr class="bt" data-batch="'+esc(b.id)+'"><td style="padding-left:24px"><span class="ar'+(bo?' o':'')+'">▶</span><span class="dp">'+esc(b.dept)+'</span></td><td class="num"><b>'+rm(b.wages)+'</b></td><td class="num">'+b.pax+'</td>'+
+    '<td>'+esc(b.he)+'<small>'+esc(fdt(b.hd))+'</small></td><td>'+esc(b.de)+'<small>'+esc(fdt(b.dd))+'</small></td><td><span class="chip '+lf[1]+'">'+lf[0]+'</span></td>'+
+    '<td>'+(b.pdf?'<a class="pdf" href="'+esc(b.pdf)+'" target="_blank" rel="noopener">📄 PDF</a>':'—')+'</td><td>'+a+'</td></tr>';
+   if(bo)h+=detail(b)})});
+ $('tb').innerHTML=h}
 
-    batches.sort(function(a,b){
-      var am=(canHod(a)||canDceo(a))?0:1, bm=(canHod(b)||canDceo(b))?0:1;
-      return am-bm || String(b.id).localeCompare(String(a.id));
-    });
-
-    var grid=$('grid'); grid.innerHTML='';
-    $('empty').style.display=batches.length?'none':'block';
-    batches.forEach(function(b){
-      var cost=b.rows.reduce(function(s,r){return s+r.wages;},0);
-      var pax=b.rows.reduce(function(s,r){return s+r.pt;},0);
-      var rowsHtml=b.rows.slice(0,6).map(function(r){
-        return '<tr><td>'+esc(r.date)+' ('+esc(r.day)+')</td><td>'+esc(r.shift)+'</td><td>'+r.pt+' pax</td><td>'+r.hours+' hrs</td><td>RM '+r.rate.toFixed(2)+'</td><td><b>RM '+r.wages.toFixed(2)+'</b></td></tr>';
-      }).join('');
-      if(b.rows.length>6) rowsHtml+='<tr><td colspan="6" style="text-align:center;color:#94a3b8;">… and '+(b.rows.length-6)+' more rows. See PDF.</td></tr>';
-
-      var h=canHod(b), d=canDceo(b);
-      var hodNote = String(b.hodEmail).toLowerCase()===ME ? '' : '<div class="note">Only the assigned HOD can act here.</div>';
-      var dceoNote = String(b.dceoEmail).toLowerCase()===ME ? (b.hodStatus!=='APPROVED'?'<div class="note">Unlocks after HOD approval.</div>':'') : '<div class="note">Only the assigned DCEO can act here.</div>';
-
-      var el=document.createElement('div'); el.className='batch';
-      el.innerHTML=
-        '<div class="batch-head"><div><div class="t">🏢 '+esc(b.dept)+' | 📅 WEEK '+esc(b.week)+'</div><div class="m">'+esc(b.id)+'</div></div>'+
-        '<div style="font-size:0.78rem;">Est. Cost: <b>RM '+cost.toFixed(2)+'</b> | '+pax+' Pax</div></div>'+
-        '<div class="batch-body"><div class="flow">'+
-          '<div class="step"><div class="st">① HOD Verification</div><div class="em">📧 '+esc(b.hodEmail)+'</div>'+
-            '<span class="badge b-'+esc(b.hodStatus)+'">'+esc(b.hodStatus)+'</span><div class="dt">'+(b.hodDate?'🕐 '+esc(b.hodDate):'')+'</div>'+
-            '<div class="acts"><button class="ap" data-batch="'+esc(b.id)+'" data-level="HOD" data-act="APPROVED" data-label="'+esc(b.dept)+' Week '+esc(b.week)+'" '+(h?'':'disabled')+'>✔ Approve</button>'+
-            '<button class="rj" data-batch="'+esc(b.id)+'" data-level="HOD" data-act="REJECTED" data-label="'+esc(b.dept)+' Week '+esc(b.week)+'" '+(h?'':'disabled')+'>✘ Reject</button></div>'+hodNote+'</div>'+
-          '<div class="step"><div class="st">② Deputy CEO Approval</div><div class="em">📧 '+esc(b.dceoEmail)+'</div>'+
-            '<span class="badge b-'+esc(b.dceoStatus)+'">'+esc(b.dceoStatus)+'</span><div class="dt">'+(b.dceoDate?'🕐 '+esc(b.dceoDate):'')+'</div>'+
-            '<div class="acts"><button class="ap" data-batch="'+esc(b.id)+'" data-level="DCEO" data-act="APPROVED" data-label="'+esc(b.dept)+' Week '+esc(b.week)+'" '+(d?'':'disabled')+'>✔ Approve</button>'+
-            '<button class="rj" data-batch="'+esc(b.id)+'" data-level="DCEO" data-act="REJECTED" data-label="'+esc(b.dept)+' Week '+esc(b.week)+'" '+(d?'':'disabled')+'>✘ Reject</button></div>'+dceoNote+'</div>'+
-        '</div>'+
-        '<div class="wrap"><table class="d"><thead><tr><th>Date</th><th>Shift</th><th>Headcount</th><th>Hours</th><th>Rate</th><th>Wages</th></tr></thead><tbody>'+rowsHtml+'</tbody></table></div>'+
-        (b.pdf?'<a class="pdf" href="'+esc(b.pdf)+'" target="_blank" rel="noopener">📄 View Full PDF</a>':'')+
-        '</div>';
-      grid.appendChild(el);
-    });
-  }
-
-  // ---------- decisions ----------
-  $('grid').addEventListener('click',function(ev){
-    var btn=ev.target.closest('button[data-act]');
-    if(!btn||btn.disabled) return;
-    var label=btn.dataset.label, level=btn.dataset.level, act=btn.dataset.act, id=btn.dataset.batch;
-    if(!confirm((act==='APPROVED'?'Approve':'Reject')+' '+label+' as '+level+'?')) return;
-    document.querySelectorAll('#grid button[data-act]').forEach(function(x){x.disabled=true;});
-    toast('⏳ Updating…','t-info');
-    api({action:'updateBatch', token:TOKEN, batchId:id, level:level, status:act}).then(function(res){
-      if(res.status==='success'){ toast('✅ '+level+' '+act,'t-ok'); setTimeout(loadData,1200); }
-      else if(res.message==='AUTH'){ toast('Session expired. Sign in again.','t-err'); logout(); }
-      else { toast('❌ '+(res.message||'Not allowed'),'t-err'); loadData(); }
-    }).catch(function(){ toast('❌ Network error','t-err'); loadData(); });
-  });
-
-  $('email').addEventListener('keydown',function(e){ if(e.key==='Enter') sendCode(); });
-  $('code').addEventListener('keydown',function(e){ if(e.key==='Enter') verifyCode(); });
-
-  // ---------- init ----------
-  TOKEN=sget('tok'); ME=sget('me')||"";
-  if(TOKEN && ME) showApp();
+/* actions */
+function decide(id,lv,st){const b=batches(ROWS).filter(x=>x.id===id)[0],lb=b?b.dept+' Week '+b.week:id;
+ if(!confirm((st==='APPROVED'?'Approve ':'Reject ')+lb+' as '+lv+'?'))return;
+ document.querySelectorAll('#tb button[data-act]').forEach(x=>x.disabled=true);toast('⏳ Updating…');
+ api({action:'updateBatch',token:TOKEN,batchId:id,level:lv,status:st}).then(r=>{
+  if(r.status==='success'){toast('✅ '+lv+' '+st,'t1');setTimeout(()=>load(false),1200)}
+  else if(r.message==='AUTH'){toast('Session expired.','t2');out()}
+  else{toast('❌ '+(r.message||'Not allowed'),'t2');load(false)}}).catch(()=>{toast('❌ Network error','t2');load(false)})}
+$('tb').addEventListener('click',e=>{
+ const bt=e.target.closest('button[data-act]');if(bt){if(!bt.disabled)decide(bt.dataset.batch,bt.dataset.level,bt.dataset.act);return}
+ if(e.target.closest('a'))return;
+ const r=e.target.closest('tr.bt');if(r){const i=r.dataset.batch;oB[i]=!oB[i];render();return}
+ const w=e.target.closest('tr.wk');if(w){const i=w.dataset.week;oW[i]=!oW[i];render()}});
+$('nav').addEventListener('click',e=>{const a=e.target.closest('a[data-view]');if(a){view=a.dataset.view;render()}});
+$('f-week').onchange=render;$('f-dept').onchange=render;
+$('b-send').onclick=send;$('b-ver').onclick=verify;$('b-ref').onclick=()=>load(false);$('b-out').onclick=out;
+$('email').onkeydown=e=>{if(e.key==='Enter')send()};$('code').onkeydown=e=>{if(e.key==='Enter')verify()};
+TOKEN=sg('tok');ME=sg('me')||"";if(TOKEN&&ME)enter();
 </script>
 </body>
 </html>
