@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MITEC — Staff Duty Entry</title>
 
-  <!-- Speed Optimizations -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
-  <!-- Synchronous Supabase Library Load -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Firebase SDKs Compat Layer (For casual_labour_profile) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <style>
     :root {
       --mitec-blue: #092253;
       --mitec-blue-dark: #071a3d;
-      --bg-base: #f8f9fa; 
+      --bg-base: #f8f9fa;
       --card-bg: #ffffff;
       --text-main: #2c2c2e;
       --text-muted: #6e6e73;
@@ -25,84 +25,25 @@
     }
 
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-
-    body { 
-      margin: 0; padding: 40px 20px; 
-      background-color: var(--bg-base);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      color: var(--text-main);
-    }
-
+    body { margin: 0; padding: 40px 20px; background-color: var(--bg-base); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text-main); }
     .container { max-width: 400px; margin: 0 auto; }
-
     .header { text-align: center; margin-bottom: 32px; }
     .brand-img { height: 24px; width: auto; }
-
-    .profile-card {
-      background: var(--mitec-blue);
-      border-radius: 16px;
-      padding: 20px;
-      color: #fff;
-      display: flex; align-items: center; gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .avatar { 
-      width: 56px; height: 56px; border-radius: 50%; 
-      border: 2px solid rgba(255,255,255,0.2); object-fit: cover; 
-      background: rgba(255,255,255,0.1); 
-    }
-
+    .profile-card { background: var(--mitec-blue); border-radius: 16px; padding: 20px; color: #fff; display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+    .avatar { width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; background: rgba(255,255,255,0.1); }
     .profile-info { flex: 1; }
     .profile-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; margin-bottom: 4px; display: block; }
     .profile-name { font-size: 16px; font-weight: 600; margin: 0; }
-
-    .form-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: var(--shadow-standard);
-    }
-
-    .section-title { 
-      font-size: 13px; font-weight: 700; color: var(--mitec-blue); 
-      margin-bottom: 20px; display: block; border-bottom: 1px solid #eee; padding-bottom: 8px;
-    }
-
+    .form-card { background: var(--card-bg); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-standard); }
+    .section-title { font-size: 13px; font-weight: 700; color: var(--mitec-blue); margin-bottom: 20px; display: block; border-bottom: 1px solid #eee; padding-bottom: 8px; }
     .field { margin-bottom: 16px; }
     .input-wrapper { position: relative; display: flex; align-items: center; }
-
-    .input-icon {
-      position: absolute; left: 14px;
-      font-size: 18px; color: var(--text-muted);
-    }
-
-    .input-field, select {
-      width: 100%; height: 50px; border-radius: 8px;
-      border: 1px solid var(--border-color); background: #fff;
-      padding: 0 12px 0 44px; font-size: 15px;
-      outline: none; transition: border 0.2s;
-      appearance: none; color: var(--text-main);
-    }
-
+    .input-icon { position: absolute; left: 14px; font-size: 18px; color: var(--text-muted); }
+    .input-field, select { width: 100%; height: 50px; border-radius: 8px; border: 1px solid var(--border-color); background: #fff; padding: 0 12px 0 44px; font-size: 15px; outline: none; transition: border 0.2s; appearance: none; color: var(--text-main); }
     .input-field:focus, select:focus { border-color: var(--mitec-blue); }
-
-    .btn-submit {
-      width: 100%; height: 52px; border-radius: 8px;
-      background: var(--mitec-blue); color: #fff;
-      font-size: 15px; font-weight: 600; border: none;
-      cursor: pointer; transition: background 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      margin-top: 8px;
-    }
+    .btn-submit { width: 100%; height: 52px; border-radius: 8px; background: var(--mitec-blue); color: #fff; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
     .btn-submit:hover { background: var(--mitec-blue-dark); }
-
-    .overlay {
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(255,255,255,0.98);
-      display: none; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 100; text-align: center; padding: 20px;
-    }
+    .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 20px; }
     .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top: 3px solid var(--mitec-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
@@ -164,30 +105,14 @@
           <i class="ph ph-clock input-icon"></i>
           <select id="shift" required>
             <option value="" disabled selected hidden>Scheduled Shift</option>
-            <option value="07:00">07:00</option>
-            <option value="08:00">08:00</option>
-            <option value="09:00">09:00</option>
-            <option value="10:00">10:00</option>
-            <option value="11:00">11:00</option>
-            <option value="12:00">12:00</option>
-            <option value="13:00">13:00</option>
-            <option value="14:00">14:00</option>
-            <option value="15:00">15:00</option>
-            <option value="16:00">16:00</option>
-            <option value="17:00">17:00</option>
-            <option value="18:00">18:00</option>
-            <option value="19:00">19:00</option>
-            <option value="20:00">20:00</option>
-            <option value="21:00">21:00</option>
-            <option value="22:00">22:00</option>
-            <option value="23:00">23:00</option>
-            <option value="00:00">00:00</option>
-            <option value="01:00">01:00</option>
-            <option value="02:00">02:00</option>
-            <option value="03:00">03:00</option>
-            <option value="04:00">04:00</option>
-            <option value="05:00">05:00</option>
-            <option value="06:00">06:00</option>
+            <option value="07:00">07:00</option><option value="08:00">08:00</option><option value="09:00">09:00</option>
+            <option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option>
+            <option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option>
+            <option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option>
+            <option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option>
+            <option value="22:00">22:00</option><option value="23:00">23:00</option><option value="00:00">00:00</option>
+            <option value="01:00">01:00</option><option value="02:00">02:00</option><option value="03:00">03:00</option>
+            <option value="04:00">04:00</option><option value="05:00">05:00</option><option value="06:00">06:00</option>
           </select>
         </div>
       </div>
@@ -207,28 +132,28 @@
   </div>
 
   <script>
-    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
-    let supabaseClient = null;
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjXs1JPXirpNXduua4I9fH4sdOyByebou8ZOP744S2quQHJAWXeF58-aHzT8ue5f08/exec";
 
-    function getSupabase() {
-      if (!supabaseClient) {
-        if (window.supabase && typeof window.supabase.createClient === 'function') {
-          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-        } else {
-          throw new Error("Supabase SDK not loaded properly");
-        }
-      }
-      return supabaseClient;
+    // Firebase Configuration (For casual_labour_profile)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
+      authDomain: "mitec-cl-2027.firebaseapp.com",
+      projectId: "mitec-cl-2027",
+      storageBucket: "mitec-cl-2027.firebasestorage.app",
+      messagingSenderId: "42229239032",
+      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
+    const db = firebase.firestore();
 
     async function initPage() {
-      const docNo = localStorage.getItem("mcl_doc_no");
-      if (!docNo) {
-        window.location.href = "index.html";
-        return;
-      }
+      const rawDocNo = localStorage.getItem("mcl_doc_no");
+      if (!rawDocNo) { window.location.href = "index.html"; return; }
 
+      const docNo = String(rawDocNo).trim().replace(/^'/, '');
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
       const nameEl = document.getElementById("workerName");
       const avatarEl = document.getElementById("workerAvatar");
@@ -241,23 +166,18 @@
       }
 
       try {
-        const client = getSupabase();
-        const { data: profile } = await client
-          .from('casual_labour_profile')
-          .select('photo_link, name_mykad, email')
-          .eq('doc_no', docNo)
-          .maybeSingle();
-
-        if (profile) {
+        const docSnap = await db.collection('casual_labour_profile').doc(docNo).get();
+        if (docSnap.exists) {
+          const profile = docSnap.data();
           if (profile.name_mykad) nameEl.textContent = profile.name_mykad;
           if (profile.photo_link) avatarEl.src = profile.photo_link;
-          
+
           record.email = profile.email || record.email;
           record.name_mykad = profile.name_mykad || record.name_mykad;
           localStorage.setItem("mitecWorkerRecord", JSON.stringify(record));
         }
-      } catch(e) {
-        console.error(e);
+      } catch (e) {
+        console.error("Error loading profile from Firestore:", e);
       }
     }
 
@@ -265,7 +185,7 @@
       const voucherVal = document.getElementById("voucherNo").value.trim();
       const deptVal = document.getElementById("dept").value;
       const shiftVal = document.getElementById("shift").value;
-      const docNo = localStorage.getItem("mcl_doc_no");
+      const docNo = String(localStorage.getItem("mcl_doc_no") || "").trim().replace(/^'/, '');
       const worker = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
 
       if (!voucherVal || !deptVal || !shiftVal) {
@@ -289,76 +209,35 @@
       closeBtn.style.display = "none";
 
       try {
-        const client = getSupabase();
-        const now = new Date();
-
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const todayDateString = `${year}-${month}-${day}`;
-
-        // Clean Local Malaysia ISO string without milliseconds (+08:00)
-        const offsetMs = now.getTimezoneOffset() * 60 * 1000;
-        const localTime = new Date(now.getTime() - offsetMs);
-        const localISOString = localTime.toISOString().split('.')[0] + '+08:00';
-
-        // 1. Check if an entry already exists for today
-        const { data: existingRecord } = await client
-          .from('attendance_records')
-          .select('shift')
-          .eq('doc_no', docNo)
-          .eq('working_date', todayDateString)
-          .maybeSingle();
-
-        if (existingRecord) {
-          spinner.style.display = "none";
-          title.textContent = "Already Signed In";
-          title.style.color = "#ff9500";
-          msg.innerHTML = `You have already clocked in today.`;
-          closeBtn.style.display = "flex";
-          closeBtn.textContent = "Return to Dashboard";
-          closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
-          return;
-        }
-
-        // 2. Insert attendance record with source_sheet tagged as SHEET_A
-        const { error } = await client
-          .from('attendance_records')
-          .insert([{
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "submitAttendance",
             doc_no: docNo,
             name: worker.name_mykad || worker.full_name || "",
             email: worker.email || "",
             voucher: voucherVal,
             department: deptVal,
-            shift: shiftVal,
-            working_date: todayDateString,
-            timestamp: localISOString,
-            source_sheet: 'SHEET_A'
-          }]);
+            shift: shiftVal
+          })
+        });
 
+        const result = await response.json();
         spinner.style.display = "none";
+        closeBtn.style.display = "flex";
 
-        if (!error) {
+        if (result.success) {
           title.textContent = "Entry Confirmed";
           title.style.color = "#28a745";
           msg.innerHTML = `Attendance recorded successfully for shift <strong>${shiftVal}</strong>`;
-          closeBtn.style.display = "flex";
           closeBtn.textContent = "Return to Home";
           closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
-        } else if (error.code === '23505') {
-          title.textContent = "Already Signed In";
+        } else {
+          title.textContent = result.message.includes("Already") ? "Already Signed In" : "Submission Failed";
           title.style.color = "#ff9500";
-          msg.innerHTML = `An attendance record already exists for today.`;
-          closeBtn.style.display = "flex";
+          msg.innerHTML = result.message;
           closeBtn.textContent = "Return to Dashboard";
           closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
-        } else {
-          title.textContent = "Submission Failed";
-          title.style.color = "#dc3545";
-          msg.textContent = error.message || "Registration Failed";
-          closeBtn.textContent = "Try Again";
-          closeBtn.onclick = () => { overlay.style.display = "none"; };
-          closeBtn.style.display = "flex";
         }
       } catch (err) {
         spinner.style.display = "none";
