@@ -951,9 +951,11 @@
     </a>
   </nav>
 
-  <!-- FIREBASE DASHBOARD SCRIPT LOGIC -->
+  <!-- FIREBASE & GOOGLE SHEET ATTENDANCE DASHBOARD SCRIPT -->
   <script>
-    // 1. Real Firebase Configuration for project 'mitec-cl-2027'
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjXs1JPXirpNXduua4I9fH4sdOyByebou8ZOP744S2quQHJAWXeF58-aHzT8ue5f08/exec";
+
+    // Firebase Configuration for project 'mitec-cl-2027'
     const firebaseConfig = {
       apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
       authDomain: "mitec-cl-2027.firebaseapp.com",
@@ -989,6 +991,10 @@
     function getStoredWorker() { return JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}"); }
     function toProperCase(str) { return str ? String(str).toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : ""; }
 
+    function normalizeDocNo(raw) {
+      return String(raw || "").trim().replace(/^'/, "").replace(/[\s-]/g, "").toUpperCase();
+    }
+
     function convertToDirectLink(url) {
       if (!url) return "";
       let stringUrl = String(url);
@@ -1005,6 +1011,45 @@
       imgEl.onerror = function() { this.onerror = null; this.src = fallback; };
       const finalSrc = convertToDirectLink(src);
       if (finalSrc && finalSrc.length > 5) imgEl.src = finalSrc;
+    }
+
+    function getMalaysiaTodayStr() {
+      // Returns YYYY-MM-DD in Asia/Kuala_Lumpur (UTC+8)
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kuala_Lumpur",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(new Date());
+    }
+
+    function formatToKLDisplay(rawTs) {
+      if (!rawTs) return { date: "", time: "--:--" };
+      const parsed = new Date(rawTs);
+      if (!isNaN(parsed.getTime())) {
+        const datePart = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Kuala_Lumpur",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }).format(parsed);
+        const timePart = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Kuala_Lumpur",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+        }).format(parsed);
+        return { date: datePart, time: timePart };
+      }
+      const parts = String(rawTs).trim().split(" ");
+      return { date: parts[0] || "", time: parts[1] || parts[0] || "--:--" };
+    }
+
+    function formatVoucherNo(val) {
+      if (val === null || val === undefined || String(val).trim() === "") return "-";
+      const clean = String(val).trim().replace(/^'/, "");
+      return /^\d{1,6}$/.test(clean) ? clean.padStart(6, "0") : clean;
     }
 
     async function fillWorkerData() {
@@ -1028,18 +1073,10 @@
         return;
       }
 
-      const cleanDocNo = String(docNo).trim().replace(/^'/, '');
-
-      const cachedSummary = sessionStorage.getItem(`dash_summary_cache_${cleanDocNo}`);
-      const cachedTime = sessionStorage.getItem(`dash_summary_time_${cleanDocNo}`);
-      const nowTime = Date.now();
-
-      if (cachedSummary && cachedTime && (nowTime - Number(cachedTime) < 120000)) {
-        renderShiftSummary(JSON.parse(cachedSummary));
-        return;
-      }
+      const cleanDocNo = normalizeDocNo(docNo);
 
       try {
+        // 1. Sync profile photo & name from Firestore if not already cached locally
         if (!worker.photo_link || !worker.name_mykad) {
           const docSnap = await db.collection('casual_labour_profile').doc(cleanDocNo).get();
 
@@ -1057,33 +1094,25 @@
           }
         }
 
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const todayDateString = `${year}-${month}-${day}`;
+        // 2. Fetch live attendance from Google Sheet ('attendance' tab) via Apps Script
+        const todayDateString = getMalaysiaTodayStr(); // e.g., "2026-11-24"
+        const res = await fetch(`${APPS_SCRIPT_URL}?action=getAttendanceAdmin`);
+        const json = await res.json();
 
         let summary = null;
-        const directAttSnap = await db.collection('attendance_records').doc(`${cleanDocNo}_${todayDateString}`).get();
+        if (json && json.success && Array.isArray(json.attendance)) {
+          const matches = json.attendance.filter(row => {
+            const rDoc = normalizeDocNo(row.doc_no);
+            const rDate = String(row.working_date || "").trim().split("T")[0];
+            return rDoc === cleanDocNo && rDate === todayDateString;
+          });
 
-        if (directAttSnap.exists) {
-          summary = directAttSnap.data();
-        } else {
-          const attQuery = await db.collection('attendance_records')
-            .where('doc_no', '==', cleanDocNo)
-            .where('working_date', '==', todayDateString)
-            .get();
-
-          if (!attQuery.empty) {
-            let records = [];
-            attQuery.forEach(doc => records.push(doc.data()));
-            records.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
-            summary = records[0];
+          if (matches.length > 0) {
+            matches.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+            summary = matches[0];
           }
         }
 
-        sessionStorage.setItem(`dash_summary_cache_${cleanDocNo}`, JSON.stringify(summary || {}));
-        sessionStorage.setItem(`dash_summary_time_${cleanDocNo}`, String(nowTime));
         renderShiftSummary(summary);
 
       } catch (e) { 
@@ -1170,25 +1199,32 @@
       loaderState.style.display = "none";
       summaryGrid.style.display = "grid";
 
-      const now = new Date();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate()).padStart(2, '0');
-      const year = now.getFullYear();
-      const todayFormattedDate = `${day}/${month}/${year}`;
-
       if (summary && Object.keys(summary).length > 0) {
-        let formattedClockIn = "--:--";
-        if (summary.clock_in) {
-          formattedClockIn = `${todayFormattedDate}<br>${summary.clock_in}`;
-        } else if (summary.timestamp) {
-          let timePart = summary.timestamp.includes('T') ? summary.timestamp.split('T')[1].substring(0, 8) : summary.timestamp.split(' ')[1]?.substring(0, 8);
-          if (timePart) formattedClockIn = `${todayFormattedDate}<br>${timePart}`;
+        // 1. Time In (from Google Sheet 'attendance' tab timestamp/clock_in)
+        const rawTimeIn = summary.timestamp || summary.clock_in || "";
+        const formattedIn = formatToKLDisplay(rawTimeIn);
+        inVal.innerHTML = formattedIn.date
+          ? `${formattedIn.date}<br>${formattedIn.time}`
+          : formattedIn.time;
+
+        // 2. Time Out
+        if (summary.clock_out || summary.time_out) {
+          const formattedOut = formatToKLDisplay(summary.clock_out || summary.time_out);
+          outVal.innerHTML = formattedOut.date
+            ? `${formattedOut.date}<br>${formattedOut.time}`
+            : formattedOut.time;
+        } else {
+          outVal.innerHTML = "--:--";
         }
 
-        inVal.innerHTML = formattedClockIn;
-        outVal.innerHTML = summary.clock_out ? `${todayFormattedDate}<br>${summary.clock_out}` : "--:--";
-        vouchVal.textContent = summary.voucher || "-";
-        hoursVal.textContent = (summary.hours !== null && summary.hours !== undefined) ? summary.hours : "0.0";
+        // 3. Voucher No. (preserves 6-digit leading zeros)
+        const rawVoucher = summary.voucher ?? summary.voucher_no ?? "";
+        vouchVal.textContent = formatVoucherNo(rawVoucher);
+
+        // 4. Logged Hours
+        hoursVal.textContent = (summary.hours !== null && summary.hours !== undefined && summary.hours !== "")
+          ? summary.hours
+          : "0.0";
       } else {
         inVal.innerHTML = "--:--";
         outVal.innerHTML = "--:--";
