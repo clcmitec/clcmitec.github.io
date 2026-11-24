@@ -1,256 +1,423 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MITEC — Staff Duty Entry</title>
+  <!-- Google tag (gtag.js) - Deferred -->
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-W18GC0F7SG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-W18GC0F7SG');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MITEC — Gate Sign-In</title>
 
+  <!-- PWA Manifest & Meta Tags -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#063e99">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MITEC CL">
+  <link rel="apple-touch-icon" href="https://mitec.com.my/static/img/logos/logo-footer.png">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Firebase SDKs Compat Layer (For casual_labour_profile) -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- Phosphor Icons -->
+  <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
     :root {
-      --mitec-blue: #092253;
-      --mitec-blue-dark: #071a3d;
-      --bg-base: #f8f9fa;
-      --card-bg: #ffffff;
-      --text-main: #2c2c2e;
-      --text-muted: #6e6e73;
-      --border-color: #d1d1d6;
-      --shadow-standard: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --background: #eef2f7;
+      --foreground: #14181f;
+      --card: #ffffff;
+      --primary: #063e99;
+      --primary-hover: #094ebf;
+      --muted-foreground: #64748b;
+      --border: #cbd5e1;
+      --radius: 0.75rem;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-    body { margin: 0; padding: 40px 20px; background-color: var(--bg-base); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text-main); }
-    .container { max-width: 400px; margin: 0 auto; }
-    .header { text-align: center; margin-bottom: 32px; }
-    .brand-img { height: 24px; width: auto; }
-    .profile-card { background: var(--mitec-blue); border-radius: 16px; padding: 20px; color: #fff; display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-    .avatar { width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; background: rgba(255,255,255,0.1); }
-    .profile-info { flex: 1; }
-    .profile-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; margin-bottom: 4px; display: block; }
-    .profile-name { font-size: 16px; font-weight: 600; margin: 0; }
-    .form-card { background: var(--card-bg); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-standard); }
-    .section-title { font-size: 13px; font-weight: 700; color: var(--mitec-blue); margin-bottom: 20px; display: block; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-    .field { margin-bottom: 16px; }
-    .input-wrapper { position: relative; display: flex; align-items: center; }
-    .input-icon { position: absolute; left: 14px; font-size: 18px; color: var(--text-muted); }
-    .input-field, select { width: 100%; height: 50px; border-radius: 8px; border: 1px solid var(--border-color); background: #fff; padding: 0 12px 0 44px; font-size: 15px; outline: none; transition: border 0.2s; appearance: none; color: var(--text-main); }
-    .input-field:focus, select:focus { border-color: var(--mitec-blue); }
-    .btn-submit { width: 100%; height: 52px; border-radius: 8px; background: var(--mitec-blue); color: #fff; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
-    .btn-submit:hover { background: var(--mitec-blue-dark); }
-    .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 20px; }
-    .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top: 3px solid var(--mitec-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      font-family: var(--font-sans);
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--foreground);
+      min-height: 100vh;
+      padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      height: 58px;
+      border-bottom: 1px solid rgba(203, 213, 225, 0.8);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .back-action-arrow {
+      color: var(--foreground);
+      font-size: 18px;
+      text-decoration: none;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(0,0,0,0.1);
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-img {
+      height: 22px;
+      width: auto;
+    }
+
+    .signin-container {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+
+    .form-card {
+      background: #ffffff;
+      border: 1px solid rgba(6, 62, 153, 0.12);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.06);
+      padding: 20px 18px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 18px;
+      color: #64748b;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 11px 12px 11px 38px;
+      font-size: 14px;
+      font-weight: 500;
+      background-color: #ffffff;
+      color: var(--foreground);
+    }
+
+    .input-wrapper select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 15px;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(6, 62, 153, 0.14);
+    }
+
+    .btn-submit-clockin {
+      background: linear-gradient(180deg, #1b63d7 0%, #063e99 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      width: 100%;
+      margin-top: 6px;
+      box-shadow: 0 6px 16px -4px rgba(6, 62, 153, 0.45);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .btn-submit-clockin:hover:not(:disabled) {
+      transform: translateY(-1px);
+      color: #ffffff;
+    }
+
+    .btn-submit-clockin:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #sync-loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(238, 242, 247, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loader-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #cbd5e1;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    .loader-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="header">
-      <img class="brand-img" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
-    </div>
-
-    <div class="profile-card">
-      <img id="workerAvatar" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a2e66'/></svg>" alt="Profile">
-      <div class="profile-info">
-        <span class="profile-label">Current User</span>
-        <h2 class="profile-name" id="workerName">Staff Member</h2>
-      </div>
-    </div>
-
-    <div class="form-card">
-      <span class="section-title">Portal Sign IN</span>
-
-      <div class="field">
-        <div class="input-wrapper">
-          <i class="ph ph-hash input-icon"></i>
-          <input type="text" id="voucherNo" class="input-field" placeholder="6-Digit Voucher No." maxlength="6" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-        </div>
-      </div>
-
-      <div class="field">
-        <div class="input-wrapper">
-          <i class="ph ph-briefcase input-icon"></i>
-          <select id="dept" required>
-            <option value="" disabled selected hidden>Department</option>
-            <option value="AV">AV</option>
-            <option value="CAT">CAT</option>
-            <option value="EXH">EXH</option>
-            <option value="FIN">FIN</option>
-            <option value="GCC">GCC</option>
-            <option value="GS">GS</option>
-            <option value="HK">HK</option>
-            <option value="HR">HR</option>
-            <option value="IT">IT</option>
-            <option value="KIT">KIT</option>
-            <option value="LINEN">LINEN</option>
-            <option value="OPERATION">OPERATION</option>
-            <option value="PUR">PUR</option>
-            <option value="QA">QA</option>
-            <option value="SC">SC</option>
-            <option value="SETUP">SETUP</option>
-            <option value="SH">SH</option>
-            <option value="STWD">STWD</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field">
-        <div class="input-wrapper">
-          <i class="ph ph-clock input-icon"></i>
-          <select id="shift" required>
-            <option value="" disabled selected hidden>Scheduled Shift</option>
-            <option value="07:00">07:00</option><option value="08:00">08:00</option><option value="09:00">09:00</option>
-            <option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option>
-            <option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option>
-            <option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option>
-            <option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option>
-            <option value="22:00">22:00</option><option value="23:00">23:00</option><option value="00:00">00:00</option>
-            <option value="01:00">01:00</option><option value="02:00">02:00</option><option value="03:00">03:00</option>
-            <option value="04:00">04:00</option><option value="05:00">05:00</option><option value="06:00">06:00</option>
-          </select>
-        </div>
-      </div>
-
-      <button class="btn-submit" onclick="submitAttendance()">
-        <i class="ph ph-check-circle"></i>
-        Confirm Attendance
-      </button>
-    </div>
+  <div id="sync-loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Recording Gate Sign-In...</div>
   </div>
 
-  <div id="statusOverlay" class="overlay">
-    <div id="spinner" class="spinner"></div>
-    <h2 id="statusTitle" style="margin:0; font-size:20px; font-weight:600;">Processing...</h2>
-    <p id="statusMsg" style="color:var(--text-muted); font-size:14px; margin-top:8px;">Please wait while we record your entry.</p>
-    <button id="closeBtn" class="btn-submit" style="display:none; margin-top:24px; max-width:200px;" onclick="window.location.href='dashboard.html'">Return to Home</button>
+  <header class="header sticky-top d-flex align-items-center justify-content-center px-3">
+    <div class="position-absolute start-0 ms-3">
+      <a href="javascript:void(0)" onclick="goToPage('dashboard.html')" class="back-action-arrow" title="Return to Dashboard">
+        <i class="ph ph-caret-left"></i>
+      </a>
+    </div>
+    <img class="brand-img" src="https://mitec.com.my/static/img/logos/mitec-new-logo.png" alt="MITEC">
+  </header>
+
+  <div class="signin-container">
+    <!-- Alert Banner -->
+    <div id="statusAlert" class="alert d-none mb-3" role="alert" style="font-size: 12px; border-radius: 10px;"></div>
+
+    <!-- Sign-In Form Card (3 Questions Only) -->
+    <div class="form-card">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="ph ph-ticket fs-5" style="color: var(--primary);"></i>
+        <h1 class="h6 fw-bold mb-0">Casual Labour Sign-In</h1>
+      </div>
+
+      <form id="signInForm" onsubmit="submitClockIn(event)">
+        <div class="field">
+          <label for="voucher" class="form-label">Voucher No.</label>
+          <div class="input-wrapper">
+            <i class="ph ph-ticket input-icon"></i>
+            <input type="text" id="voucher" placeholder=" Voucher No." inputmode="numeric" maxlength="6" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="dept" class="form-label">Department</label>
+          <div class="input-wrapper">
+            <i class="ph ph-briefcase input-icon"></i>
+            <select id="dept" required>
+              <option value="" disabled selected hidden>Department</option>
+              <option value="AV">AV</option>
+              <option value="CAT">CAT</option>
+              <option value="EXH">EXH</option>
+              <option value="FIN">FIN</option>
+              <option value="GCC">GCC</option>
+              <option value="GS">GS</option>
+              <option value="HK">HK</option>
+              <option value="HR">HR</option>
+              <option value="IT">IT</option>
+              <option value="KIT">KIT</option>
+              <option value="LINEN">LINEN</option>
+              <option value="OPERATION">OPERATION</option>
+              <option value="PUR">PUR</option>
+              <option value="QA">QA</option>
+              <option value="SC">SC</option>
+              <option value="SETUP">SETUP</option>
+              <option value="SH">SH</option>
+              <option value="STWD">STWD</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="shift" class="form-label">Scheduled Shift</label>
+          <div class="input-wrapper">
+            <i class="ph ph-clock input-icon"></i>
+            <select id="shift" required>
+              <option value="" disabled selected hidden>Scheduled Shift</option>
+              <option value="07:00">07:00</option><option value="08:00">08:00</option><option value="09:00">09:00</option>
+              <option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option>
+              <option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option>
+              <option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option>
+              <option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option>
+              <option value="22:00">22:00</option><option value="23:00">23:00</option><option value="00:00">00:00</option>
+              <option value="01:00">01:00</option><option value="02:00">02:00</option><option value="03:00">03:00</option>
+              <option value="04:00">04:00</option><option value="05:00">05:00</option><option value="06:00">06:00</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-submit-clockin d-flex align-items-center justify-content-center gap-2">
+          <i class="ph ph-check-circle fs-5"></i>
+          <span>Confirm Sign In</span>
+        </button>
+      </form>
+    </div>
   </div>
 
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjXs1JPXirpNXduua4I9fH4sdOyByebou8ZOP744S2quQHJAWXeF58-aHzT8ue5f08/exec";
 
-    // Firebase Configuration (For casual_labour_profile)
-    const firebaseConfig = {
-      apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
-      authDomain: "mitec-cl-2027.firebaseapp.com",
-      projectId: "mitec-cl-2027",
-      storageBucket: "mitec-cl-2027.firebasestorage.app",
-      messagingSenderId: "42229239032",
-      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
-    };
+    let isSubmitting = false;
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+    function goToPage(url) {
+      window.location.href = url;
     }
-    const db = firebase.firestore();
 
-    async function initPage() {
-      const rawDocNo = localStorage.getItem("mcl_doc_no");
-      if (!rawDocNo) { window.location.href = "index.html"; return; }
+    function normalizeDoc(raw) {
+      return String(raw || "").trim().replace(/^'/, "").replace(/[\s-]/g, "").toUpperCase();
+    }
 
-      const docNo = String(rawDocNo).trim().replace(/^'/, '');
+    function showAlert(type, message) {
+      const box = document.getElementById("statusAlert");
+      box.className = `alert alert-${type}`;
+      box.textContent = message;
+      box.classList.remove("d-none");
+    }
+
+    function showLoader(msg) {
+      const loader = document.getElementById("sync-loader");
+      if (msg) loader.querySelector(".loader-text").textContent = msg;
+      loader.style.display = "flex";
+    }
+
+    function hideLoader() {
+      document.getElementById("sync-loader").style.display = "none";
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
       const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
-      const nameEl = document.getElementById("workerName");
-      const avatarEl = document.getElementById("workerAvatar");
-
-      if (record.name_mykad || record.full_name) {
-        nameEl.textContent = record.name_mykad || record.full_name;
+      const rawDoc = record.doc_no || record.mykad_passport_no || localStorage.getItem("mcl_doc_no") || localStorage.getItem("workerDocNo") || "";
+      if (!normalizeDoc(rawDoc)) {
+        window.location.href = "index.html";
       }
-      if (record.photo_link) {
-        avatarEl.src = record.photo_link;
-      }
+    });
 
-      try {
-        const docSnap = await db.collection('casual_labour_profile').doc(docNo).get();
-        if (docSnap.exists) {
-          const profile = docSnap.data();
-          if (profile.name_mykad) nameEl.textContent = profile.name_mykad;
-          if (profile.photo_link) avatarEl.src = profile.photo_link;
+    async function submitClockIn(event) {
+      event.preventDefault();
+      if (isSubmitting) return;
 
-          record.email = profile.email || record.email;
-          record.name_mykad = profile.name_mykad || record.name_mykad;
-          localStorage.setItem("mitecWorkerRecord", JSON.stringify(record));
-        }
-      } catch (e) {
-        console.error("Error loading profile from Firestore:", e);
-      }
-    }
+      const record = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+      const docNo = normalizeDoc(
+        record.doc_no || record.mykad_passport_no || localStorage.getItem("mcl_doc_no") || localStorage.getItem("workerDocNo") || ""
+      );
+      const name = String(record.name_mykad || record.full_name || "").trim().toUpperCase();
+      const email = String(record.email || "").trim();
 
-    async function submitAttendance() {
-      const voucherVal = document.getElementById("voucherNo").value.trim();
-      const deptVal = document.getElementById("dept").value;
-      const shiftVal = document.getElementById("shift").value;
-      const docNo = String(localStorage.getItem("mcl_doc_no") || "").trim().replace(/^'/, '');
-      const worker = JSON.parse(localStorage.getItem("mitecWorkerRecord") || "{}");
+      const voucher = String(document.getElementById("voucher").value || "").trim().replace(/^'/, "");
+      const department = String(document.getElementById("dept").value || "").trim();
+      const shift = String(document.getElementById("shift").value || "").trim();
 
-      if (!voucherVal || !deptVal || !shiftVal) {
-        alert("Action Required: Please complete all fields.");
+      if (!docNo) {
+        window.location.href = "index.html";
         return;
       }
 
-      if (voucherVal.length !== 6) {
-        alert("Action Required: Voucher Number must be exactly 6 digits.");
+      if (!voucher || !department || !shift) {
+        showAlert("warning", "Please enter your voucher number, department, and scheduled shift.");
         return;
       }
 
-      const overlay = document.getElementById("statusOverlay");
-      const title = document.getElementById("statusTitle");
-      const msg = document.getElementById("statusMsg");
-      const spinner = document.getElementById("spinner");
-      const closeBtn = document.getElementById("closeBtn");
-
-      overlay.style.display = "flex";
-      spinner.style.display = "block";
-      closeBtn.style.display = "none";
+      isSubmitting = true;
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      showLoader("Submitting Attendance...");
+      document.getElementById("statusAlert").classList.add("d-none");
 
       try {
-        const response = await fetch(APPS_SCRIPT_URL, {
+        const res = await fetch(APPS_SCRIPT_URL, {
           method: "POST",
           body: JSON.stringify({
             action: "submitAttendance",
             doc_no: docNo,
-            name: worker.name_mykad || worker.full_name || "",
-            email: worker.email || "",
-            voucher: voucherVal,
-            department: deptVal,
-            shift: shiftVal
+            name: name,
+            voucher: voucher,
+            department: department,
+            shift: shift,
+            email: email
           })
         });
 
-        const result = await response.json();
-        spinner.style.display = "none";
-        closeBtn.style.display = "flex";
+        const result = await res.json();
 
-        if (result.success) {
-          title.textContent = "Entry Confirmed";
-          title.style.color = "#28a745";
-          msg.innerHTML = `Attendance recorded successfully for shift <strong>${shiftVal}</strong>`;
-          closeBtn.textContent = "Return to Home";
-          closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
+        if (result && result.success) {
+          sessionStorage.clear();
+          showAlert("success", "Clock-in recorded! Redirecting to dashboard...");
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 700);
         } else {
-          title.textContent = result.message.includes("Already") ? "Already Signed In" : "Submission Failed";
-          title.style.color = "#ff9500";
-          msg.innerHTML = result.message;
-          closeBtn.textContent = "Return to Dashboard";
-          closeBtn.onclick = () => { window.location.href = 'dashboard.html'; };
+          hideLoader();
+          btn.disabled = false;
+          isSubmitting = false;
+          showAlert("danger", (result && result.message) || "Unable to record attendance. Please check with HR.");
         }
       } catch (err) {
-        spinner.style.display = "none";
-        title.textContent = "System Error";
-        title.style.color = "#dc3545";
-        msg.textContent = err.message || "Unable to process request.";
-        closeBtn.style.display = "flex";
-        closeBtn.textContent = "Try Again";
-        closeBtn.onclick = () => { overlay.style.display = "none"; };
+        hideLoader();
+        btn.disabled = false;
+        isSubmitting = false;
+        showAlert("danger", "Network error while signing in: " + err.message);
       }
     }
 
-    initPage();
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+          .then(reg => console.log("PWA SW Registered (Sign-In):", reg.scope))
+          .catch(err => console.error("PWA SW Registration Failed:", err));
+      });
+    }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
