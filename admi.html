@@ -11,8 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
-  <!-- Load Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Firebase SDKs Compat Layer (For casual_labour_profile) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <!-- Load SheetJS library for native XLSX file generation -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -91,6 +92,7 @@
       padding: 0 24px;
       display: flex;
       gap: 24px;
+      overflow-x: auto;
     }
 
     .tab-btn {
@@ -106,6 +108,7 @@
       align-items: center;
       gap: 8px;
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
     .tab-btn:hover { color: var(--mitec-blue); }
@@ -272,6 +275,8 @@
     .tag-dept { background: rgba(15, 74, 130, 0.08); color: var(--mitec-accent); padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; }
     .tag-rate { background: rgba(40, 167, 69, 0.08); color: var(--success); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; }
     .tag-risk { background: rgba(220, 53, 69, 0.1); color: var(--error); padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; }
+    .tag-ok { background: rgba(40, 167, 69, 0.1); color: var(--success); padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; }
+    .tag-id { background: rgba(27, 54, 93, 0.08); color: var(--mitec-blue); padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 10px; letter-spacing: 0.04em; }
 
     /* PIVOT TABLE STYLES */
     tr.pivot-header-row td { background: rgba(27, 54, 93, 0.05); font-weight: 800; border-top: 2px solid var(--border); }
@@ -315,6 +320,149 @@
 
     .chart-title { font-size: 15px; font-weight: 800; color: var(--mitec-blue); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
 
+    /* WORKER PROFILING GRID */
+    .profiles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 18px;
+    }
+
+    .worker-profile-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.025);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .worker-profile-card:hover {
+      border-color: var(--mitec-blue);
+      box-shadow: 0 8px 24px rgba(27, 54, 93, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .worker-card-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .worker-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--border);
+      background: #eef2f7;
+      flex-shrink: 0;
+    }
+
+    .worker-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--mitec-blue);
+      line-height: 1.25;
+    }
+
+    .worker-doc {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .worker-meta-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .worker-meta-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .worker-meta-label {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .worker-meta-val {
+      color: var(--text-main);
+      font-weight: 700;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .worker-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* PROFILE DETAIL MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      max-width: 520px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 22px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .modal-close {
+      background: #f4f6f9;
+      border: 1px solid var(--border);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     /* SPINNER & EMPTY STATE */
     .loading-state, .empty-state {
       padding: 40px;
@@ -339,6 +487,7 @@
     @media (max-width: 768px) {
       .main-container { padding: 12px; }
       .charts-grid { grid-template-columns: 1fr; }
+      .profiles-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -368,6 +517,9 @@
     <button class="tab-btn" onclick="switchTab('bankTab', this)">
       <i class="ph-bold ph-bank"></i> Bank Bulk Payroll
     </button>
+    <button class="tab-btn" onclick="switchTab('profileTab', this)">
+      <i class="ph-bold ph-users-three"></i> Worker Profiles
+    </button>
   </div>
 
   <div class="main-container">
@@ -394,7 +546,7 @@
               <option value="ALL">All Departments</option>
             </select>
           </div>
-          
+
           <div>
             <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Shift Filter</label>
             <select id="filterShift" class="control-select" onchange="applyFiltersAndSort()">
@@ -670,7 +822,7 @@
 
     <!-- ================= TAB 3: BANK BULK PAYROLL ================= -->
     <div id="bankTab" class="tab-content">
-      
+
       <!-- BANK EXPORT CONTROLS -->
       <div class="filter-panel">
         <div class="filter-group">
@@ -779,14 +931,110 @@
 
     </div>
 
+    <!-- ================= TAB 4: CASUAL LABOUR PROFILES ================= -->
+    <div id="profileTab" class="tab-content">
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Total Registered Workers</div>
+          <div class="kpi-value" id="profTotalCount">0</div>
+          <div class="kpi-sub">In Firestore profile directory</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">MyKad Holders</div>
+          <div class="kpi-value" id="profMykadCount">0</div>
+          <div class="kpi-sub">Local IC workers</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Passport Holders</div>
+          <div class="kpi-value" id="profPassportCount">0</div>
+          <div class="kpi-sub">Foreign document workers</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Complete Bank Info</div>
+          <div class="kpi-value" id="profCompleteBankCount" style="color:var(--success)">0</div>
+          <div class="kpi-sub">Verified bank & account no.</div>
+        </div>
+      </div>
+
+      <div class="filter-panel">
+        <div class="filter-group">
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Search Worker</label>
+            <input type="text" id="profileSearch" class="control-input" style="min-width: 240px;" placeholder="Name, IC/Doc No, Email, Phone..." oninput="renderWorkerProfiles()">
+          </div>
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">ID Type</label>
+            <select id="profileIdTypeFilter" class="control-select" onchange="renderWorkerProfiles()">
+              <option value="ALL">All ID Types</option>
+              <option value="MYKAD">MYKAD</option>
+              <option value="PASSPORT">PASSPORT</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Bank Status</label>
+            <select id="profileBankFilter" class="control-select" onchange="renderWorkerProfiles()">
+              <option value="ALL">All Bank Statuses</option>
+              <option value="COMPLETE">Bank Info Complete</option>
+              <option value="INCOMPLETE">Missing Bank / Account</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-group" style="align-self: flex-end;">
+          <button class="btn-secondary" onclick="resetProfileFilters()">
+            <i class="ph-bold ph-arrow-counter-clockwise"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <div id="workerProfilesGrid" class="profiles-grid">
+        <div class="loading-state" style="grid-column: 1 / -1;">
+          <div class="spinner"></div>
+          <div>Loading casual labour profiles...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- WORKER PROFILE DETAIL MODAL -->
+  <div id="profileModal" class="modal-backdrop" onclick="if(event.target === this) closeProfileModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <img id="modalAvatar" class="worker-avatar" src="" alt="Avatar">
+          <div>
+            <div id="modalName" style="font-size:16px; font-weight:800; color:var(--mitec-blue);"></div>
+            <div id="modalDoc" style="font-size:12px; color:var(--text-muted); font-weight:600;"></div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeProfileModal()"><i class="ph-bold ph-x"></i></button>
+      </div>
+      <div id="modalBody" class="worker-meta-list" style="border-top:none; padding-top:0; gap:10px;"></div>
+    </div>
   </div>
 
   <script>
-    const SUPABASE_URL = "https://oikkdqutclltliaioand.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wtA2_Kg9OluSwrxfU9sEIQ_ZxkBikmo";
-    let supabaseClient = null;
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjXs1JPXirpNXduua4I9fH4sdOyByebou8ZOP744S2quQHJAWXeF58-aHzT8ue5f08/exec";
+
+    // Firebase Configuration (Used ONLY for casual_labour_profile)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
+      authDomain: "mitec-cl-2027.firebaseapp.com",
+      projectId: "mitec-cl-2027",
+      storageBucket: "mitec-cl-2027.firebasestorage.app",
+      messagingSenderId: "42229239032",
+      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
 
     let rawAttendanceData = [];
+    let allProfilesList = [];
     let labourProfilesMap = new Map();
     let processedData = [];
     let aggregatedBankData = [];
@@ -795,13 +1043,11 @@
 
     // COMPREHENSIVE MALAYSIAN BANK & E-WALLET BIC / DUITNOW MAPPING
     const BANK_BIC_MAP = {
-      // --- Retail & Commercial Banks ---
       'maybank': 'MBBEMYKL',
       'malayan banking': 'MBBEMYKL',
       'cimb': 'CIBBMYKL',
       'public bank': 'PBBEMYKL',
       'rhb': 'RHBBMYKL',
-      'rhb银行': 'RHBBMYKL',
       'hong leong': 'HLBBMYKL',
       'ambank': 'ARBKMYKL',
       'bank islam': 'BIMBMYKL',
@@ -834,15 +1080,11 @@
       'bank of america': 'BOFAMY2X',
       'jp morgan': 'CHASMYKX',
       'kaf investment': 'KAFBMYK2',
-
-      // --- Licensed Digital Banks ---
       'gxbank': 'GXSPMYKL',
       'gx bank': 'GXSPMYKL',
       'aeon bank': 'ACDBMYK2',
       'aeon': 'ACDBMYK2',
       'boost bank': 'BOBEMYK2',
-
-      // --- E-Wallets & E-Money Providers ---
       'touch n go': 'TNGDMYNB',
       'touch \'n go': 'TNGDMYNB',
       'touch n go ewallet': 'TNGDMYNB',
@@ -850,22 +1092,17 @@
       'tngo': 'TNGDMYNB',
       'dompet elektronik touch n go': 'TNGDMYNB',
       'edompet touch n go': 'TNGDMYNB',
-      
       'shopee': 'ARPYMYNB',
       'shopeepay': 'ARPYMYNB',
       'seamoney': 'SCCHMYKL',
-
       'grabpay': 'GRABMYNB',
       'grab': 'GRABMYNB',
-
       'boost': 'BOSTMYNB',
       'boostconnect': 'BCNTMYNB',
-
       'bigpay': 'BGPYMYNB',
       'instapay': 'INSTMYNB',
       'merchantrade': 'MASBMYNB',
       'merchanttrade': 'MASBMYNB',
-      
       'payex': 'PAYXMYNBP',
       'setel': 'SVSBMYNB',
       'razer': 'RZMSMYNB',
@@ -885,16 +1122,7 @@
       'siliconnet': 'SPAYMYNB'
     };
 
-    function getSupabase() {
-      if (!supabaseClient) {
-        if (window.supabase && typeof window.supabase.createClient === 'function') {
-          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-        } else {
-          throw new Error("Supabase SDK failed to load.");
-        }
-      }
-      return supabaseClient;
-    }
+    const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231B365D'/><text x='50' y='57' font-family='Inter,sans-serif' font-size='32' font-weight='700' fill='%23ffffff' text-anchor='middle'>CL</text></svg>";
 
     // FORMAT TIMESTAMP TO dd/mm/yyyy HH:mm:ss
     function formatTimestamp(tsStr) {
@@ -916,7 +1144,7 @@
     function switchTab(tabId, btnElement) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      
+
       document.getElementById(tabId).classList.add('active');
       btnElement.classList.add('active');
 
@@ -925,6 +1153,8 @@
       } else if (tabId === 'bankTab') {
         populatePaymentDateDropdown();
         renderBankPayroll();
+      } else if (tabId === 'profileTab') {
+        renderWorkerProfiles();
       }
     }
 
@@ -1010,29 +1240,34 @@
       }
     }
 
-    // FETCH ALL RAW ATTENDANCE RECORDS & CASUAL LABOUR PROFILES
+    // FETCH ATTENDANCE FROM GOOGLE SHEETS & WORKER PROFILES FROM FIRESTORE
     async function fetchLiveAttendance() {
       const tbody = document.getElementById("attendanceTbody");
-      tbody.innerHTML = `<tr><td colspan="17" class="loading-state"><div class="spinner"></div><div>Loading attendance records...</div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="17" class="loading-state"><div class="spinner"></div><div>Loading attendance records from Google Sheets...</div></td></tr>`;
 
       try {
-        const client = getSupabase();
-        
-        const [attendanceRes, profileRes] = await Promise.all([
-          client.from('attendance_records').select('*').order('timestamp', { ascending: false }),
-          client.from('casual_labour_profile').select('*')
+        const [sheetsRes, profileSnap] = await Promise.all([
+          fetch(`${APPS_SCRIPT_URL}?action=getAttendanceAdmin`).then(r => r.json()),
+          db.collection('casual_labour_profile').get()
         ]);
 
-        if (attendanceRes.error) throw attendanceRes.error;
-        rawAttendanceData = attendanceRes.data || [];
+        if (!sheetsRes.success) throw new Error(sheetsRes.message || "Google Sheets fetch failed");
+        rawAttendanceData = sheetsRes.attendance || [];
 
+        // Sort newest first by default
+        rawAttendanceData.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+        allProfilesList = [];
         labourProfilesMap.clear();
-        if (profileRes.data && !profileRes.error) {
-          profileRes.data.forEach(p => {
-            const kDoc = cleanKey(p.doc_no || p.doc_number);
+        if (!profileSnap.empty) {
+          profileSnap.forEach(doc => {
+            const p = { id: doc.id, ...doc.data() };
+            allProfilesList.push(p);
+
+            const kDoc = cleanKey(p.doc_no || p.doc_number || doc.id);
             const kIc = cleanKey(p.ic_number || p.ic_no || p.ic);
             const kEmail = String(p.email || '').trim().toLowerCase();
-            const kName = cleanKey(p.full_name || p.name);
+            const kName = cleanKey(p.full_name || p.name_mykad || p.name);
 
             if (kDoc) labourProfilesMap.set(`doc:${kDoc}`, p);
             if (kIc) labourProfilesMap.set(`ic:${kIc}`, p);
@@ -1045,6 +1280,7 @@
         populateDeptDropdown();
 
         applyFiltersAndSort();
+        renderWorkerProfiles();
       } catch (err) {
         console.error("Error fetching data:", err);
         tbody.innerHTML = `<tr><td colspan="17" class="empty-state" style="color:var(--error)">Failed to fetch records: ${err.message}</td></tr>`;
@@ -1111,15 +1347,17 @@
       };
 
       processedData = rawAttendanceData.filter(row => {
-        // Tab 1 Date Filters
-        const rowWorkDate = row.working_date || (row.timestamp ? row.timestamp.split('T')[0] : '');
+        let rowWorkDate = row.working_date || (row.timestamp ? String(row.timestamp).split('T')[0] : '');
+        if (rowWorkDate && rowWorkDate.includes('/')) {
+          const p = rowWorkDate.split('/');
+          if (p.length === 3) rowWorkDate = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+        }
+
         if (dateFrom && rowWorkDate && rowWorkDate < dateFrom) return false;
         if (dateTo && rowWorkDate && rowWorkDate > dateTo) return false;
 
-        // Department Filter
         if (deptFilter !== 'ALL' && (row.department || '').toUpperCase() !== deptFilter) return false;
 
-        // Shift Filter
         if (shiftFilter !== 'ALL') {
           const rowShift = String(row.shift || '').trim();
           const normRow = rowShift.split(':').slice(0, 2).join(':');
@@ -1128,7 +1366,6 @@
           if (normRow !== normFilter) return false;
         }
 
-        // Global Search Filter
         if (globalQuery) {
           const matchGlobal = Object.values(row).some(val => 
             String(val || '').toLowerCase().includes(globalQuery)
@@ -1136,7 +1373,6 @@
           if (!matchGlobal) return false;
         }
 
-        // Individual Column Filters
         for (const [key, filterVal] of Object.entries(colFilters)) {
           if (filterVal) {
             let cellVal = String(row[key] || '').toLowerCase();
@@ -1178,6 +1414,10 @@
       }
 
       tbody.innerHTML = processedData.map(row => {
+        const hrs = parseFloat(row.hours) || 0;
+        const rate = parseFloat(row.rate) || 12;
+        const wages = row.wages !== undefined && row.wages !== '' ? row.wages : (hrs * rate).toFixed(2);
+
         return `
           <tr>
             <td>${formatTimestamp(row.timestamp)}</td>
@@ -1190,9 +1430,9 @@
             <td>${row.sign_out || '-'}</td>
             <td><strong>${row.clock_in || '-'}</strong></td>
             <td><strong>${row.clock_out || '-'}</strong></td>
-            <td><strong>${row.hours !== null && row.hours !== undefined ? row.hours : '0.0'}</strong></td>
-            <td>${row.rate !== null && row.rate !== undefined ? row.rate : '12'}</td>
-            <td><strong>${row.wages !== null && row.wages !== undefined ? row.wages : '0.00'}</strong></td>
+            <td><strong>${row.hours !== undefined && row.hours !== '' ? row.hours : '0.0'}</strong></td>
+            <td>${row.rate !== undefined && row.rate !== '' ? row.rate : '12'}</td>
+            <td><strong>${wages}</strong></td>
             <td>${row.process_date || '-'}</td>
             <td>${row.payment_date || '-'}</td>
             <td>${row.remarks || '-'}</td>
@@ -1214,7 +1454,6 @@
       const shiftCounts = {};
       const staffAggMap = new Map();
 
-      // PIVOT TABLE DATA MAP: Dept -> Rate -> { workers, wages }
       const pivotMap = new Map();
 
       processedData.forEach(row => {
@@ -1237,7 +1476,6 @@
           shiftCounts[row.shift] = (shiftCounts[row.shift] || 0) + 1;
         }
 
-        // Aggregate individual worker metrics
         const sName = (row.name || 'UNKNOWN').trim().toUpperCase();
         const sKey = sName.toLowerCase();
         if (!staffAggMap.has(sKey)) {
@@ -1254,7 +1492,6 @@
         sData.hours += hrs;
         sData.wages += wage;
 
-        // Populate Pivot Map: Dept -> Rate
         if (!pivotMap.has(dept)) {
           pivotMap.set(dept, new Map());
         }
@@ -1268,7 +1505,6 @@
         pCell.wages += wage;
       });
 
-      // KPI CARDS
       const avgHours = totalStaff > 0 ? (totalHours / totalStaff).toFixed(1) : "0.0";
       const avgWage = totalStaff > 0 ? (totalWages / totalStaff).toFixed(2) : "0.00";
 
@@ -1279,7 +1515,6 @@
       document.getElementById("kpiAvgHours").textContent = `${avgHours} hrs`;
       document.getElementById("kpiAvgWage").textContent = `RM ${avgWage}`;
 
-      // RENDER PIVOT TABLE (DEPARTMENT - RATE)
       const pivotTbody = document.getElementById("pivotDeptRateTbody");
       if (pivotMap.size === 0) {
         pivotTbody.innerHTML = `<tr><td colspan="4" class="empty-state">No matching data to build pivot table.</td></tr>`;
@@ -1297,14 +1532,12 @@
           let deptWorkersSubtotal = 0;
           let deptWagesSubtotal = 0;
 
-          // Department Group Header Row
           pivotHTML += `
             <tr class="pivot-header-row">
               <td colspan="4"><span class="tag-dept">${dept}</span></td>
             </tr>
           `;
 
-          // Rate Sub-Rows
           sortedRates.forEach(rateKey => {
             const data = rateMap.get(rateKey);
             deptWorkersSubtotal += data.workers;
@@ -1322,7 +1555,6 @@
             `;
           });
 
-          // Department Subtotal Row
           pivotHTML += `
             <tr class="pivot-subtotal-row">
               <td colspan="2" style="text-align: right;">${dept} Subtotal:</td>
@@ -1332,7 +1564,6 @@
           `;
         });
 
-        // Grand Total Row
         pivotHTML += `
           <tr class="pivot-grandtotal-row">
             <td colspan="2" style="text-align: right;">GRAND TOTAL:</td>
@@ -1344,7 +1575,6 @@
         pivotTbody.innerHTML = pivotHTML;
       }
 
-      // DEPARTMENT SUMMARY TABLE
       const deptTbody = document.getElementById("deptSummaryTbody");
       const deptKeys = Object.keys(deptCounts);
 
@@ -1361,7 +1591,6 @@
         `).join('');
       }
 
-      // SHIFT SUMMARY TABLE
       const shiftTbody = document.getElementById("shiftSummaryTbody");
       const shiftKeys = Object.keys(shiftCounts);
 
@@ -1381,7 +1610,6 @@
         }).join('');
       }
 
-      // TOP 5 EARNERS TABLE
       const staffList = Array.from(staffAggMap.values());
       const topEarners = [...staffList].sort((a, b) => b.wages - a.wages).slice(0, 5);
       const topEarnersTbody = document.getElementById("topEarnersTbody");
@@ -1400,7 +1628,6 @@
         `).join('');
       }
 
-      // TOP 5 HOURS WORKED TABLE
       const topHours = [...staffList].sort((a, b) => b.hours - a.hours).slice(0, 5);
       const topHoursTbody = document.getElementById("topHoursTbody");
 
@@ -1429,7 +1656,7 @@
       return '';
     }
 
-    // FORMAT DATE TO DDMMYYYY FOR DUITNOW / MAYBANK SPEC
+    // FORMAT DATE TO DDMMYYYY FOR DUITNOW / AFFIN / MAYBANK SPEC
     function formatToDDMMYYYY(dateStr) {
       if (!dateStr) return '';
       const clean = String(dateStr).trim();
@@ -1474,7 +1701,7 @@
       }
     }
 
-    // TAB 3 PAYROLL AGGREGATION & DUAL-TABLE RISK AUDIT
+    // TAB 3 PAYROLL AGGREGATION & DUAL-TABLE RISK AUDIT (Profiles pulled from Firestore)
     function renderBankPayroll() {
       const selectedPaymentDate = document.getElementById("bankPaymentDate")?.value || 'ALL';
       const payeesMap = new Map();
@@ -1492,48 +1719,43 @@
         const rowDoc = cleanKey(row.doc_no || row.column_6);
         const rowIc = cleanKey(row.ic_number || row.ic_no || row.ic);
         const rowName = cleanKey(row.name);
-        
+
         const profile = labourProfilesMap.get(`doc:${rowDoc}`) || 
                         labourProfilesMap.get(`ic:${rowIc}`) || 
                         labourProfilesMap.get(`email:${rowEmail}`) || 
                         labourProfilesMap.get(`name:${rowName}`) || {};
 
-        const finalName = (profile.full_name || profile.name || row.name || 'UNKNOWN').trim().toUpperCase();
+        const finalName = (profile.full_name || profile.name_mykad || profile.name || row.name || 'UNKNOWN').trim().toUpperCase();
         const finalBank = profile.bank_name || profile.bank || row.bank_name || row.bank || '';
-        
-        const rawAccNo = profile["Column 19"] ?? 
-                         profile["column_19"] ?? 
-                         profile["Column_19"] ?? 
-                         profile["column19"] ?? 
-                         profile.account_number ?? 
+
+        const rawAccNo = profile.account_number ?? 
                          profile.bank_account ?? 
                          profile.account_no ?? 
-                         row["Column 19"] ?? 
-                         row.column_19 ?? 
+                         profile.acc_no ?? 
+                         profile["Column 19"] ?? 
+                         profile["column_19"] ?? 
                          row.bank_account ?? 
                          row.account_no ?? 
                          row.acc_no ?? '';
-                         
+
         const finalAccNo = String(rawAccNo).replace(/\D/g, '');
 
-        const finalDocType = String(profile.doc_type || profile.id_type || row.id_type || '');
         const rawDocNo = String(profile.doc_no || profile.ic_number || profile.ic_no || row.doc_no || row.column_6 || '');
         const finalDocNo = rawDocNo.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
+        const isPassport = !/^\d/.test(finalDocNo) && finalDocNo.length > 0;
+
         const hrs = parseFloat(row.hours) || 0;
         const wage = parseFloat(row.wages) || (hrs * (parseFloat(row.rate) || 12));
-        
-        const isPassport = finalDocType.toLowerCase().includes('passport') || (finalDocNo.length < 12 && /[a-zA-Z]/.test(finalDocNo));
 
         const derivedBic = getBankBic(finalBank);
 
-        // RISK AUDIT: Identify Missing / Invalid Data
         const riskReasons = [];
         if (!finalAccNo || finalAccNo.length < 5) riskReasons.push("Missing Bank Account No");
         if (!finalDocNo || finalDocNo.length < 5) riskReasons.push("Missing IC / Document No");
         if (!derivedBic) riskReasons.push(`Unrecognized Bank (${finalBank || 'None'})`);
 
-        const key = (rowEmail || finalName || 'UNKNOWN').toLowerCase();
+        const key = (finalDocNo || rowEmail || finalName || 'UNKNOWN').toLowerCase();
 
         if (!payeesMap.has(key)) {
           payeesMap.set(key, {
@@ -1560,12 +1782,10 @@
         payee.totalWages += wage;
       });
 
-      // SPLIT INTO HIGH RISK VS VERIFIED DATA ARRAYS
       const allPayees = Array.from(payeesMap.values());
       highRiskBankData = allPayees.filter(p => p.isHighRisk).sort((a, b) => a.name.localeCompare(b.name));
       aggregatedBankData = allPayees.filter(p => !p.isHighRisk).sort((a, b) => a.name.localeCompare(b.name));
 
-      // RENDER TABLE 1: HIGH RISK / INCOMPLETE
       const riskTbody = document.getElementById("bankPayrollRiskTbody");
       if (highRiskBankData.length === 0) {
         riskTbody.innerHTML = `<tr><td colspan="8" class="empty-state" style="color:var(--success)"><i class="ph-bold ph-check-circle"></i> Zero high-risk payees! All accounts are verified and ready for payment.</td></tr>`;
@@ -1584,7 +1804,6 @@
         `).join('');
       }
 
-      // RENDER TABLE 2: VERIFIED / READY
       const tbody = document.getElementById("bankPayrollTbody");
       let grandTotalPayout = 0;
 
@@ -1612,6 +1831,185 @@
       document.getElementById("bankPayeeCount").textContent = aggregatedBankData.length;
       document.getElementById("bankRiskCount").textContent = highRiskBankData.length;
       document.getElementById("bankTotalPayout").textContent = `RM ${grandTotalPayout.toFixed(2)}`;
+    }
+
+    // ================= TAB 4: CASUAL LABOUR PROFILING VIEW =================
+    function normalizeProfileRecord(p) {
+      const docNo = String(p.doc_no || p.doc_number || p.ic_number || p.id || '').trim().replace(/^'/, '').toUpperCase();
+      const rawType = String(p.document_type || p.doc_type || '').trim().toUpperCase();
+      const idType = rawType === 'PASSPORT' || (!/^\d/.test(docNo) && docNo.length > 0) ? 'PASSPORT' : 'MYKAD';
+      const name = String(p.full_name || p.name_mykad || p.name || 'Unnamed Worker').trim();
+      const email = String(p.email || '').trim();
+      const phone = String(p.phone_no || p.phone || p.contact_no || '').trim();
+      const bankName = String(p.bank_name || p.bank || '').trim();
+      const accNo = String(p.account_number ?? p.bank_account ?? p.account_no ?? p.acc_no ?? '').replace(/\D/g, '');
+      const bic = getBankBic(bankName);
+      const isBankComplete = Boolean(accNo && accNo.length >= 5 && bic);
+      const photo = p.photo_link || p.photo_url || DEFAULT_AVATAR;
+
+      return {
+        raw: p,
+        docNo,
+        idType,
+        name,
+        email,
+        phone,
+        bankName,
+        accNo,
+        bic,
+        isBankComplete,
+        photo
+      };
+    }
+
+    function getWorkerAttendanceStats(docNo, email, name) {
+      const cleanDoc = cleanKey(docNo);
+      const cleanEmail = String(email || '').trim().toLowerCase();
+      const cleanName = cleanKey(name);
+
+      let shifts = 0;
+      let hours = 0;
+
+      rawAttendanceData.forEach(row => {
+        const rDoc = cleanKey(row.doc_no || row.column_6);
+        const rEmail = String(row.email || '').trim().toLowerCase();
+        const rName = cleanKey(row.name);
+
+        const matches = (cleanDoc && rDoc === cleanDoc) ||
+                        (cleanEmail && rEmail === cleanEmail) ||
+                        (cleanName && rName === cleanName);
+
+        if (matches) {
+          shifts += 1;
+          hours += parseFloat(row.hours) || 0;
+        }
+      });
+
+      return { shifts, hours };
+    }
+
+    function resetProfileFilters() {
+      document.getElementById("profileSearch").value = "";
+      document.getElementById("profileIdTypeFilter").value = "ALL";
+      document.getElementById("profileBankFilter").value = "ALL";
+      renderWorkerProfiles();
+    }
+
+    function renderWorkerProfiles() {
+      const grid = document.getElementById("workerProfilesGrid");
+      if (!grid) return;
+
+      const normalized = allProfilesList.map(normalizeProfileRecord);
+
+      // Update KPI summary across all profiles
+      const mykadCount = normalized.filter(w => w.idType === 'MYKAD').length;
+      const passportCount = normalized.filter(w => w.idType === 'PASSPORT').length;
+      const completeBankCount = normalized.filter(w => w.isBankComplete).length;
+
+      document.getElementById("profTotalCount").textContent = normalized.length;
+      document.getElementById("profMykadCount").textContent = mykadCount;
+      document.getElementById("profPassportCount").textContent = passportCount;
+      document.getElementById("profCompleteBankCount").textContent = completeBankCount;
+
+      const searchQ = (document.getElementById("profileSearch")?.value || '').toLowerCase().trim();
+      const idFilter = document.getElementById("profileIdTypeFilter")?.value || 'ALL';
+      const bankFilter = document.getElementById("profileBankFilter")?.value || 'ALL';
+
+      const filtered = normalized.filter(w => {
+        if (idFilter !== 'ALL' && w.idType !== idFilter) return false;
+        if (bankFilter === 'COMPLETE' && !w.isBankComplete) return false;
+        if (bankFilter === 'INCOMPLETE' && w.isBankComplete) return false;
+
+        if (searchQ) {
+          const hay = `${w.name} ${w.docNo} ${w.email} ${w.phone} ${w.bankName} ${w.accNo}`.toLowerCase();
+          if (!hay.includes(searchQ)) return false;
+        }
+        return true;
+      }).sort((a, b) => a.name.localeCompare(b.name));
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;">No casual labour profiles match your current filter.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((w, index) => {
+        const stats = getWorkerAttendanceStats(w.docNo, w.email, w.name);
+        const bankBadge = w.isBankComplete
+          ? `<span class="tag-ok"><i class="ph-bold ph-check"></i> Bank Ready</span>`
+          : `<span class="tag-risk"><i class="ph-bold ph-warning"></i> Incomplete Bank</span>`;
+
+        return `
+          <div class="worker-profile-card" onclick="openProfileModal(${index})">
+            <div class="worker-card-top">
+              <img class="worker-avatar" src="${w.photo}" alt="${w.name}" onerror="this.src='${DEFAULT_AVATAR}'">
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                  <div class="worker-name" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${w.name}</div>
+                  <span class="tag-id">${w.idType}</span>
+                </div>
+                <div class="worker-doc"><i class="ph-bold ph-identification-card"></i> ${w.docNo || 'No ID'}</div>
+              </div>
+            </div>
+
+            <div class="worker-meta-list">
+              <div class="worker-meta-row">
+                <span class="worker-meta-label">Phone / Email</span>
+                <span class="worker-meta-val">${w.phone || '-'} · ${w.email || '-'}</span>
+              </div>
+              <div class="worker-meta-row">
+                <span class="worker-meta-label">Bank</span>
+                <span class="worker-meta-val">${w.bankName || 'Not set'} ${w.bic ? `(${w.bic})` : ''}</span>
+              </div>
+              <div class="worker-meta-row">
+                <span class="worker-meta-label">Account No.</span>
+                <span class="worker-meta-val">${w.accNo || 'Not set'}</span>
+              </div>
+            </div>
+
+            <div class="worker-card-footer">
+              <span>${stats.shifts} shift(s) · ${stats.hours.toFixed(1)} hrs</span>
+              ${bankBadge}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      window._filteredProfilesCache = filtered;
+    }
+
+    function openProfileModal(index) {
+      const list = window._filteredProfilesCache || [];
+      const w = list[index];
+      if (!w) return;
+
+      const stats = getWorkerAttendanceStats(w.docNo, w.email, w.name);
+      document.getElementById("modalAvatar").src = w.photo;
+      document.getElementById("modalAvatar").onerror = function() { this.src = DEFAULT_AVATAR; };
+      document.getElementById("modalName").textContent = w.name;
+      document.getElementById("modalDoc").textContent = `${w.idType} · ${w.docNo || 'No ID'}`;
+
+      const rows = [
+        ["Email Address", w.email || "-"],
+        ["Phone Number", w.phone || "-"],
+        ["Bank Name", w.bankName || "Not provided"],
+        ["Bank BIC Code", w.bic || "Unrecognized / Missing"],
+        ["Bank Account No.", w.accNo || "Not provided"],
+        ["Logged Shifts", `${stats.shifts} shift(s)`],
+        ["Total Hours Logged", `${stats.hours.toFixed(1)} hrs`]
+      ];
+
+      document.getElementById("modalBody").innerHTML = rows.map(([label, val]) => `
+        <div class="worker-meta-row">
+          <span class="worker-meta-label">${label}</span>
+          <span class="worker-meta-val">${val}</span>
+        </div>
+      `).join('');
+
+      document.getElementById("profileModal").classList.add("open");
+    }
+
+    function closeProfileModal() {
+      document.getElementById("profileModal").classList.remove("open");
     }
 
     // EXPORT VERIFIED BINARY XLSX FILE (EXCLUDES HIGH RISK RECORDS)
@@ -1666,7 +2064,6 @@
         const amt = item.totalWages.toFixed(2);
         const itemDateFormatted = item.paymentDate ? formatToDDMMYYYY(item.paymentDate) : formattedPaymentDate;
 
-        // Row 01 - Payment Line
         sheetData.push([
           "01", "CN", itemDateFormatted, custRefName, amt, debitingAcc,
           item.idTypeDuitNow, item.ic, "MY", "To Saving Account",
@@ -1674,7 +2071,6 @@
           creditDesc, "Y", item.idTypeBeneficiary, item.ic, "02"
         ]);
 
-        // Row 02 - Payment Advice Line
         sheetData.push([
           "02", amt, custRefName, "kahyeel@mitec.com.my", "ulfaamran@mitec.com.my",
           "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
@@ -1704,25 +2100,31 @@
         "HOURS", "RATE", "WAGES", "PROCESS DATE", "PAYMENT DATE", "REMARKS", "NOTES"
       ];
 
-      const rows = processedData.map(row => [
-        `"${formatTimestamp(row.timestamp)}"`,
-        `"${row.shift || ''}"`,
-        `"${row.email || ''}"`,
-        `"${row.doc_no || row.column_6 || ''}"`,
-        `"${row.voucher || ''}"`,
-        `"${row.name || ''}"`,
-        `"${row.department || ''}"`,
-        `"${row.sign_out || ''}"`,
-        `"${row.clock_in || ''}"`,
-        `"${row.clock_out || ''}"`,
-        `"${row.hours !== null && row.hours !== undefined ? row.hours : '0.0'}"`,
-        `"${row.rate !== null && row.rate !== undefined ? row.rate : '12'}"`,
-        `"${row.wages !== null && row.wages !== undefined ? row.wages : '0.00'}"`,
-        `"${row.process_date || ''}"`,
-        `"${row.payment_date || ''}"`,
-        `"${row.remarks || ''}"`,
-        `"${row.notes || ''}"`
-      ]);
+      const rows = processedData.map(row => {
+        const hrs = parseFloat(row.hours) || 0;
+        const rate = parseFloat(row.rate) || 12;
+        const wages = row.wages !== undefined && row.wages !== '' ? row.wages : (hrs * rate).toFixed(2);
+
+        return [
+          `"${formatTimestamp(row.timestamp)}"`,
+          `"${row.shift || ''}"`,
+          `"${row.email || ''}"`,
+          `"${row.doc_no || row.column_6 || ''}"`,
+          `"${row.voucher || ''}"`,
+          `"${row.name || ''}"`,
+          `"${row.department || ''}"`,
+          `"${row.sign_out || ''}"`,
+          `"${row.clock_in || ''}"`,
+          `"${row.clock_out || ''}"`,
+          `"${row.hours !== undefined && row.hours !== '' ? row.hours : '0.0'}"`,
+          `"${row.rate !== undefined && row.rate !== '' ? row.rate : '12'}"`,
+          `"${wages}"`,
+          `"${row.process_date || ''}"`,
+          `"${row.payment_date || ''}"`,
+          `"${row.remarks || ''}"`,
+          `"${row.notes || ''}"`
+        ];
+      });
 
       const csvContent = "\uFEFF" + [headers.map(h => `"${h}"`).join(","), ...rows.map(e => e.join(","))].join("\n");
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
