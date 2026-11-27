@@ -1685,7 +1685,7 @@
 
     function goToPage(url) { window.location.href = url; }
 
-    // PWA BANNER, CENTER POPUP & SERVICE WORKER LOGIC
+    // PWA BANNER, CENTER POPUP, INSTALL TRACKING & SERVICE WORKER LOGIC
     let deferredInstallPrompt = null;
     const PWA_SNOOZE_KEY = "mcl_pwa_banner_snoozed_until";
     const PWA_SNOOZE_MS = 60 * 60 * 1000;
@@ -1727,6 +1727,35 @@
       document.getElementById("pwaGuideModal").classList.remove("open");
     }
 
+    async function recordPwaInstallStatus(sourceEvent) {
+      try {
+        const worker = getStoredWorker();
+        const rawDoc = worker.doc_no || worker.mykad_passport_no || localStorage.getItem("mcl_doc_no") || localStorage.getItem("workerDocNo") || "";
+        const cleanDocNo = normalizeDocNo(rawDoc);
+        if (!cleanDocNo) return;
+
+        const standalone = isRunningStandalone();
+        if (!standalone && sourceEvent !== "appinstalled") return;
+
+        const sessionKey = `pwa_tracked_${cleanDocNo}_${sourceEvent}`;
+        if (sessionStorage.getItem(sessionKey)) return;
+
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const platform = isIOS ? "iOS" : (/Android/i.test(navigator.userAgent) ? "Android" : "Other");
+
+        await db.collection("casual_labour_profile").doc(cleanDocNo).set({
+          pwa_installed: true,
+          pwa_platform: platform,
+          pwa_last_seen_mode: standalone ? "standalone_app" : "browser_install_event",
+          pwa_updated_at: new Date().toISOString()
+        }, { merge: true });
+
+        sessionStorage.setItem(sessionKey, "1");
+      } catch (err) {
+        console.warn("PWA tracking skipped:", err);
+      }
+    }
+
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
@@ -1738,6 +1767,7 @@
       const banner = document.getElementById("pwaInstallBanner");
       if (banner) banner.style.display = "none";
       closePwaCenterPopup();
+      recordPwaInstallStatus("appinstalled");
     });
 
     async function triggerPwaInstall() {
@@ -1772,6 +1802,7 @@
         fillWorkerData();
         loadAnnouncementsFromFirestore();
         loadBirthdaysFromFirestore();
+        recordPwaInstallStatus("launch");
       }
     }
 
