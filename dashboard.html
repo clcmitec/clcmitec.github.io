@@ -9,7 +9,9 @@
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#1B365D">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MITEC CL">
   <link rel="apple-touch-icon" href="https://mitec.com.my/static/img/logos/logo-footer.png">
 
   <!-- Speed Optimizations -->
@@ -540,6 +542,7 @@
       display: block; 
       line-height: 1.25;
       margin-top: 2px;
+      font-variant-numeric: tabular-nums;
     }
 
     /* SHINY GLOWING BUTTON STYLES */
@@ -1013,19 +1016,17 @@
       if (finalSrc && finalSrc.length > 5) imgEl.src = finalSrc;
     }
 
-    function getMalaysiaTodayStr() {
-      // Returns YYYY-MM-DD in Asia/Kuala_Lumpur (UTC+8)
-      return new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Asia/Kuala_Lumpur",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-      }).format(new Date());
-    }
-
     function formatToKLDisplay(rawTs) {
       if (!rawTs) return { date: "", time: "--:--" };
-      const parsed = new Date(rawTs);
+      const str = String(rawTs).trim();
+
+      // If Apps Script already formatted as "dd/MM/yyyy HH:mm:ss"
+      const directMatch = str.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2}:\d{2})/);
+      if (directMatch) {
+        return { date: directMatch[1], time: directMatch[2] };
+      }
+
+      const parsed = new Date(str);
       if (!isNaN(parsed.getTime())) {
         const datePart = new Intl.DateTimeFormat("en-GB", {
           timeZone: "Asia/Kuala_Lumpur",
@@ -1042,7 +1043,8 @@
         }).format(parsed);
         return { date: datePart, time: timePart };
       }
-      const parts = String(rawTs).trim().split(" ");
+
+      const parts = str.split(" ");
       return { date: parts[0] || "", time: parts[1] || parts[0] || "--:--" };
     }
 
@@ -1094,25 +1096,11 @@
           }
         }
 
-        // 2. Fetch live attendance from Google Sheet ('attendance' tab) via Apps Script
-        const todayDateString = getMalaysiaTodayStr(); // e.g., "2026-11-24"
-        const res = await fetch(`${APPS_SCRIPT_URL}?action=getAttendanceAdmin`);
+        // 2. Fast single-worker today attendance lookup via Apps Script #1
+        const res = await fetch(`${APPS_SCRIPT_URL}?action=getTodayAttendance&doc_no=${encodeURIComponent(cleanDocNo)}`);
         const json = await res.json();
 
-        let summary = null;
-        if (json && json.success && Array.isArray(json.attendance)) {
-          const matches = json.attendance.filter(row => {
-            const rDoc = normalizeDocNo(row.doc_no);
-            const rDate = String(row.working_date || "").trim().split("T")[0];
-            return rDoc === cleanDocNo && rDate === todayDateString;
-          });
-
-          if (matches.length > 0) {
-            matches.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
-            summary = matches[0];
-          }
-        }
-
+        const summary = (json && json.success && json.record) ? json.record : null;
         renderShiftSummary(summary);
 
       } catch (e) { 
