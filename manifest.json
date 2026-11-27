@@ -1,0 +1,25 @@
+{
+  "name": "MITEC Casual Labour Portal",
+  "short_name": "MITEC CL",
+  "description": "MITEC Casual Labour Shift Booking & Gate Attendance Portal",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6f9",
+  "theme_color": "#1B365D",
+  "icons": [
+    {
+      "src": "https://mitec.com.my/static/img/logos/logo-footer.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://mitec.com.my/static/img/logos/logo-footer.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
