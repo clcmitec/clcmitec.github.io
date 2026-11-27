@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MITEC CL — App Install Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --navy: #1B365D;
+      --blue: #063e99;
+      --text: #1d1d1f;
+      --muted: #51525c;
+      --border: #e1e4ea;
+      --danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 18px 14px 40px;
+    }
+
+    /* LOCK SCREEN */
+    .lock-screen {
+      min-height: 82vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .lock-card {
+      width: 100%;
+      max-width: 360px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 14px 34px rgba(27, 54, 93, 0.1);
+    }
+
+    .lock-card h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+
+    .lock-card p {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .pin-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.25em;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .pin-input:focus {
+      border-color: var(--blue);
+    }
+
+    .lock-error {
+      min-height: 18px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--danger);
+      margin-bottom: 10px;
+    }
+
+    .tracker-app {
+      display: none;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      background: linear-gradient(135deg, #063e99 0%, #1B365D 100%);
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 24px rgba(27, 54, 93, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top-bar h1 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .top-bar p {
+      font-size: 12.5px;
+      opacity: 0.9;
+    }
+
+    .btn-lock {
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--blue);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .controls {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 180px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--blue);
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--navy);
+      color: #ffffff;
+      width: 100%;
+    }
+
+    .controls .btn-primary {
+      width: auto;
+    }
+
+    .btn-secondary {
+      background: #edf2f7;
+      color: var(--navy);
+    }
+
+    .list-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .worker-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 8px;
+      border-bottom: 1px solid #eef1f5;
+    }
+
+    .worker-row:last-child {
+      border-bottom: none;
+    }
+
+    .worker-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .worker-meta {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #e8f0fe;
+      color: var(--blue);
+      white-space: nowrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <!-- PIN LOCK SCREEN -->
+  <div class="lock-screen" id="lockScreen">
+    <form class="lock-card" onsubmit="unlockTracker(event)">
+      <h2>Admin Access Required</h2>
+      <p>Enter your passcode to view installed app users</p>
+      <input
+        type="password"
+        id="pinInput"
+        class="pin-input"
+        inputmode="numeric"
+        maxlength="12"
+        placeholder="••••"
+        autocomplete="off"
+        required
+      />
+      <div class="lock-error" id="lockError"></div>
+      <button type="submit" class="btn btn-primary">Unlock Tracker</button>
+    </form>
+  </div>
+
+  <!-- MAIN TRACKER APP -->
+  <div class="tracker-app" id="trackerApp">
+    <div class="wrap">
+      <div class="top-bar">
+        <div>
+          <h1>App Install Tracker</h1>
+          <p>Workers recorded with app install or standalone launch</p>
+        </div>
+        <button type="button" class="btn-lock" onclick="lockTracker()">Lock</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-num" id="totalCount">-</div>
+          <div class="stat-label">Installed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="androidCount">-</div>
+          <div class="stat-label">Android</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="iosCount">-</div>
+          <div class="stat-label">iOS</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search name, Doc No, or platform..."
+          oninput="filterAndRender()"
+        />
+        <button type="button" class="btn btn-secondary" onclick="loadInstalledWorkers()">Refresh</button>
+        <button type="button" class="btn btn-primary" onclick="exportCsv()">Export CSV</button>
+      </div>
+
+      <div class="list-card" id="workerList">
+        <div class="empty-state">Loading app install records...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_PIN = "281126";
+    const UNLOCK_KEY = "mitec_pwa_tracker_unlocked";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
+      authDomain: "mitec-cl-2027.firebaseapp.com",
+      projectId: "mitec-cl-2027",
+      storageBucket: "mitec-cl-2027.firebasestorage.app",
+      messagingSenderId: "42229239032",
+      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    let allInstalledWorkers = [];
+    let hasLoadedData = false;
+
+    function showUnlockedView() {
+      document.getElementById("lockScreen").style.display = "none";
+      document.getElementById("trackerApp").style.display = "block";
+      if (!hasLoadedData) {
+        hasLoadedData = true;
+        loadInstalledWorkers();
+      }
+    }
+
+    function unlockTracker(event) {
+      event.preventDefault();
+      const entered = document.getElementById("pinInput").value.trim();
+      const errEl = document.getElementById("lockError");
+
+      if (entered === ADMIN_PIN) {
+        errEl.textContent = "";
+        sessionStorage.setItem(UNLOCK_KEY, "1");
+        document.getElementById("pinInput").value = "";
+        showUnlockedView();
+      } else {
+        errEl.textContent = "Incorrect passcode. Please try again.";
+      }
+    }
+
+    function lockTracker() {
+      sessionStorage.removeItem(UNLOCK_KEY);
+      document.getElementById("trackerApp").style.display = "none";
+      document.getElementById("lockScreen").style.display = "flex";
+      document.getElementById("pinInput").value = "";
+      document.getElementById("lockError").textContent = "";
+    }
+
+    function toProperCase(str) {
+      return str ? String(str).toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : "Unknown Worker";
+    }
+
+    function formatDate(isoString) {
+      if (!isoString) return "No timestamp";
+      const d = new Date(isoString);
+      if (isNaN(d.getTime())) return isoString;
+      return d.toLocaleString("en-MY", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    async function loadInstalledWorkers() {
+      const listEl = document.getElementById("workerList");
+      listEl.innerHTML = `<div class="empty-state">Loading app install records...</div>`;
+
+      try {
+        const snap = await db
+          .collection("casual_labour_profile")
+          .where("pwa_installed", "==", true)
+          .get();
+
+        const rows = [];
+        let android = 0;
+        let ios = 0;
+
+        snap.forEach(doc => {
+          const data = doc.data();
+          const platform = data.pwa_platform || "Other";
+          if (platform === "Android") android++;
+          if (platform === "iOS") ios++;
+
+          rows.push({
+            docNo: data.doc_no || doc.id,
+            name: toProperCase(data.name_mykad || data.full_name || "Unknown"),
+            platform,
+            mode: data.pwa_last_seen_mode || "standalone_app",
+            updatedAt: data.pwa_updated_at || ""
+          });
+        });
+
+        rows.sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+        allInstalledWorkers = rows;
+
+        document.getElementById("totalCount").textContent = rows.length;
+        document.getElementById("androidCount").textContent = android;
+        document.getElementById("iosCount").textContent = ios;
+
+        filterAndRender();
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = `<div class="empty-state">Could not load records. Check Firestore rules or connection.</div>`;
+      }
+    }
+
+    function getFilteredRows() {
+      const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+      if (!q) return allInstalledWorkers;
+      return allInstalledWorkers.filter(item =>
+        item.name.toLowerCase().includes(q) ||
+        String(item.docNo).toLowerCase().includes(q) ||
+        item.platform.toLowerCase().includes(q)
+      );
+    }
+
+    function filterAndRender() {
+      const listEl = document.getElementById("workerList");
+      const rows = getFilteredRows();
+
+      if (!rows.length) {
+        listEl.innerHTML = `<div class="empty-state">No matching installed users found.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = rows.map(item => `
+        <div class="worker-row">
+          <div>
+            <div class="worker-name">${item.name}</div>
+            <div class="worker-meta">ID: ${item.docNo} • ${formatDate(item.updatedAt)}</div>
+          </div>
+          <span class="pill">${item.platform}</span>
+        </div>
+      `).join("");
+    }
+
+    function exportCsv() {
+      const rows = getFilteredRows();
+      if (!rows.length) return;
+
+      const headers = ["Name", "Doc No", "Platform", "Mode", "Updated At"];
+      const csvLines = [
+        headers.join(","),
+        ...rows.map(r => [
+          `"${String(r.name).replace(/"/g, '""')}"`,
+          `"${String(r.docNo).replace(/"/g, '""')}"`,
+          `"${String(r.platform).replace(/"/g, '""')}"`,
+          `"${String(r.mode).replace(/"/g, '""')}"`,
+          `"${String(r.updatedAt).replace(/"/g, '""')}"`
+        ].join(","))
+      ];
+
+      const blob = new Blob([csvLines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mitec-pwa-installed.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    if (sessionStorage.getItem(UNLOCK_KEY) === "1") {
+      showUnlockedView();
+    }
+  </script>
+</body>
+</html>
