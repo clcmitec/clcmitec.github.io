@@ -44,11 +44,11 @@
       --md-surface-container: #ffffff;
       --md-on-surface: #1d1d1f;
       --md-on-surface-variant: #51525c;
-      --md-outline: #e1e4ea; 
+      --md-outline: #e1e4ea;
 
-      --mitec-blue: #1B365D;         
-      --mitec-blue-hover: #2D68C4;   
-      --mitec-accent: #0f4a82;       
+      --mitec-blue: #1B365D;
+      --mitec-blue-hover: #2D68C4;
+      --mitec-accent: #0f4a82;
 
       --md-font: 'Inter', -apple-system, sans-serif;
       --brand-font: 'Caveat', cursive, sans-serif;
@@ -70,7 +70,7 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      padding-top: 80px; 
+      padding-top: 80px;
       padding-bottom: 90px;
       overflow-x: hidden;
     }
@@ -307,28 +307,213 @@
     .overlay.active { opacity: 1; visibility: visible; }
 
     /* WORKER NAME AREA */
-    .welcome-wrap { 
-      margin-bottom: 16px; 
-      text-align: left; 
-      padding: 0 4px; 
+    .welcome-wrap {
+      margin-bottom: 16px;
+      text-align: left;
+      padding: 0 4px;
     }
 
-    .welcome-text { 
-      font-family: var(--brand-font); 
-      font-size: 18px; 
-      font-weight: 600; 
-      color: var(--mitec-blue); 
-      margin-bottom: 2px; 
+    .welcome-text {
+      font-family: var(--brand-font);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--mitec-blue);
+      margin-bottom: 2px;
     }
 
-    .worker-name { 
-      font-family: var(--brand-font); 
-      font-size: 22px; 
-      font-weight: 700; 
-      color: var(--md-on-surface); 
-      margin: 0; 
-      line-height: 1.2; 
-      letter-spacing: 0.01em; 
+    .worker-name {
+      font-family: var(--brand-font);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--md-on-surface);
+      margin: 0;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+
+    /* PRONOUNCED PWA INSTALL BANNER */
+    .pwa-install-banner {
+      display: none;
+      background: linear-gradient(135deg, #063e99 0%, #1b63d7 60%, #094ebf 100%);
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 12px 28px -6px rgba(6, 62, 153, 0.45), 0 0 0 3px rgba(27, 99, 215, 0.14);
+      position: relative;
+      overflow: hidden;
+      animation: bannerPopIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .pwa-install-banner::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -20%;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .pwa-banner-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pwa-app-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 6px;
+      object-fit: contain;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .pwa-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #facc15;
+      color: #0f172a;
+      font-size: 9.5px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+    }
+
+    .pwa-pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #dc2626;
+      animation: pwaDotPulse 1.2s infinite;
+    }
+
+    .pwa-title {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #ffffff;
+    }
+
+    .pwa-sub {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    .pwa-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .pwa-btn-install {
+      flex: 1;
+      background: #ffffff;
+      color: #063e99;
+      font-size: 13px;
+      font-weight: 800;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      transition: transform 0.2s ease;
+    }
+
+    .pwa-btn-install:active {
+      transform: scale(0.98);
+    }
+
+    .pwa-btn-later {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* iOS / Manual Instructions Modal */
+    .pwa-guide-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(9, 34, 83, 0.55);
+      backdrop-filter: blur(6px);
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .pwa-guide-modal.open {
+      display: flex;
+    }
+
+    .pwa-guide-sheet {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      animation: bannerPopIn 0.3s ease;
+    }
+
+    .pwa-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f4f6f9;
+      border: 1px solid #e1e4ea;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1d1d1f;
+    }
+
+    .pwa-step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #063e99;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    @keyframes pwaDotPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.5; }
+    }
+
+    @keyframes bannerPopIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* CONTAINER LAYOUT */
@@ -340,7 +525,7 @@
     }
 
     /* SECTION CARD WRAPPER */
-    .partition-card { 
+    .partition-card {
       background: var(--md-surface-container);
       border: 1px solid rgba(9, 34, 83, 0.08);
       border-radius: 20px;
@@ -351,15 +536,15 @@
     }
 
     /* MITEC BLUE THEME SECTION HEADERS */
-    .section-head { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 12px; 
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
       padding: 12px 14px;
       border-radius: 14px;
       background-color: var(--mitec-blue);
-      background-image: 
+      background-image:
         linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.08) 1%, transparent 1%, transparent 50%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.03) 52%, transparent 52%),
         linear-gradient(65deg, transparent 45%, rgba(45, 104, 196, 0.25) 45%, rgba(45, 104, 196, 0.25) 47%, transparent 47%, transparent 70%, rgba(45, 104, 196, 0.1) 70%, rgba(45, 104, 196, 0.1) 71%, transparent 71%),
         radial-gradient(circle at 20% 30%, var(--mitec-blue-hover), transparent 70%),
@@ -369,68 +554,68 @@
       box-shadow: inset 0 -4px 10px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(27, 54, 93, 0.15);
     }
 
-    .section-title { 
-      font-size: 15px; 
-      font-weight: 800; 
-      letter-spacing: -0.01em; 
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
       color: #ffffff;
       text-shadow: 0 1px 3px rgba(0,0,0,0.4);
     }
 
-    .section-mini { 
-      font-size: 9px; 
-      color: rgba(255, 255, 255, 0.85); 
-      text-transform: uppercase; 
-      letter-spacing: .06em; 
+    .section-mini {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.85);
+      text-transform: uppercase;
+      letter-spacing: .06em;
       font-weight: 700;
       text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
 
-    .section-desc { 
-      font-family: var(--brand-font); 
-      font-size: 15px; 
-      font-weight: 600; 
-      color: var(--mitec-accent); 
-      margin: 0 4px 12px 4px; 
-      line-height: 1.4; 
+    .section-desc {
+      font-family: var(--brand-font);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--mitec-accent);
+      margin: 0 4px 12px 4px;
+      line-height: 1.4;
     }
 
     /* ANNOUNCEMENTS / BRIEFINGS WITH READ MORE COLLAPSE */
     .announcement-wrapper {
-      overflow: hidden; 
-      border-radius: 14px; 
+      overflow: hidden;
+      border-radius: 14px;
       position: relative;
     }
 
     .announcement-track { display: flex; gap: 12px; }
 
-    .announcement-card { 
-      min-width: 100%; 
-      background: var(--md-surface); 
+    .announcement-card {
+      min-width: 100%;
+      background: var(--md-surface);
       border: 1px solid var(--md-outline);
-      border-radius: 14px; 
-      padding: 14px; 
-      position: relative; 
-      overflow: hidden; 
+      border-radius: 14px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .announcement-tag { 
-      display: inline-flex; 
-      background: rgba(9, 34, 83, 0.06); 
-      color: var(--mitec-accent); 
-      padding: 3px 10px; 
-      border: 1px solid rgba(9, 34, 83, 0.1); 
-      border-radius: 999px; 
-      font-size: 9px; 
-      font-weight: 800; 
-      letter-spacing: .06em; 
-      margin-bottom: 8px; 
+    .announcement-tag {
+      display: inline-flex;
+      background: rgba(9, 34, 83, 0.06);
+      color: var(--mitec-accent);
+      padding: 3px 10px;
+      border: 1px solid rgba(9, 34, 83, 0.1);
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      margin-bottom: 8px;
     }
 
-    .announcement-body { 
-      font-size: 13px; 
-      color: var(--md-on-surface); 
-      line-height: 1.5; 
+    .announcement-body {
+      font-size: 13px;
+      color: var(--md-on-surface);
+      line-height: 1.5;
       font-weight: 600;
       white-space: pre-wrap;
       display: -webkit-box;
@@ -474,38 +659,38 @@
       66%, 100% { transform: translateX(calc(-200% - 24px)); }
     }
 
-    .carousel-dots { 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      gap: 6px; 
-      margin-top: 10px; 
-      min-height: 6px; 
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      min-height: 6px;
     }
 
-    .dot { 
-      width: 5px; 
-      height: 5px; 
-      border-radius: 50%; 
-      background: var(--md-outline); 
-      transition: all 0.3s ease; 
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--md-outline);
+      transition: all 0.3s ease;
     }
 
-    .dot.active { 
-      background: var(--mitec-blue); 
-      transform: scale(1.3); 
+    .dot.active {
+      background: var(--mitec-blue);
+      transform: scale(1.3);
     }
 
     /* SUMMARY HIGHLIGHT DISPLAY */
     .summary-highlight {
       background: var(--md-surface);
       border: 1px solid var(--md-outline);
-      border-radius: 16px; 
-      padding: 14px; 
-      min-height: 120px; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       position: relative;
       margin-bottom: 12px;
     }
@@ -514,32 +699,32 @@
     .loader-text { font-size: 12px; font-weight: 600; color: var(--md-on-surface-variant); letter-spacing: 0.02em; margin-top: 10px; animation: pulse 1.5s infinite; }
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; z-index: 1; }
 
-    .summary-item { 
-      background: var(--md-surface-container); 
-      border: 1px solid var(--md-outline); 
-      padding: 10px 12px; 
-      border-radius: 12px; 
+    .summary-item {
+      background: var(--md-surface-container);
+      border: 1px solid var(--md-outline);
+      padding: 10px 12px;
+      border-radius: 12px;
       min-height: 62px;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
 
-    .item-label { 
-      font-size: 9px; 
-      font-weight: 700; 
-      text-transform: uppercase; 
-      letter-spacing: 0.05em; 
-      color: var(--md-on-surface-variant); 
-      display: block; 
-      margin-bottom: 2px; 
+    .item-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--md-on-surface-variant);
+      display: block;
+      margin-bottom: 2px;
     }
 
-    .item-value { 
-      font-size: 15px; 
-      font-weight: 800; 
-      color: var(--mitec-blue); 
-      display: block; 
+    .item-value {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--mitec-blue);
+      display: block;
       line-height: 1.25;
       margin-top: 2px;
       font-variant-numeric: tabular-nums;
@@ -616,64 +801,64 @@
     .animate-spin { animation: spinVertical 14s linear infinite; }
     @keyframes spinVertical { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 
-    .person { 
-      display: flex; 
-      align-items: center; 
-      background: var(--md-surface); 
-      border: 1px solid var(--md-outline); 
-      border-radius: 12px; 
-      padding: 10px 14px; 
-      min-height: 38px; 
+    .person {
+      display: flex;
+      align-items: center;
+      background: var(--md-surface);
+      border: 1px solid var(--md-outline);
+      border-radius: 12px;
+      padding: 10px 14px;
+      min-height: 38px;
     }
 
-    .person-name { 
-      font-size: 12px; 
-      font-weight: 700; 
-      line-height: 1.2; 
-      color: var(--mitec-blue); 
+    .person-name {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--mitec-blue);
     }
 
-    .birthday-blessing-footer { 
-      text-align: center; 
-      font-family: var(--brand-font); 
-      font-size: 17px; 
-      font-weight: 700; 
-      color: var(--mitec-accent); 
-      padding-top: 10px; 
-      margin-top: 10px; 
-      border-top: 1px solid var(--md-outline); 
-      letter-spacing: 0.02em; 
+    .birthday-blessing-footer {
+      text-align: center;
+      font-family: var(--brand-font);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--mitec-accent);
+      padding-top: 10px;
+      margin-top: 10px;
+      border-top: 1px solid var(--md-outline);
+      letter-spacing: 0.02em;
     }
 
     /* DOCKED BOTTOM NAVIGATION BAR */
     .bottom-nav {
-      position: fixed; 
-      bottom: 0; 
-      left: 0; 
-      width: 100%; 
-      height: 92px; 
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 92px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      border-top: 1px solid rgba(0, 0, 0, 0.08); 
-      border-radius: 0; 
-      display: grid; 
-      grid-template-columns: repeat(5, 1fr); 
-      padding: 0; 
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 0;
       padding-bottom: env(safe-area-inset-bottom, 0px);
-      box-shadow: 0 -4px 20px rgba(9, 34, 83, 0.06); 
-      z-index: 1000; 
+      box-shadow: 0 -4px 20px rgba(9, 34, 83, 0.06);
+      z-index: 1000;
     }
 
-    .nav-item { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 3px; 
-      position: relative; 
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      position: relative;
       color: var(--md-on-surface-variant);
-      text-decoration: none; 
+      text-decoration: none;
       transition: background 0.2s ease, color 0.2s ease;
       cursor: pointer;
     }
@@ -686,7 +871,7 @@
     .nav-item svg { width: 20px; height: 20px; stroke-width: 2; position: relative; z-index: 2; stroke: currentColor; }
     .nav-label { font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; z-index: 2; }
 
-    .nav-item.active, .nav-item:hover { 
+    .nav-item.active, .nav-item:hover {
       color: var(--mitec-blue);
       background: rgba(9, 34, 83, 0.05);
     }
@@ -723,7 +908,6 @@
       .header { padding: 12px 16px; }
     }
   </style>
-
 </head>
 <body>
 
@@ -749,6 +933,9 @@
 
     <!-- Scrollable Menu Content Area -->
     <div class="nav-content-scroll">
+      <!-- Quick App Install Action -->
+      <a href="javascript:void(0)" onclick="toggleSideNav(); triggerPwaInstall();" class="dropdown-item" style="color:#063e99;"><i class="ph-bold ph-download-simple"></i> Install Mobile App</a>
+
       <!-- Group 1: Core Navigation -->
       <a href="javascript:void(0)" onclick="goToPage('dashboard.html')" class="dropdown-item"><i class="ph-bold ph-house"></i> Home</a>
       <a href="javascript:void(0)" onclick="goToPage('hub.html')" class="dropdown-item"><i class="ph-bold ph-squares-four"></i> Services</a>
@@ -810,7 +997,7 @@
 
       <!-- Group 5: Quick Links Group -->
       <div class="dropdown-item" onclick="toggleGroupMenu('quickLinksSubmenu', 'quickLinksCaret')">
-        <i class="ph-bold ph-link-simple"></i> Quick Links 
+        <i class="ph-bold ph-link-simple"></i> Quick Links
         <i class="ph-bold ph-caret-down" id="quickLinksCaret" style="margin-left: auto; font-size: 14px; transition: transform 0.3s;"></i>
       </div>
       <div id="quickLinksSubmenu" class="dropdown-submenu">
@@ -841,6 +1028,47 @@
     <div class="welcome-wrap">
       <p class="welcome-text">Hi,</p>
       <h1 class="worker-name" id="heroName">Syncing Profile...</h1>
+    </div>
+
+    <!-- HIGH-VISIBILITY PWA INSTALL BANNER -->
+    <div class="pwa-install-banner" id="pwaInstallBanner">
+      <div class="pwa-banner-top">
+        <img src="https://mitec.com.my/static/img/logos/logo-footer.png" alt="MITEC App" class="pwa-app-icon">
+        <div>
+          <div class="pwa-badge"><span class="pwa-pulse-dot"></span> Official App Available</div>
+          <div class="pwa-title">Install MITEC Casual Labour App</div>
+          <div class="pwa-sub">Book shifts faster & clock in at West Gate in 1 tap from your Home Screen.</div>
+        </div>
+      </div>
+      <div class="pwa-actions">
+        <button type="button" class="pwa-btn-install" onclick="triggerPwaInstall()">
+          <i class="ph-bold ph-download-simple" style="font-size: 16px;"></i>
+          <span>Download App Now</span>
+        </button>
+        <button type="button" class="pwa-btn-later" onclick="snoozePwaBanner()">Later</button>
+      </div>
+    </div>
+
+    <!-- MANUAL / IOS INSTALL GUIDE MODAL -->
+    <div class="pwa-guide-modal" id="pwaGuideModal" onclick="if(event.target===this) closePwaGuide()">
+      <div class="pwa-guide-sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="font-size:16px; font-weight:800; color:#1B365D;">Add MITEC App to Home Screen</h3>
+          <button onclick="closePwaGuide()" style="border:none; background:#edf2f7; width:30px; height:30px; border-radius:8px; font-weight:800; cursor:pointer;">✕</button>
+        </div>
+        <p style="font-size:12.5px; color:#51525c; margin-bottom:14px;">Follow these 2 quick steps on your phone browser:</p>
+        <div class="pwa-step">
+          <span class="pwa-step-num">1</span>
+          <span>Tap the browser menu <b>(⋮)</b> at the top right or <b>Share (□↑)</b> at the bottom.</span>
+        </div>
+        <div class="pwa-step">
+          <span class="pwa-step-num">2</span>
+          <span>Select <b>"Install App"</b> or <b>"Add to Home Screen"</b>, then tap <b>Install / Add</b>.</span>
+        </div>
+        <button type="button" class="cta-btn-dark" style="margin-top:6px;" onclick="closePwaGuide()">
+          <span>Got It</span>
+        </button>
+      </div>
     </div>
 
     <!-- 1. BRIEFINGS & UPDATES -->
@@ -1020,7 +1248,6 @@
       if (!rawTs) return { date: "", time: "--:--" };
       const str = String(rawTs).trim();
 
-      // If Apps Script already formatted as "dd/MM/yyyy HH:mm:ss"
       const directMatch = str.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2}:\d{2})/);
       if (directMatch) {
         return { date: directMatch[1], time: directMatch[2] };
@@ -1056,7 +1283,7 @@
 
     async function fillWorkerData() {
       const worker = getStoredWorker();
-      const docNo = worker.doc_no || worker.mykad_passport_no || localStorage.getItem("mcl_doc_no") || localStorage.getItem("workerDocNo"); 
+      const docNo = worker.doc_no || worker.mykad_passport_no || localStorage.getItem("mcl_doc_no") || localStorage.getItem("workerDocNo");
       const nameStr = worker.name_mykad || worker.full_name || "Worker";
       document.getElementById("heroName").textContent = toProperCase(nameStr);
 
@@ -1078,7 +1305,6 @@
       const cleanDocNo = normalizeDocNo(docNo);
 
       try {
-        // 1. Sync profile photo & name from Firestore if not already cached locally
         if (!worker.photo_link || !worker.name_mykad) {
           const docSnap = await db.collection('casual_labour_profile').doc(cleanDocNo).get();
 
@@ -1096,14 +1322,13 @@
           }
         }
 
-        // 2. Fast single-worker today attendance lookup via Apps Script #1
         const res = await fetch(`${APPS_SCRIPT_URL}?action=getTodayAttendance&doc_no=${encodeURIComponent(cleanDocNo)}`);
         const json = await res.json();
 
         const summary = (json && json.success && json.record) ? json.record : null;
         renderShiftSummary(summary);
 
-      } catch (e) { 
+      } catch (e) {
         console.error("Dashboard Shift Sync Error:", e);
         renderShiftSummary(null);
       }
@@ -1188,14 +1413,12 @@
       summaryGrid.style.display = "grid";
 
       if (summary && Object.keys(summary).length > 0) {
-        // 1. Time In (from Google Sheet 'attendance' tab timestamp/clock_in)
         const rawTimeIn = summary.timestamp || summary.clock_in || "";
         const formattedIn = formatToKLDisplay(rawTimeIn);
         inVal.innerHTML = formattedIn.date
           ? `${formattedIn.date}<br>${formattedIn.time}`
           : formattedIn.time;
 
-        // 2. Time Out
         if (summary.clock_out || summary.time_out) {
           const formattedOut = formatToKLDisplay(summary.clock_out || summary.time_out);
           outVal.innerHTML = formattedOut.date
@@ -1205,11 +1428,9 @@
           outVal.innerHTML = "--:--";
         }
 
-        // 3. Voucher No. (preserves 6-digit leading zeros)
         const rawVoucher = summary.voucher ?? summary.voucher_no ?? "";
         vouchVal.textContent = formatVoucherNo(rawVoucher);
 
-        // 4. Logged Hours
         hoursVal.textContent = (summary.hours !== null && summary.hours !== undefined && summary.hours !== "")
           ? summary.hours
           : "0.0";
@@ -1292,10 +1513,72 @@
         if(dots[current]) dots[current].classList.remove("active");
         current = (current + 1) % totalCards;
         if(dots[current]) dots[current].classList.add("active");
-      }, 5000); 
+      }, 5000);
     }
 
     function goToPage(url) { window.location.href = url; }
+
+    // PWA INSTALL BANNER & SERVICE WORKER LOGIC
+    let deferredInstallPrompt = null;
+    const PWA_SNOOZE_KEY = "mcl_pwa_banner_snoozed_until";
+    const PWA_SNOOZE_MS = 60 * 60 * 1000;
+
+    function isRunningStandalone() {
+      return (
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true
+      );
+    }
+
+    function shouldShowPwaBanner() {
+      if (isRunningStandalone()) return false;
+      const snoozedUntil = parseInt(localStorage.getItem(PWA_SNOOZE_KEY) || "0", 10);
+      return Date.now() > snoozedUntil;
+    }
+
+    function showPwaBanner() {
+      const banner = document.getElementById("pwaInstallBanner");
+      if (banner && shouldShowPwaBanner()) {
+        banner.style.display = "block";
+      }
+    }
+
+    function snoozePwaBanner() {
+      localStorage.setItem(PWA_SNOOZE_KEY, String(Date.now() + PWA_SNOOZE_MS));
+      const banner = document.getElementById("pwaInstallBanner");
+      if (banner) banner.style.display = "none";
+    }
+
+    function closePwaGuide() {
+      document.getElementById("pwaGuideModal").classList.remove("open");
+    }
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      showPwaBanner();
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      const banner = document.getElementById("pwaInstallBanner");
+      if (banner) banner.style.display = "none";
+    });
+
+    async function triggerPwaInstall() {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        if (outcome === "accepted") {
+          document.getElementById("pwaInstallBanner").style.display = "none";
+        }
+      } else {
+        document.getElementById("pwaGuideModal").classList.add("open");
+      }
+    }
+
+    setTimeout(showPwaBanner, 1200);
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
