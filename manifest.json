@@ -11,13 +11,13 @@
   "icons": [
     {
       "src": "https://mitec.com.my/static/img/logos/logo-footer.png",
-      "sizes": "172x172",
+      "sizes": "152x152",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
       "src": "https://mitec.com.my/static/img/logos/logo-footer.png",
-      "sizes": "480x480",
+      "sizes": "680x680",
       "type": "image/png",
       "purpose": "any maskable"
     }
