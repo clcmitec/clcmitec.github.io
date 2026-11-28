@@ -410,7 +410,12 @@
       listEl.innerHTML = `<div class="empty-state">Loading app install records...</div>`;
 
       try {
-        const snap = await rtdb.ref("casual_labour_profile").get();
+        const snap = await rtdb
+          .ref("casual_labour_profile")
+          .orderByChild("pwa_installed")
+          .equalTo(true)
+          .once("value");
+
         const rows = [];
         let android = 0;
         let ios = 0;
@@ -420,7 +425,6 @@
             const key = child.key;
             const data = child.val();
             if (!data || typeof data !== "object") return;
-            if (data.pwa_installed !== true) return;
 
             const platform = data.pwa_platform || "Other";
             if (platform === "Android") android++;
