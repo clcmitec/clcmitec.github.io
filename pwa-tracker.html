@@ -6,7 +6,7 @@
   <title>MITEC CL — App Install Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
   <style>
     :root {
       --bg: #f4f6f9;
@@ -338,18 +338,20 @@
     const UNLOCK_KEY = "mitec_pwa_tracker_unlocked";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyA6dkB3OMqK_6ZukKPI8Hnnm5W-u6BoR4",
+      apiKey: "AIzaSyA6dkB3GMqK_6ZukKPlDBhnmdSW-u06oR4",
       authDomain: "mitec-cl-2027.firebaseapp.com",
+      databaseURL: "https://mitec-cl-2027-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "mitec-cl-2027",
       storageBucket: "mitec-cl-2027.firebasestorage.app",
       messagingSenderId: "42229239032",
-      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
+      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d",
+      measurementId: "G-QSCPZBF4YF"
     };
 
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    const db = firebase.firestore();
+    const rtdb = firebase.database();
 
     let allInstalledWorkers = [];
     let hasLoadedData = false;
@@ -408,29 +410,31 @@
       listEl.innerHTML = `<div class="empty-state">Loading app install records...</div>`;
 
       try {
-        const snap = await db
-          .collection("casual_labour_profile")
-          .where("pwa_installed", "==", true)
-          .get();
-
+        const snap = await rtdb.ref("casual_labour_profile").get();
         const rows = [];
         let android = 0;
         let ios = 0;
 
-        snap.forEach(doc => {
-          const data = doc.data();
-          const platform = data.pwa_platform || "Other";
-          if (platform === "Android") android++;
-          if (platform === "iOS") ios++;
+        if (snap.exists()) {
+          snap.forEach(child => {
+            const key = child.key;
+            const data = child.val();
+            if (!data || typeof data !== "object") return;
+            if (data.pwa_installed !== true) return;
 
-          rows.push({
-            docNo: data.doc_no || doc.id,
-            name: toProperCase(data.name_mykad || data.full_name || "Unknown"),
-            platform,
-            mode: data.pwa_last_seen_mode || "standalone_app",
-            updatedAt: data.pwa_updated_at || ""
+            const platform = data.pwa_platform || "Other";
+            if (platform === "Android") android++;
+            if (platform === "iOS") ios++;
+
+            rows.push({
+              docNo: data.doc_no || key,
+              name: toProperCase(data.name_mykad || data.full_name || "Unknown"),
+              platform,
+              mode: data.pwa_last_seen_mode || "standalone_app",
+              updatedAt: data.pwa_updated_at || ""
+            });
           });
-        });
+        }
 
         rows.sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || ""));
         allInstalledWorkers = rows;
@@ -442,7 +446,7 @@
         filterAndRender();
       } catch (err) {
         console.error(err);
-        listEl.innerHTML = `<div class="empty-state">Could not load records. Check Firestore rules or connection.</div>`;
+        listEl.innerHTML = `<div class="empty-state">Could not load records from Realtime Database: ${err && err.message ? err.message : "Connection error"}</div>`;
       }
     }
 
