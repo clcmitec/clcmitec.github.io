@@ -1,8 +1,8 @@
 {
   "name": "MITEC Casual Labour Portal",
-  "short_name": "MITEC CL",
+  "short_name": " Casual MITEC",
   "description": "MITEC Casual Labour Shift Booking & Gate Attendance Portal",
-  "start_url": "./index.html",
+  "start_url": "./dashboard.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
