@@ -56,7 +56,7 @@
 
     .sub { font-size: 14px; color: var(--text-muted); margin: 0; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
 
-    .input-group { position: relative; margin-bottom: 28px; text-align: left; margin-top: 32px;}
+    .input-group { position: relative; margin-bottom: 28px; text-align: left; margin-top: 32px; }
 
     .input-icon {
       position: absolute; left: 16px; top: 18px;
@@ -177,7 +177,8 @@
       projectId: "mitec-cl-2027",
       storageBucket: "mitec-cl-2027.firebasestorage.app",
       messagingSenderId: "42229239032",
-      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d"
+      appId: "1:42229239032:web:97f3372e9d86b45fcf7f0d",
+      measurementId: "G-QSCPZBF4YF"
     };
 
     if (!firebase.apps.length) {
@@ -191,6 +192,31 @@
       msg.className = isError ? "msg error" : "msg success";
     }
 
+    function resetButton() {
+      const loginBtn = document.getElementById("loginBtn");
+      loginBtn.disabled = false;
+      loginBtn.querySelector("span").textContent = "Access";
+    }
+
+    async function findWorkerProfile(docNo) {
+      const colRef = db.collection("casual_labour_profile");
+
+      // 1. Check if a document exists directly using docNo as Document ID
+      const directSnap = await colRef.doc(docNo).get();
+      if (directSnap.exists) {
+        return { id: directSnap.id, data: directSnap.data() };
+      }
+
+      // 2. Otherwise query by the 'doc_no' field (handles auto-generated document IDs)
+      const querySnap = await colRef.where("doc_no", "==", docNo).limit(1).get();
+      if (!querySnap.empty) {
+        const firstDoc = querySnap.docs[0];
+        return { id: firstDoc.id, data: firstDoc.data() };
+      }
+
+      return null;
+    }
+
     async function handleLogin() {
       const docInput = document.getElementById("docInput");
       const loginBtn = document.getElementById("loginBtn");
@@ -202,35 +228,43 @@
       }
 
       loginBtn.disabled = true;
-      loginBtn.querySelector('span').textContent = "Login...";
+      loginBtn.querySelector("span").textContent = "Checking...";
       showStatus("");
 
       try {
-        // Query Firestore collection 'casual_labour_profile' by document ID (doc_no)
-        const docRef = db.collection('casual_labour_profile').doc(docNo);
-        const docSnap = await docRef.get();
+        const match = await findWorkerProfile(docNo);
 
-        if (docSnap.exists) {
-          const worker = docSnap.data();
+        if (match) {
+          const worker = { ...match.data, _docId: match.id };
           showStatus("Identity Verified. Entering...", false);
-          
-          // Save worker session locally for dashboard.html and other views
+
           localStorage.setItem("mitecWorkerRecord", JSON.stringify(worker));
           localStorage.setItem("mcl_doc_no", docNo);
           localStorage.setItem("workerDocNo", docNo);
 
-          setTimeout(() => { window.location.href = "dashboard.html"; }, 150);
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 150);
         } else {
-          showStatus("Record not found for doc_no: " + docNo);
-          loginBtn.disabled = false;
-          loginBtn.querySelector('span').textContent = "Access";
+          showStatus("Record not found for IC / Passport: " + docNo);
+          resetButton();
         }
       } catch (err) {
-        showStatus("System Error: " + err.message);
-        loginBtn.disabled = false;
-        loginBtn.querySelector('span').textContent = "Access";
+        console.error("Login error:", err);
+        if (err && err.code === "permission-denied") {
+          showStatus("Firestore Rules blocked access. Check Rules & Publish in Firebase.");
+        } else {
+          showStatus("System Error: " + (err && err.message ? err.message : "Unable to connect."));
+        }
+        resetButton();
       }
     }
+
+    document.getElementById("docInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        handleLogin();
+      }
+    });
   </script>
 </body>
 </html>
